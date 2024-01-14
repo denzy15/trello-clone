@@ -27,14 +27,21 @@ router.get("/:boardId", isAuth, async (req, res) => {
       });
     }
 
-    const cards = [];
+    // const cards = [];
+    // for (const listId of board.lists) {
+    //   const list = await List.findById(listId);
+    //   if (list) {
+    //     for (const cardId of list.cards) {
+    //       cards.push(await Card.findById(cardId));
+    //     }
+    //   }
+    // }
 
-    for (const listId of board.lists) {
-      const list = await List.findById(listId);
-      if (list) {
-        cards.push(...list.cards);
-      }
-    }
+    const listIds = board.lists; // Получаем массив ID листов
+    const lists = await List.find({ _id: { $in: listIds } }); // Находим все листы в одном запросе
+
+    const cardIds = lists.flatMap((list) => list.cards); // Получаем массив ID карточек
+    const cards = await Card.find({ _id: { $in: cardIds } });
 
     res.json(cards);
   } catch (err) {
@@ -47,7 +54,7 @@ router.get("/:boardId", isAuth, async (req, res) => {
 router.post("/:boardId/:listId/", isAuth, async (req, res) => {
   try {
     const { boardId, listId } = req.params;
-    const { title, order } = req.body;
+    const { title } = req.body;
 
     const board = await Board.findById(boardId);
     const list = await List.findById(listId);
@@ -71,12 +78,9 @@ router.post("/:boardId/:listId/", isAuth, async (req, res) => {
     }
 
     // Создаем новую карточку и добавляем в список
-    const newCard = await Card.create({ title, order });
+    const newCard = await Card.create({ title, order: list.cards.length + 1 });
     list.cards.push(newCard._id);
     await list.save();
-    // await List.updateOne(listId, {
-    //   cards: [...list.cards, newCard._id],
-    // });
 
     res.status(201).json(newCard);
   } catch (err) {
@@ -85,43 +89,10 @@ router.post("/:boardId/:listId/", isAuth, async (req, res) => {
   }
 });
 
-// Поиск карточек доски по нужному списку
-router.get("/:boardId/:listId", isAuth, async (req, res) => {
-  try {
-    const { boardId, listId } = req.params;
-
-    const board = await Board.findById(boardId);
-    const list = await List.findById(listId);
-
-    if (!board) {
-      return res.status(404).json({ message: "Доска не найдена" });
-    }
-
-    if (!list) {
-      return res.status(404).json({ message: "Список не найден" });
-    }
-
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
-      return res.status(403).json({
-        message: "У вас нет доступа к просмотру карточек в этом списке",
-      });
-    }
-
-    const cards = board.lists[listIndex].cards;
-    res.json(cards);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Ошибка сервера" });
-  }
-});
-
 // Удаление карточки из списка на доске
-router.delete("/:boardId/:cardId", isAuth, async (req, res) => {
+router.delete("/:boardId/:listId/:cardId", isAuth, async (req, res) => {
   try {
-    const { boardId, cardId } = req.params;
+    const { boardId, listId, cardId } = req.params;
 
     const board = await Board.findById(boardId);
 
@@ -137,10 +108,33 @@ router.delete("/:boardId/:cardId", isAuth, async (req, res) => {
         message: "У вас нет доступа к удалению карточек из этого списка",
       });
     }
-    //
-    // ВОЗМОЖНО НАДО ТАКЖЕ ОБНОВИТЬ LIST
-    //
-    await Card.findByIdAndDelete(cardId);
+
+    const list = await List.findById(listId);
+
+    if (!list) {
+      return res.status(404).json({ message: "Список не найден" });
+    }
+
+    const card = await Card.findById(cardId);
+
+    if (!card) {
+      return res.status(404).json({ message: "Карточка не найдена" });
+    }
+
+    const deletedCardOrder = card.order;
+
+    list.cards = list.cards.filter((c) => c._id.toString() !== cardId);
+
+    for (const cardId of list.cards) {
+      const remainingCard = await Card.findById(cardId);
+      if (remainingCard && remainingCard.order > deletedCardOrder) {
+        remainingCard.order--;
+        await remainingCard.save();
+      }
+    }
+
+    await Card.deleteOne(card);
+    await list.save();
 
     res.json({ message: "Карточка успешно удалена" });
   } catch (err) {
@@ -149,6 +143,7 @@ router.delete("/:boardId/:cardId", isAuth, async (req, res) => {
   }
 });
 
+// Обновление данных о карточке
 router.put("/:boardId/:cardId", isAuth, async (req, res) => {
   try {
     const { boardId, cardId } = req.params;
@@ -191,11 +186,92 @@ router.put("/:boardId/:cardId", isAuth, async (req, res) => {
 router.put("/:boardId/:cardId/move", isAuth, async (req, res) => {
   try {
     const { boardId, cardId } = req.params;
-    const { from, to } = req.body;
+    const { from, to, newOrder } = req.body;
+
+    if (from === to) {
+      return res
+        .status(400)
+        .json({ message: "Карточка уже находится в этом списке" });
+    }
 
     const board = await Board.findById(boardId);
     const sourceList = await List.findById(from);
     const assignedList = await List.findById(to);
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    if (
+      board.creator.toString() !== req.user._id &&
+      !board.users.includes(req.user._id)
+    ) {
+      return res.status(403).json({
+        message: "У вас нет доступа к перемещению карточек на этой доске",
+      });
+    }
+
+    const card = await Card.findById(cardId);
+
+    if (!card) {
+      return res.status(404).json({ message: "Карточка не найдена" });
+    }
+
+    sourceList.cards = sourceList.cards.filter(
+      (sourceListCardId) => sourceListCardId.toString() !== cardId
+    );
+
+    const targetOrder = parseInt(newOrder);
+
+    if (isNaN(targetOrder)) {
+      return res.status(400).json({ message: "Некорректный новый порядок" });
+    }
+
+    const sourceCards = await Card.find({ _id: { $in: sourceList.cards } });
+
+    // Сортируем объекты карточек по порядку
+    sourceCards
+      .sort((a, b) => a.order - b.order)
+      .forEach(async (sourceCard, idx) => {
+        sourceCard.order = idx + 1;
+        await sourceCard.save();
+      });
+
+    // Обновляем массив ID карточек в списках
+    sourceList.cards = sourceCards.map((card) => card._id);
+
+    for (const assignedCardId of assignedList.cards) {
+      const assignedCard = await Card.findById(assignedCardId);
+      if (assignedCard) {
+        if (assignedCard.order >= targetOrder) {
+          assignedCard.order++;
+          await assignedCard.save();
+        }
+      }
+    }
+
+    card.order = assignedList.cards.length === 0 ? 1 : targetOrder;
+
+    assignedList.cards.push(cardId);
+
+    await card.save();
+    await sourceList.save();
+    await assignedList.save();
+
+    res.json({ message: "Карточка успешно перемещена в новый список" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+router.put("/:boardId/:cardId/change-order", isAuth, async (req, res) => {
+  try {
+    const { boardId, cardId } = req.params;
+    const { newOrder } = req.body;
+    const { listId } = req.query;
+
+    const board = await Board.findById(boardId);
 
     if (!board) {
       return res.status(404).json({ message: "Доска не найдена" });
@@ -211,17 +287,60 @@ router.put("/:boardId/:cardId/move", isAuth, async (req, res) => {
       });
     }
 
-    sourceList.cards = sourceList.cards.filter((card) => card._id !== cardId);
-    assignedList.cards.push(cardId);
+    const list = await List.findById(listId);
 
-    await sourceList.save();
-    await assignedList.save();
+    if (!list) {
+      return res.status(404).json({ message: "Список не найден" });
+    }
 
-    res.json({ message: "Карточка успешно перемещена в новый список" });
+    const card = await Card.findById(cardId);
+
+    if (!card) {
+      return res.status(404).json({ message: "Карточка не найдена" });
+    }
+
+    const targetOrder = parseInt(newOrder);
+
+    if (isNaN(targetOrder)) {
+      return res.status(400).json({ message: "Некорректный новый порядок" });
+    }
+
+    for (const cardIdToUpdate of list.cards) {
+      const cardToUpdate = await Card.findById(cardIdToUpdate);
+
+      if (!cardToUpdate)
+        return res.status(404).json({ message: "Что то пошло не так" });
+
+      if (card.order < targetOrder) {
+        if (
+          card.order < cardToUpdate.order &&
+          cardToUpdate.order <= targetOrder
+        ) {
+          cardToUpdate.order--;
+          await cardToUpdate.save();
+        }
+      } else {
+        if (
+          cardToUpdate.order >= targetOrder &&
+          card.order > cardToUpdate.order
+        ) {
+          cardToUpdate.order++;
+          await cardToUpdate.save();
+        }
+      }
+    }
+
+    card.order = targetOrder;
+
+    await card.save();
+    await list.save();
+
+    res.json({ message: "Порядок изменён успешно" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
   }
 });
+
 
 export default router;

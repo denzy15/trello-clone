@@ -1,8 +1,7 @@
 import express from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import { isAuth, generateToken } from "../utils.js";
+import { generateToken } from "../utils.js";
 
 const router = express.Router();
 
@@ -58,15 +57,9 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Неверный email или пароль" });
     }
 
-    // Создание токена для аутентификации
-    // const token = jwt.sign(
-    //   { id: user._id, email: user.email },
-    //   process.env.JWT_SECRET,
-    //   { expiresIn: '1h' } // Время действия токена (1 час)
-    // );
-
     res.json({
-      username: user.name,
+      _id: user._id,
+      username: user.username,
       email,
       token: generateToken(user),
     });

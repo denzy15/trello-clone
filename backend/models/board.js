@@ -23,6 +23,12 @@ const boardSchema = new Schema({
       ref: "List",
     },
   ],
+  labels: [
+    {
+      title: { type: String, default: "" },
+      color: { type: String },
+    },
+  ],
 });
 
 const Board = model("Board", boardSchema);
