@@ -165,7 +165,6 @@ router.put("/:boardId/rename/:listId", isAuth, async (req, res) => {
   }
 });
 
-// Поменять местами списки
 router.put("/:boardId/move/:listId", isAuth, async (req, res) => {
   try {
     const { boardId, listId } = req.params;

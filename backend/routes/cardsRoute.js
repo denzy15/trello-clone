@@ -165,6 +165,9 @@ router.put("/:boardId/:cardId", isAuth, async (req, res) => {
       });
     }
 
+    // ДАТА В ТАКОМ ФОРМАТЕ
+    // console.log(new Date().toUTCString());
+
     // Изменяем данные карточки, включая метки
     const updatedCard = await Card.findById(cardId);
     updatedCard.title = title || updatedCard.title;
@@ -265,6 +268,8 @@ router.put("/:boardId/:cardId/move", isAuth, async (req, res) => {
   }
 });
 
+
+// Изменение порядка внутри списка
 router.put("/:boardId/:cardId/change-order", isAuth, async (req, res) => {
   try {
     const { boardId, cardId } = req.params;

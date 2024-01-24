@@ -1,5 +1,7 @@
 import express from "express";
 import Board from "../models/board.js";
+import List from "../models/list.js";
+import Card from "../models/card.js";
 import { isAuth } from "../utils.js";
 
 const router = express.Router();
@@ -91,29 +93,44 @@ router.delete("/:boardId", isAuth, async (req, res) => {
   }
 });
 
-// Получение информации о конкретной доске
+// Получение полной информации о конкретной доске
 router.get("/:boardId", isAuth, async (req, res) => {
   try {
     const { boardId } = req.params;
 
-    const board = await Board.findById(boardId);
+    const board = await Board.findById(boardId)
+      .populate("creator", "username email") // Популируем создателя доски и выбираем только username
+      .populate("users", "username email")
+      .populate({
+        path: "lists",
+        populate: {
+          path: "cards",
+        },
+      })
+      .exec();
 
     if (!board) {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    const isUserInBoard = board.users.some(
+      (user) => user._id.toString() === req.user._id
+    );
+
+    if (board.creator._id.toString() !== req.user._id && !isUserInBoard) {
       return res
         .status(403)
         .json({ message: "У вас нет доступа к этой доске" });
     }
 
+    board.lists.sort((a, b) => a.order - b.order);
+
+    board.lists.forEach((list) => {
+      list.cards.sort((a, b) => a.order - b.order);
+    });
+
     res.json(board);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
   }
 });

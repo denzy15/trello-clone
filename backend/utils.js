@@ -31,3 +31,15 @@ export const isAuth = (req, res, next) => {
     res.status(401).send({ message: "No Token" });
   }
 };
+
+export const convertUsersResponse = (userData) => {
+  if (Array.isArray(userData)) {
+    return userData.map((user) => {
+      const { username, email, _id } = user;
+      return { _id, username, email };
+    });
+  }
+
+  const { username, email, _id } = userData;
+  return { _id, username, email };
+};
