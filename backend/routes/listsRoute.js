@@ -10,7 +10,17 @@ router.get("/:boardId", isAuth, async (req, res) => {
   try {
     const { boardId } = req.params;
 
-    const board = await Board.findById(boardId);
+    const board = await Board.findById(boardId)
+      .populate({
+        path: "lists",
+        populate: {
+          path: "cards",
+          populate: {
+            path: "assignedUsers",
+          },
+        },
+      })
+      .exec();
 
     if (!board) {
       return res.status(404).json({ message: "Доска не найдена" });
@@ -26,13 +36,13 @@ router.get("/:boardId", isAuth, async (req, res) => {
       });
     }
 
-    const lists = [];
+    board.lists.sort((a, b) => a.order - b.order);
 
-    for (const list of board.lists) {
-      lists.push(await List.findById(list));
-    }
+    board.lists.forEach((list) => {
+      list.cards.sort((a, b) => a.order - b.order);
+    });
 
-    res.json(lists);
+    res.json(board.lists);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -66,7 +76,7 @@ router.post("/:boardId", isAuth, async (req, res) => {
     const newList = await List.create({
       title,
       cards: [],
-      order: board.lists.length + 1,
+      order: board.lists.length,
     });
     board.lists.push(newList._id);
     await board.save();

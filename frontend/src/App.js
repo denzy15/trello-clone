@@ -1,14 +1,18 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
-import { Box, Container } from "@mui/material";
+import { Box } from "@mui/material";
 import Home from "./pages/Home";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import { useSelector } from "react-redux";
 import BoardPage from "./pages/BoardPage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "draft-js/dist/Draft.css";
+import dayjs from "dayjs";
 
 function App() {
+  dayjs.locale("ru");
   return (
     <Box className="App">
       <Routes>
@@ -31,6 +35,18 @@ function App() {
           }
         />
       </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </Box>
   );
 }

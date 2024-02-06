@@ -6,6 +6,10 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "./store";
 import { createTheme, ThemeProvider } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { ruRU } from "@mui/x-date-pickers/locales";
+
 const theme = createTheme({
   typography: {
     fontFamily: ["Montserrat", "sans-serif"].join(","),
@@ -14,15 +18,13 @@ const theme = createTheme({
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-
-    <Provider store={store}>
-      <PersistGate persistor={persistor} loading={null}>
-        <BrowserRouter>
-          <ThemeProvider theme={theme}>
-            <App />
-          </ThemeProvider>
-        </BrowserRouter>
-      </PersistGate>
-    </Provider>
-
+  <Provider store={store}>
+    <PersistGate persistor={persistor} loading={null}>
+      <BrowserRouter>
+        <ThemeProvider theme={theme}>
+          <App />
+        </ThemeProvider>
+      </BrowserRouter>
+    </PersistGate>
+  </Provider>
 );

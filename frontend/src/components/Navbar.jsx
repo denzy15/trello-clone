@@ -21,9 +21,11 @@ const Navbar = () => {
       component={Stack}
       spacing={1}
       sx={{
-        borderBottom: "1px solid gray",
+        borderBottom: "1px solid #b7b7b7",
         p: 2,
         alignItems: "center",
+        bgcolor: "#87b1ff",
+        color: "#252525"
       }}
     >
       <Link
@@ -33,7 +35,7 @@ const Navbar = () => {
           display: "flex",
           alignItems: "center",
           gap: 10,
-          color: "gray",
+          color: "#252525",
           flexGrow: 1,
         }}
         to="/"
@@ -48,7 +50,7 @@ const Navbar = () => {
         spacing={2}
         sx={{ alignItems: "center" }}
       >
-        <Typography variant="subtitle1">
+        <Typography variant="subtitle1" sx={{color: "inherit"}}>
           {userInfo.username} | {userInfo.email}
         </Typography>
         <Button

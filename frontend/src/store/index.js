@@ -17,13 +17,13 @@ import {
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth", "metadata"],
+  whitelist: ["auth"],
 };
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  metadata: metadataReducer,
   boards: boardsReducer,
+  metadata: metadataReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -5,12 +5,13 @@ const cardSchema = new Schema({
     type: String,
     required: true,
   },
-  description: String,
+  description: { type: String, default: "" },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-  dueDate: Date,
+  startDate: { type: Date, default: null },
+  dueDate: { type: Date, default: null },
   attachments: [String],
   assignedUsers: [
     {
@@ -28,6 +29,20 @@ const cardSchema = new Schema({
     type: Number,
     required: true,
   },
+  comments: [
+    {
+      message: {
+        type: String,
+        required: true,
+      },
+
+      author: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+    },
+  ],
 });
 
 const Card = model("Card", cardSchema);

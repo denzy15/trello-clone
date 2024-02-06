@@ -1,4 +1,4 @@
-import { Alert, Box, Container, Stack } from "@mui/material";
+import { Alert, Backdrop, Box, Button, Container, Stack } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useParams } from "react-router-dom";
@@ -8,15 +8,34 @@ import GridLoader from "react-spinners/GridLoader";
 import List from "../components/List";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import BoardInfoBar from "../components/BoardInfoBar";
+import AddElement from "./AddElement";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import CardEditModal from "../components/CardEditModal";
+import { stopCardEdit } from "../store/slices/metadataSlice";
+import {
+  pickBoard,
+  renameList,
+  updateCardOrder,
+  updateListOrder,
+} from "../store/slices/boardsSlice";
+import { LocalizationProvider, ruRU } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+
 
 const BoardPage = () => {
   const { boardId } = useParams();
   const [loading, setLoading] = useState(false);
 
-  const [currentBoard, setCurrentBoard] = useState({});
   const [error, setError] = useState("");
 
-  const [orderedLists, setOrderedLists] = useState([]);
+  const [isCreatingNewList, setIsCreatingNewList] = useState(false);
+
+  const { cardEditing } = useSelector((state) => state.metadata);
+  const { currentBoard } = useSelector((state) => state.boards);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     async function fetchBoardInfo() {
@@ -24,8 +43,9 @@ const BoardPage = () => {
       await axiosInstance
         .get(`${SERVER_URL}/api/boards/${boardId}`)
         .then(({ data }) => {
-          setCurrentBoard(data);
-          setOrderedLists(data.lists);
+          dispatch(pickBoard(data));
+
+          // setOrderedLists(data.lists);
         })
         .finally(() => {
           setLoading(false);
@@ -35,8 +55,31 @@ const BoardPage = () => {
     fetchBoardInfo();
   }, []);
 
+  const handleEditListTitle = async (listId, listIndex, newListTitle) => {
+    const oldListTitle = currentBoard.lists[listIndex].title;
+
+    // setOrderedLists((prev) => {
+    //   const updatedLists = [...prev];
+    //   updatedLists[listIndex] = {
+    //     ...updatedLists[listIndex],
+    //     title: newListTitle,
+    //   };
+    //   return updatedLists;
+    // });
+    dispatch(renameList({ listIndex, title: newListTitle }));
+
+    await axiosInstance
+      .put(`${SERVER_URL}/api/lists/${boardId}/rename/${listId}`, {
+        title: newListTitle,
+      })
+      .catch(() => {
+        toast.error("Не удалось переименовать список, попробуйте позже");
+        dispatch(renameList({ listIndex, title: oldListTitle }));
+      });
+  };
+
   const onDragEnd = async (result) => {
-    console.log(result);
+    // console.log(result);
     const { destination, source, draggableId, type } = result;
     if (!destination) {
       return;
@@ -49,20 +92,21 @@ const BoardPage = () => {
     }
 
     if (type === "COLUMN") {
-      const oldOrderedLists = Array.from(orderedLists);
-      const newOrderedLists = Array.from(orderedLists);
+      const oldOrderedLists = Array.from(currentBoard.lists);
+      const newOrderedLists = Array.from(currentBoard.lists);
 
       const [targetList] = newOrderedLists.splice(source.index, 1);
       newOrderedLists.splice(destination.index, 0, targetList);
-
-      setOrderedLists(newOrderedLists);
+      dispatch(updateListOrder(newOrderedLists));
+      // setOrderedLists(newOrderedLists);
       await axiosInstance
         .put(
           `${SERVER_URL}/api/lists/${currentBoard._id}/move/${draggableId}?newOrder=${destination.index}`
         )
         .catch(() => {
           setError("Ошибка. Не удалось поменять местами списки");
-          setOrderedLists(oldOrderedLists);
+          dispatch(updateListOrder(oldOrderedLists));
+          // setOrderedLists(oldOrderedLists);
           setTimeout(() => {
             setError("");
           }, 3000);
@@ -71,11 +115,10 @@ const BoardPage = () => {
       return;
     }
 
-    // debugger;
-    const sourceListIndex = orderedLists.findIndex(
+    const sourceListIndex = currentBoard.lists.findIndex(
       (list) => list._id === source.droppableId
     );
-    const resultListIndex = orderedLists.findIndex(
+    const resultListIndex = currentBoard.lists.findIndex(
       (list) => list._id === destination.droppableId
     );
 
@@ -85,19 +128,26 @@ const BoardPage = () => {
     }
 
     if (sourceListIndex !== -1 && sourceListIndex === resultListIndex) {
-      const oldOrderedCards = Array.from(orderedLists[sourceListIndex].cards);
-      const newOrderedCards = Array.from(orderedLists[sourceListIndex].cards);
+      const oldOrderedCards = Array.from(
+        currentBoard.lists[sourceListIndex].cards
+      );
+      const newOrderedCards = Array.from(
+        currentBoard.lists[sourceListIndex].cards
+      );
 
       const [targetCard] = newOrderedCards.splice(source.index, 1);
       newOrderedCards.splice(destination.index, 0, targetCard);
-      setOrderedLists((prev) => {
-        const updatedLists = [...prev];
-        updatedLists[sourceListIndex] = {
-          ...updatedLists[sourceListIndex],
-          cards: newOrderedCards,
-        };
-        return updatedLists;
-      });
+      // setOrderedLists((prev) => {
+      //   const updatedLists = [...prev];
+      //   updatedLists[sourceListIndex] = {
+      //     ...updatedLists[sourceListIndex],
+      //     cards: newOrderedCards,
+      //   };
+      //   return updatedLists;
+      // });
+      dispatch(
+        updateCardOrder({ listIndex: sourceListIndex, cards: newOrderedCards })
+      );
 
       await axiosInstance
         .put(
@@ -105,86 +155,186 @@ const BoardPage = () => {
           { newOrder: destination.index }
         )
         .catch(() => {
-          setOrderedLists((prev) => {
-            const updatedLists = [...prev];
-            updatedLists[sourceListIndex] = {
-              ...updatedLists[sourceListIndex],
+          // setOrderedLists((prev) => {
+          //   const updatedLists = [...prev];
+          //   updatedLists[sourceListIndex] = {
+          //     ...updatedLists[sourceListIndex],
+          //     cards: oldOrderedCards,
+          //   };
+          //   return updatedLists;
+          // });
+          dispatch(
+            updateCardOrder({
+              listIndex: sourceListIndex,
               cards: oldOrderedCards,
-            };
-            return updatedLists;
-          });
+            })
+          );
         });
       return;
     }
 
     const newOrderedSourceCards = Array.from(
-      orderedLists[sourceListIndex].cards
+      currentBoard.lists[sourceListIndex].cards
     );
 
     const newOrderedDestinationCards = Array.from(
-      orderedLists[resultListIndex].cards
+      currentBoard.lists[resultListIndex].cards
     );
 
     const [targetCard] = newOrderedSourceCards.splice(source.index, 1);
     newOrderedDestinationCards.splice(destination.index, 0, targetCard);
 
-    setOrderedLists((prev) => {
-      const lists = [...prev];
-      lists[sourceListIndex] = {
-        ...lists[sourceListIndex],
+    // setOrderedLists((prev) => {
+    //   const lists = [...prev];
+    //   lists[sourceListIndex] = {
+    //     ...lists[sourceListIndex],
+    //     cards: newOrderedSourceCards,
+    //   };
+    //   lists[resultListIndex] = {
+    //     ...lists[resultListIndex],
+    //     cards: newOrderedDestinationCards,
+    //   };
+    //   return lists;
+    // });
+    dispatch(
+      updateCardOrder({
+        listIndex: sourceListIndex,
         cards: newOrderedSourceCards,
-      };
-      lists[resultListIndex] = {
-        ...lists[resultListIndex],
+      })
+    );
+    dispatch(
+      updateCardOrder({
+        listIndex: resultListIndex,
         cards: newOrderedDestinationCards,
-      };
-      return lists;
-    });
+      })
+    );
+
+    await axiosInstance
+      .put(`${SERVER_URL}/api/cards/${boardId}/${draggableId}/move`, {
+        from: source.droppableId,
+        to: destination.droppableId,
+        newOrder: destination.index,
+      })
+      .catch(() => {
+        // setOrderedLists((prev) => {
+        //   const lists = [...prev];
+        //   newOrderedSourceCards.splice(source.index, 0, targetCard);
+        //   lists[sourceListIndex] = {
+        //     ...lists[sourceListIndex],
+        //     cards: newOrderedSourceCards,
+        //   };
+        //   newOrderedDestinationCards.splice(destination.index, 1);
+        //   lists[resultListIndex] = {
+        //     ...lists[resultListIndex],
+        //     cards: newOrderedDestinationCards,
+        //   };
+        //   return lists;
+        // });
+
+        newOrderedDestinationCards.splice(destination.index, 1);
+        newOrderedSourceCards.splice(source.index, 0, targetCard);
+        dispatch(
+          updateCardOrder({
+            listIndex: sourceListIndex,
+            cards: newOrderedSourceCards,
+          })
+        );
+        dispatch(
+          updateCardOrder({
+            listIndex: resultListIndex,
+            cards: newOrderedDestinationCards,
+          })
+        );
+      });
   };
 
   return (
-    <Box>
-      <Navbar />
-      <BoardInfoBar {...currentBoard} />
-      <Container>
-        {!!error && (
-          <Alert severity="error" sx={{ my: 3 }}>
-            {error}
-          </Alert>
-        )}
-        {loading ? (
-          <Box sx={{ textAlign: "center", mt: 4 }}>
-            <GridLoader color="#875ceb" size={30} />
-          </Box>
-        ) : (
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable
-              droppableId={boardId}
-              key={boardId}
-              type="COLUMN"
-              direction="horizontal"
-            >
-              {(provided) => (
-                <Stack
-                  sx={{ mt: 2 }}
-                  direction={"row"}
-                  spacing={2}
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale="ru"
+      localeText={
+        ruRU.components.MuiLocalizationProvider.defaultProps.localeText
+      }
+    >
+      <Box>
+        <Navbar />
+        <BoardInfoBar {...currentBoard} />
+        <Box
+          sx={{
+            px: 1,
+            height: "100%",
+          }}
+        >
+          {!!error && (
+            <Alert severity="error" sx={{ my: 3 }}>
+              {error}
+            </Alert>
+          )}
+          {loading ? (
+            <Box sx={{ textAlign: "center", mt: 4 }}>
+              <GridLoader color="#875ceb" size={30} />
+            </Box>
+          ) : (
+            <Box>
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable
+                  droppableId={boardId}
+                  key={boardId}
+                  type="COLUMN"
+                  direction="horizontal"
                 >
-                  {orderedLists &&
-                    orderedLists.map((list, idx) => {
-                      // debugger;
-                      return <List key={list._id} index={idx} {...list} />;
-                    })}
-                  {provided.placeholder}
-                </Stack>
+                  {(provided) => (
+                    <Stack
+                      sx={{ mt: 2, overflow: "auto", pb: 1, minHeight: "83vh" }}
+                      direction={"row"}
+                      alignItems={"start"}
+                      spacing={2}
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                    >
+                      {currentBoard &&
+                        currentBoard.lists &&
+                        currentBoard.lists.map((list, idx) => (
+                          <List
+                            key={list._id}
+                            index={idx}
+                            handleEditListTitle={handleEditListTitle}
+                            {...list}
+                          />
+                        ))}
+                      {provided.placeholder}
+
+                      <AddElement
+                        boardId={boardId}
+                        isCreating={isCreatingNewList}
+                        setIsCreating={setIsCreatingNewList}
+                        type="LIST"
+                      />
+                    </Stack>
+                  )}
+                </Droppable>
+              </DragDropContext>
+              {cardEditing.isEditing && (
+                <Backdrop
+                  sx={{
+                    color: "#fff",
+                    zIndex: 5,
+                  }}
+                  open={cardEditing.isEditing}
+                  onClick={() => dispatch(stopCardEdit())}
+                >
+                  <CardEditModal
+                    key={1}
+                    isOpen={cardEditing.isEditing}
+                    close={() => dispatch(stopCardEdit())}
+                  />
+                </Backdrop>
               )}
-            </Droppable>
-          </DragDropContext>
-        )}
-      </Container>
-    </Box>
+            </Box>
+          )}
+        </Box>
+      </Box>
+    </LocalizationProvider>
   );
 };
 

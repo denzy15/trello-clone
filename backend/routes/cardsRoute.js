@@ -3,6 +3,7 @@ import { isAuth } from "../utils.js";
 import Board from "../models/board.js";
 import List from "../models/list.js";
 import Card from "../models/card.js";
+import User from "../models/user.js";
 
 const router = express.Router();
 
@@ -50,6 +51,51 @@ router.get("/:boardId", isAuth, async (req, res) => {
   }
 });
 
+router.get("/:boardId/:cardId", isAuth, async (req, res) => {
+  try {
+    const { boardId, cardId } = req.params;
+
+    const board = await Board.findById(boardId);
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    // Проверяем доступ пользователя к этой доске перед получением карточек
+    if (
+      board.creator.toString() !== req.user._id &&
+      !board.users.includes(req.user._id)
+    ) {
+      return res.status(403).json({
+        message: "У вас нет доступа к просмотру карточек на этой доске",
+      });
+    }
+
+    const card = await Card.findById(cardId)
+      .populate("assignedUsers", "username email _id")
+      .exec();
+
+    // const board = await Board.findById(boardId)
+    // .populate("creator", "username email") // Популируем создателя доски и выбираем только username
+    // .populate("users", "username email")
+    // .populate({
+    //   path: "lists",
+    //   populate: {
+    //     path: "cards",
+    //     populate: {
+    //       path: "assignedUsers",
+    //     },
+    //   },
+    // })
+    // .exec();
+
+    res.json(card);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
 // Добавление карточки в определенный список
 router.post("/:boardId/:listId/", isAuth, async (req, res) => {
   try {
@@ -78,7 +124,7 @@ router.post("/:boardId/:listId/", isAuth, async (req, res) => {
     }
 
     // Создаем новую карточку и добавляем в список
-    const newCard = await Card.create({ title, order: list.cards.length + 1 });
+    const newCard = await Card.create({ title, order: list.cards.length });
     list.cards.push(newCard._id);
     await list.save();
 
@@ -143,48 +189,6 @@ router.delete("/:boardId/:listId/:cardId", isAuth, async (req, res) => {
   }
 });
 
-// Обновление данных о карточке
-router.put("/:boardId/:cardId", isAuth, async (req, res) => {
-  try {
-    const { boardId, cardId } = req.params;
-    const { title, description, dueDate, attachments, assignedUsers, labels } =
-      req.body;
-
-    const board = await Board.findById(boardId);
-
-    if (!board) {
-      return res.status(404).json({ message: "Доска не найдена" });
-    }
-
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
-      return res.status(403).json({
-        message: "У вас нет доступа к изменению данных карточек в этом списке",
-      });
-    }
-
-    // ДАТА В ТАКОМ ФОРМАТЕ
-    // console.log(new Date().toUTCString());
-
-    // Изменяем данные карточки, включая метки
-    const updatedCard = await Card.findById(cardId);
-    updatedCard.title = title || updatedCard.title;
-    updatedCard.description = description || updatedCard.description;
-    updatedCard.dueDate = dueDate || updatedCard.dueDate;
-    updatedCard.attachments = attachments || updatedCard.attachments;
-    updatedCard.assignedUsers = assignedUsers || updatedCard.assignedUsers;
-    updatedCard.labels = labels || updatedCard.labels;
-
-    await updatedCard.save();
-    res.json(updatedCard);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Ошибка сервера" });
-  }
-});
-
 // Изменение списка, в котором находится карточка
 router.put("/:boardId/:cardId/move", isAuth, async (req, res) => {
   try {
@@ -236,7 +240,7 @@ router.put("/:boardId/:cardId/move", isAuth, async (req, res) => {
     sourceCards
       .sort((a, b) => a.order - b.order)
       .forEach(async (sourceCard, idx) => {
-        sourceCard.order = idx + 1;
+        sourceCard.order = idx;
         await sourceCard.save();
       });
 
@@ -253,7 +257,7 @@ router.put("/:boardId/:cardId/move", isAuth, async (req, res) => {
       }
     }
 
-    card.order = assignedList.cards.length === 0 ? 1 : targetOrder;
+    card.order = assignedList.cards.length === 0 ? 0 : targetOrder;
 
     assignedList.cards.push(cardId);
 
@@ -267,7 +271,6 @@ router.put("/:boardId/:cardId/move", isAuth, async (req, res) => {
     res.status(500).json({ message: "Ошибка сервера" });
   }
 });
-
 
 // Изменение порядка внутри списка
 router.put("/:boardId/:cardId/change-order", isAuth, async (req, res) => {
@@ -347,5 +350,148 @@ router.put("/:boardId/:cardId/change-order", isAuth, async (req, res) => {
   }
 });
 
+// Изменение списка пользователей
+router.put("/:boardId/:cardId/users", isAuth, async (req, res) => {
+  try {
+    const { boardId, cardId } = req.params;
+    const { type, userId } = req.body;
+
+    const board = await Board.findById(boardId);
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    if (
+      board.creator.toString() !== req.user._id &&
+      !board.users.includes(req.user._id)
+    ) {
+      return res.status(403).json({
+        message: "У вас нет доступа к изменению данных карточек в этом списке",
+      });
+    }
+
+    const updatedCard = await Card.findById(cardId);
+    if (!updatedCard) {
+      return res.status(404).json({ message: "Карточка не найдена" });
+    }
+
+    const user = await User.findById(userId);
+
+    if (type === "add") {
+      if (updatedCard.assignedUsers.some((uId) => uId.toString() === userId)) {
+        return res
+          .status(400)
+          .json({ message: "Пользователь уже добавлен в список" });
+      }
+      updatedCard.assignedUsers.push(user._id);
+    } else if (type === "remove") {
+      updatedCard.assignedUsers = updatedCard.assignedUsers.filter(
+        (u) => u._id.toString() !== userId
+      );
+    }
+
+    await updatedCard.save();
+    res.json(updatedCard);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+router.put(
+  "/:boardId/:cardId/remove-deleted-label",
+  isAuth,
+  async (req, res) => {
+    try {
+      const { boardId, cardId } = req.params;
+      const { label } = req.body;
+
+      const board = await Board.findById(boardId);
+
+      if (!board) {
+        return res.status(404).json({ message: "Доска не найдена" });
+      }
+
+      if (
+        board.creator.toString() !== req.user._id &&
+        !board.users.includes(req.user._id)
+      ) {
+        return res.status(403).json({
+          message:
+            "У вас нет доступа к изменению данных карточек в этом списке",
+        });
+      }
+
+      // Удаляем метку label из каждой карточки, если она есть
+      for (const list of board.lists) {
+        for (const card of list.cards) {
+          if (card._id.toString() === cardId) {
+            const updatedLabels = card.labels.filter(
+              (lbl) => lbl.title !== label.title
+            );
+            card.labels = updatedLabels;
+            await card.save();
+          }
+        }
+      }
+
+      res.status(200).json({ message: "Метка успешно удалена из карточки" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Ошибка сервера" });
+    }
+  }
+);
+
+// Обновление данных о карточке
+router.put("/:boardId/:cardId", isAuth, async (req, res) => {
+  try {
+    const { boardId, cardId } = req.params;
+    const {
+      title,
+      description,
+      dueDate,
+      attachments,
+      assignedUsers,
+      labels,
+      startDate,
+    } = req.body;
+
+    const board = await Board.findById(boardId);
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    if (
+      board.creator.toString() !== req.user._id &&
+      !board.users.includes(req.user._id)
+    ) {
+      return res.status(403).json({
+        message: "У вас нет доступа к изменению данных карточек в этом списке",
+      });
+    }
+
+    // ДАТА В ТАКОМ ФОРМАТЕ
+    // console.log(new Date().toUTCString());
+
+    // Изменяем данные карточки, включая метки
+    const updatedCard = await Card.findById(cardId);
+    updatedCard.title = title || updatedCard.title;
+    updatedCard.description = description || updatedCard.description;
+    updatedCard.dueDate = dueDate || updatedCard.dueDate;
+    updatedCard.attachments = attachments || updatedCard.attachments;
+    updatedCard.assignedUsers = assignedUsers || updatedCard.assignedUsers;
+    updatedCard.labels = labels || updatedCard.labels;
+    updatedCard.startDate = startDate || updatedCard.startDate;
+
+    await updatedCard.save();
+    res.json(updatedCard);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
 
 export default router;

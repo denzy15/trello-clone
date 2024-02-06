@@ -51,9 +51,6 @@ const Register = () => {
   const [errors, setErrors] = useState(initialErrorsData);
 
   const handleLogin = () => {
-    console.log(formData);
-    console.log(errors);
-
     if (!formData.username) {
       setErrors((prev) => ({ ...prev, username: "Заполните поле" }));
       return;
