@@ -23,7 +23,6 @@ import { LocalizationProvider, ruRU } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
-
 const BoardPage = () => {
   const { boardId } = useParams();
   const [loading, setLoading] = useState(false);
@@ -319,6 +318,7 @@ const BoardPage = () => {
                   sx={{
                     color: "#fff",
                     zIndex: 5,
+                    overflowY: "auto",
                   }}
                   open={cardEditing.isEditing}
                   onClick={() => dispatch(stopCardEdit())}

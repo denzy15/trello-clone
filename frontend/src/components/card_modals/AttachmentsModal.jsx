@@ -1,0 +1,105 @@
+import React, { useState } from "react";
+import { FilePond, registerPlugin } from "react-filepond";
+import "filepond/dist/filepond.min.css";
+import { Box, Button } from "@mui/material";
+import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+import { useDispatch, useSelector } from "react-redux";
+import { SERVER_URL } from "../../constants";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import axiosInstance from "../../axiosInterceptor";
+import { toast } from "react-toastify";
+import { updateCard } from "../../store/slices/boardsSlice";
+import { updateCardAttachments } from "../../store/slices/metadataSlice";
+registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
+
+const AttachmentsModal = ({ closeModal }) => {
+  const { cardEditing } = useSelector((state) => state.metadata);
+  const { currentBoard } = useSelector((state) => state.boards);
+
+  const dispatch = useDispatch();
+
+  const [files, setFiles] = useState([]);
+
+  const handleFileChange = async (event) => {
+    const selectedFiles = Array.from(event.target.files);
+    setFiles(selectedFiles);
+
+    try {
+      for (const file of selectedFiles) {
+        if (file.size > 10 * 1024 * 1024) {
+          toast.warn(
+            `Файл ${file.name} превышает максимально допустимый размер (10 МБ)`
+          );
+          continue;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        await toast.promise(
+          axiosInstance.post(
+            `${SERVER_URL}/api/cards/${currentBoard._id}/${cardEditing.card._id}/upload-files`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          ),
+          {
+            pending: "Загрузка файла...",
+            success: "Файл успешно загружен",
+            error: "Ошибка при загрузке файла",
+          }
+        );
+
+        const { data } = await axiosInstance.get(
+          `${SERVER_URL}/api/cards/${currentBoard._id}/${cardEditing.card._id}`
+        );
+
+        dispatch(
+          updateCard({
+            card: data,
+            listIndex: cardEditing.card.listInfo.index,
+            cardIndex: cardEditing.card.index,
+          })
+        );
+        dispatch(updateCardAttachments(data.attachments));
+      }
+      closeModal();
+    } catch (error) {
+      toast.error("Ошибка при отправке файлов: " + error);
+    }
+  };
+
+  return (
+    <Box>
+      <Button
+        component="label"
+        variant="contained"
+        startIcon={<CloudUploadIcon />}
+      >
+        Загрузить файл
+        <input
+          onChange={handleFileChange}
+          style={{
+            clip: "rect(0 0 0 0)",
+            clipPath: "inset(50%)",
+            height: 1,
+            overflow: "hidden",
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            whiteSpace: "nowrap",
+            width: 1,
+          }}
+          type="file"
+        />
+      </Button>
+    </Box>
+  );
+};
+
+export default AttachmentsModal;

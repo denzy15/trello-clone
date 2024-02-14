@@ -1,16 +1,21 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import cors from 'cors'
+import cors from "cors";
 import boardsRouter from "./routes/boardsRoute.js";
 import authRouter from "./routes/authRoute.js";
 import listsRouter from "./routes/listsRoute.js";
 import cardsRouter from "./routes/cardsRoute.js";
 import usersRouter from "./routes/usersRoute.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const PORT = 5000;
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -22,7 +27,9 @@ mongoose
   });
 
 const app = express();
-app.use(cors())
+
+app.use(express.static(path.join(__dirname, "uploads")));
+app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/boards", boardsRouter);

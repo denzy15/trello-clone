@@ -10,11 +10,8 @@ import {
   FormatListBulleted,
   FormatListNumbered,
   Code,
-  FormatAlignLeft,
-  FormatAlignCenter,
-  FormatAlignRight,
 } from "@mui/icons-material";
-import { Box, Button, Divider } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 const Toolbar = ({ editorState, setEditorState }) => {
   const tools = [

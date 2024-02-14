@@ -12,7 +12,21 @@ const cardSchema = new Schema({
   },
   startDate: { type: Date, default: null },
   dueDate: { type: Date, default: null },
-  attachments: [String],
+  attachments: [
+    {
+      createdAt: {
+        type: Date,
+        default: () => new Date().toISOString(),
+      },
+      type: { type: String },
+      path: String,
+      creator: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+      name: String,
+    },
+  ],
   assignedUsers: [
     {
       type: Schema.Types.ObjectId,

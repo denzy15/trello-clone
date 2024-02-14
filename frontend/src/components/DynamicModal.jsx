@@ -4,11 +4,13 @@ import LabelsEdit from "./card_modals/LabelsEdit";
 import DateEdit from "./card_modals/DateEdit";
 import { IconButton, Paper, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import AttachmentsModal from "./card_modals/AttachmentsModal";
 
 const components = {
   Участники: UserEdit,
   Метки: LabelsEdit,
   Дата: DateEdit,
+  Вложения: AttachmentsModal,
 };
 
 const DynamicModal = ({ header, closeModal, order, ...rest }) => {

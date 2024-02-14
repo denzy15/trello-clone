@@ -10,19 +10,24 @@ import Toolbar from "./Toolbar";
 import "./DraftEditor.css";
 import { Box, Button, Divider, Stack } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { updateCardDescription } from "../../store/slices/metadataSlice";
+import {
+  toggleEditableDraft,
+  updateCardDescription,
+} from "../../store/slices/metadataSlice";
 import axiosInstance from "../../axiosInterceptor";
 import { SERVER_URL } from "../../constants";
 import { toast } from "react-toastify";
 import { updateCard } from "../../store/slices/boardsSlice";
 
-const DraftEditor = ({ closeModal }) => {
-  const { cardEditing } = useSelector((state) => state.metadata);
+const DraftEditor = () => {
+  const { cardEditing, editableDraft } = useSelector((state) => state.metadata);
   const { currentBoard } = useSelector((state) => state.boards);
 
   const dispatch = useDispatch();
 
   const createEditorState = () => {
+    // console.log("x");
+
     if (!cardEditing.card.description) {
       return EditorState.createEmpty();
     }
@@ -35,14 +40,15 @@ const DraftEditor = ({ closeModal }) => {
     return newEditorState;
   };
 
-  const [editorState, setEditorState] = useState(createEditorState());
+  const [editorState, setEditorState] = useState(() => createEditorState());
   const editor = useRef(null);
 
   useEffect(() => {
-    focusEditor();
+    // focusEditor();
   }, []);
 
   const focusEditor = () => {
+    if (!editableDraft) dispatch(toggleEditableDraft());
     editor.current.focus();
   };
 
@@ -110,40 +116,6 @@ const DraftEditor = ({ closeModal }) => {
     }
   };
 
-  // const handleSaveDescription = async () => {
-  //   const contentState = editorState.getCurrentContent();
-  //   const contentRaw = convertToRaw(contentState);
-  //   const contentString = JSON.stringify(contentRaw);
-
-  //   await axiosInstance
-  //     .put(
-  //       `${SERVER_URL}/api/cards/${currentBoard._id}/${cardEditing.card._id}`,
-  //       { description: contentString }
-  //     )
-  //     .then(async () => {
-  //       dispatch(updateCardDescription(contentString));
-  //       await axiosInstance
-  //         .get(
-  //           `${SERVER_URL}/api/cards/${currentBoard._id}/${cardEditing.card._id}`
-  //         )
-  //         .then(({ data }) => {
-  //           dispatch(
-  //             updateCard({
-  //               listIndex: cardEditing.card.listInfo.index,
-  //               cardIndex: cardEditing.card.index,
-  //               card: data,
-  //             })
-  //           );
-  //         });
-  //     })
-  //     .catch((e) => {
-  //       toast.error("Не удалось обновить описание, попробуйте позже");
-  //     })
-  //     .finally(() => {
-  //       closeModal();
-  //     });
-  // };
-
   const updateCardDescriptionOnServer = async (contentString) => {
     try {
       await axiosInstance.put(
@@ -179,41 +151,72 @@ const DraftEditor = ({ closeModal }) => {
     } catch (error) {
       toast.error("Не удалось обновить описание, попробуйте позже");
     } finally {
-      closeModal();
+      dispatch(toggleEditableDraft());
     }
   };
 
   const handleCancelEdit = () => {
-    setEditorState(createEditorState());
-    closeModal();
+    const newState = createEditorState();
+    setEditorState(newState);
+    dispatch(toggleEditableDraft());
   };
 
   return (
-    <Box className="editor-wrapper" onClick={focusEditor}>
-      <Toolbar editorState={editorState} setEditorState={setEditorState} />
-      <Divider sx={{ my: 1 }} color="black" />
-      <Box className="editor-container">
-        <Editor
-          ref={editor}
-          placeholder="Введите описание..."
-          handleKeyCommand={handleKeyCommand}
-          editorState={editorState}
-          customStyleMap={styleMap}
-          blockStyleFn={myBlockStyleFn}
-          onChange={(editorState) => {
-            setEditorState(editorState);
+    <>
+      <Box
+        sx={{
+          border: !editableDraft ? "none" : "1px solid #1976d2",
+          bgcolor: "#fff",
+          borderRadius: 1,
+          p: 1,
+          pl: editableDraft && 0,
+          maxWidth: "100%",
+        }}
+        onClick={focusEditor}
+      >
+        {editableDraft && (
+          <Toolbar editorState={editorState} setEditorState={setEditorState} />
+        )}
+        {editableDraft && <Divider sx={{ my: 1 }} color="black" />}
+        <Box
+          sx={{
+            cursor: !editableDraft && "pointer",
+            bgcolor: editableDraft ? "#fff" : "#f5f5f5",
+            px: 2,
+            py: 1,
+            minHeight: editableDraft ? 100 : 60,
+            // pb: editableDraft ? 10 : 4,
+            borderRadius: 2,
+            maxWidth: "100%",
           }}
-        />
+        >
+          <Editor
+            readOnly={!editableDraft}
+            ref={editor}
+            placeholder="Введите описание..."
+            handleKeyCommand={handleKeyCommand}
+            editorState={editorState}
+            customStyleMap={styleMap}
+            blockStyleFn={myBlockStyleFn}
+            onChange={(editorState) => setEditorState(editorState)}
+          />
+        </Box>
       </Box>
-      <Stack direction={"row"} spacing={2} sx={{ mt: 1 }}>
-        <Button variant="contained" onClick={handleSaveDescription}>
-          Сохранить
-        </Button>
-        <Button variant="outlined" color="inherit" onClick={handleCancelEdit}>
-          Отмена
-        </Button>
-      </Stack>
-    </Box>
+      {editableDraft && (
+        <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+          <Button variant="contained" onClick={handleSaveDescription}>
+            Сохранить
+          </Button>
+          <Button
+            variant="outlined"
+            color="inherit"
+            onClick={() => handleCancelEdit()}
+          >
+            Отмена
+          </Button>
+        </Stack>
+      )}
+    </>
   );
 };
 

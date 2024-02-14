@@ -32,7 +32,10 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import { EditorState, RichUtils } from "draft-js";
+import SubjectIcon from "@mui/icons-material/Subject";
 import DraftEditor from "./draft_editor/DraftEditor";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import CardAttachmentItem from "./CardAttachmentItem";
 
 const listItems = [
   {
@@ -46,6 +49,10 @@ const listItems = [
   {
     name: "Дата",
     icon: DateIcon,
+  },
+  {
+    name: "Вложения",
+    icon: AttachFileIcon,
   },
 ];
 
@@ -101,6 +108,7 @@ const CardEditModal = ({ close }) => {
     setIsEditingTitle(false);
   };
 
+
   const handleOpenModal = (name, order) => {
     if (currentModalOpened.opened && currentModalOpened.name === name) {
       setCurrentModalOpened({
@@ -121,17 +129,23 @@ const CardEditModal = ({ close }) => {
         top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
-        width: "50%",
+        width: "60%",
         bgcolor: "white",
         p: 4,
         maxHeight: "100vh",
         zIndex: 10,
+        overflowY: "auto",
       }}
       onClick={(e) => e.stopPropagation()}
     >
       <IconButton
         onClick={close}
-        sx={{ position: "absolute", right: 24, top: 24,display: "inline-block" }}
+        sx={{
+          position: "absolute",
+          right: 24,
+          top: 24,
+          display: "inline-block",
+        }}
       >
         <CloseIcon />
       </IconButton>
@@ -179,10 +193,10 @@ const CardEditModal = ({ close }) => {
       </Box>
 
       <Stack direction={"row"} sx={{ mt: 3 }}>
-        <Box sx={{ pl: 3, flex: 1, position: "relative", overflow: "hidden" }}>
+        <Box sx={{ pl: 3, flex: 1, position: "relative" }}>
           {!!cardEditing.card.assignedUsers.length && (
             <Box sx={{ mt: 2 }}>
-              <Typography sx={{ fontWeight: 500, mb: 1 }}>
+              <Typography sx={{ mb: 1 }} variant="h6">
                 Участники:
               </Typography>
               <AvatarGroup
@@ -200,15 +214,14 @@ const CardEditModal = ({ close }) => {
               </AvatarGroup>
             </Box>
           )}
-          <Box
-            sx={{ cursor: "pointer" }}
-            onClick={() => handleOpenModal("Дата", 2)}
-          >
+          <Box>
             {cardEditing.card.startDate && cardEditing.card.dueDate && (
               <>
-                <Typography>Даты:</Typography>
+                <Typography variant="h6">Даты:</Typography>
                 <Typography
+                  onClick={() => handleOpenModal("Дата", 2)}
                   sx={{
+                    cursor: "pointer",
                     mt: 1,
                     bgcolor: "#eeeeee",
                     display: "inline-block",
@@ -223,9 +236,11 @@ const CardEditModal = ({ close }) => {
             )}
             {cardEditing.card.startDate && !cardEditing.card.dueDate && (
               <>
-                <Typography>Начало:</Typography>
+                <Typography variant="h6">Начало:</Typography>
                 <Typography
+                  onClick={() => handleOpenModal("Дата", 2)}
                   sx={{
+                    cursor: "pointer",
                     mt: 1,
                     bgcolor: "#eeeeee",
                     display: "inline-block",
@@ -239,10 +254,12 @@ const CardEditModal = ({ close }) => {
             )}
             {!cardEditing.card.startDate && cardEditing.card.dueDate && (
               <>
-                <Typography>Срок:</Typography>
+                <Typography variant="h6">Срок:</Typography>
                 <Typography
+                  onClick={() => handleOpenModal("Дата", 2)}
                   sx={{
                     mt: 1,
+                    cursor: "pointer",
                     bgcolor: "#eeeeee",
                     display: "inline-block",
                     p: 1,
@@ -254,11 +271,48 @@ const CardEditModal = ({ close }) => {
               </>
             )}
           </Box>
-          <Box sx={{ width: "100%" }}>
-            <Typography sx={{ my: 1 }}>Описание:</Typography>
-            <DraftEditor closeModal={close} />
-        
+          <Box sx={{ width: "100%", position: "relative" }}>
+            <SubjectIcon
+              sx={{ position: "absolute", top: 4, left: -30, fontSize: 25 }}
+            />
+            <Typography sx={{ my: 1 }} variant="h6">
+              Описание:
+            </Typography>
+            <DraftEditor />
           </Box>
+
+          {cardEditing.card.attachments.length > 0 && (
+            <Box sx={{ position: "relative" }}>
+              <AttachFileIcon
+                sx={{
+                  position: "absolute",
+                  top: 10,
+                  left: -30,
+                  fontSize: 25,
+                  transform: "rotate(45deg)",
+                }}
+              />
+              <Stack direction="row" justifyContent="space-between">
+                <Typography sx={{ my: 1 }} variant="h6">
+                  Вложения:
+                </Typography>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => handleOpenModal("Вложения", 3)}
+                >
+                  Добавить
+                </Button>
+              </Stack>
+              <Box
+                sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 3 }}
+              >
+                {cardEditing.card.attachments.map((att, i) => (
+                  <CardAttachmentItem key={i} {...att} index={i} />
+                ))}
+              </Box>
+            </Box>
+          )}
         </Box>
         <Box>
           <List

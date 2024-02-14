@@ -17,7 +17,9 @@ import axiosInstance from "../../axiosInterceptor";
 import { SERVER_URL } from "../../constants";
 import { toast } from "react-toastify";
 import { updateCardDates } from "../../store/slices/metadataSlice";
-import { updateBoardCardDates } from "../../store/slices/boardsSlice";
+import {
+  updateCard,
+} from "../../store/slices/boardsSlice";
 
 const DateEdit = ({ closeModal }) => {
   const { cardEditing } = useSelector((state) => state.metadata);
@@ -45,7 +47,10 @@ const DateEdit = ({ closeModal }) => {
     await axiosInstance
       .put(
         `${SERVER_URL}/api/cards/${currentBoard._id}/${cardEditing.card._id}`,
-        { startDate: startDate.toString(), dueDate: dueDate.toString() }
+        {
+          startDate: startDateActive ? startDate.toString() : null,
+          dueDate: dueDateActive ? dueDate.toString() : null,
+        }
       )
       .catch((e) => {
         toast.error("Не удалось обновить дату, попробуйте позже");
@@ -54,6 +59,17 @@ const DateEdit = ({ closeModal }) => {
         closeModal();
       });
 
+    const { data } = await axiosInstance.get(
+      `${SERVER_URL}/api/cards/${currentBoard._id}/${cardEditing.card._id}`
+    );
+
+    dispatch(
+      updateCard({
+        listIndex: cardEditing.card.listInfo.index,
+        cardIndex: cardEditing.card.index,
+        card: data,
+      })
+    );
     dispatch(
       updateCardDates({
         startDate: startDateActive ? startDate.toString() : null,
@@ -61,45 +77,32 @@ const DateEdit = ({ closeModal }) => {
       })
     );
 
-    dispatch(
-      updateBoardCardDates({
-        listIndex: cardEditing.card.listInfo.index,
-        cardIndex: cardEditing.card.index,
-        startDate: startDateActive ? startDate.toString() : null,
-        dueDate: dueDateActive ? dueDate.toString() : null,
-      })
-    );
-
-    // console.log(new Date(dueDate.toDate().toUTCString()).toLocaleDateString());
   };
 
   const handleDelete = async () => {
-    // await axiosInstance
-    //   .put(
-    //     `${SERVER_URL}/api/cards/${currentBoard._id}/${cardEditing.card._id}`,
-    //     { startDate: null, dueDate: null }
-    //   )
-    //   .catch((e) => {
-    //     toast.error("Не удалось обновить дату, попробуйте позже");
-    //   })
-    //   .finally(() => {
-    //     closeModal();
-    //   });
-    dispatch(
-      updateCardDates({
-        startDate: null,
-        dueDate: null,
-      })
-    );
+    try {
+      await axiosInstance.put(
+        `${SERVER_URL}/api/cards/${currentBoard._id}/${cardEditing.card._id}`,
+        { startDate: null, dueDate: null }
+      );
 
-    dispatch(
-      updateBoardCardDates({
-        listIndex: cardEditing.card.listInfo.index,
-        cardIndex: cardEditing.card.index,
-        startDate: null,
-        dueDate: null,
-      })
-    );
+      const { data } = await axiosInstance.get(
+        `${SERVER_URL}/api/cards/${currentBoard._id}/${cardEditing.card._id}`
+      );
+
+      dispatch(
+        updateCard({
+          listIndex: cardEditing.card.listInfo.index,
+          cardIndex: cardEditing.card.index,
+          card: data,
+        })
+      );
+      dispatch(updateCardDates({ startDate: null, dueDate: null }));
+    } catch (error) {
+      toast.error("Не удалось обновить дату, попробуйте позже");
+    } finally {
+      closeModal();
+    }
   };
 
   return (

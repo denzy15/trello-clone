@@ -7,6 +7,7 @@ const initialState = {
     card: null,
   },
   extendedLabels: false,
+  editableDraft: false,
 };
 
 export const metadataSlice = createSlice({
@@ -39,6 +40,7 @@ export const metadataSlice = createSlice({
         card: null,
         isEditing: false,
       };
+      state.editableDraft = false;
     },
 
     addUserToCard: (state, action) => {
@@ -70,16 +72,36 @@ export const metadataSlice = createSlice({
     },
 
     updateCardDescription: (state, action) => {
-      state.cardEditing.card.description = action.payload
+      state.cardEditing.card.description = action.payload;
+    },
+
+    updateCardAttachments: (state, action) => {
+      state.cardEditing.card.attachments = action.payload;
+    },
+
+    updateCardAttachName: (state, action) => {
+      state.cardEditing.card.attachments[action.payload.index].name =
+        action.payload.name;
+    },
+
+    deleteAttach: (state, action) => {
+      state.cardEditing.card.attachments.splice(action.payload.index, 1);
     },
 
     toggleExtendedLabels: (state, action) => {
       state.extendedLabels = !state.extendedLabels;
     },
+    toggleEditableDraft: (state, action) => {
+      state.editableDraft = !state.editableDraft;
+    },
   },
 });
 
 export const {
+  deleteAttach,
+  updateCardAttachName,
+  updateCardAttachments,
+  toggleEditableDraft,
   updateCardDescription,
   toggleExtendedLabels,
   updateCardDates,

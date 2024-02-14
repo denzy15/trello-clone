@@ -105,11 +105,18 @@ router.get("/:boardId", isAuth, async (req, res) => {
         path: "lists",
         populate: {
           path: "cards",
-          populate: {
-            path: "assignedUsers",
-          },
+          populate: [
+            {
+              path: "assignedUsers",
+            },
+            {
+              path: "attachments.creator",
+              select: "username email _id",
+            },
+          ],
         },
       })
+
       .exec();
 
     if (!board) {

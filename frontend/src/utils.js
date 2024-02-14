@@ -51,3 +51,16 @@ export const colorIsDark = (color) => {
   // Возвращение значения: true для темного фона, false для светлого
   return brightness < 128;
 };
+
+export const getFileType = (type) => {
+  if (type.includes("image")) {
+    return "image";
+  } else {
+    return "other";
+  }
+};
+
+export const getFileExtension = (path) => {
+  const index = path.lastIndexOf(".");
+  return index === -1 ? "file" : path.slice(index + 1);
+};

@@ -1,11 +1,45 @@
 import express from "express";
-import { isAuth } from "../utils.js";
+import {
+  createDirectories,
+  decodeString,
+  deleteFile,
+  isAuth,
+} from "../utils.js";
 import Board from "../models/board.js";
 import List from "../models/list.js";
 import Card from "../models/card.js";
 import User from "../models/user.js";
+import multer from "multer";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename).slice(0, -7);
 
 const router = express.Router();
+
+const storage = multer.diskStorage({
+  destination: async function (req, file, cb) {
+    const boardId = req.params.boardId;
+    const dirPath = path.join(__dirname, "uploads", boardId);
+
+    // Создаем директории при их отсутствии
+    try {
+      await createDirectories(dirPath);
+      cb(null, dirPath);
+    } catch (error) {
+      cb(error);
+    }
+  },
+  filename: function (req, file, cb) {
+    const timestamp = new Date().getTime();
+    const decodedFilename = decodeString(file.originalname);
+
+    cb(null, `${timestamp}_${decodedFilename}`);
+  },
+});
+
+const upload = multer({ storage });
 
 // Поиск всех карточек доски
 router.get("/:boardId", isAuth, async (req, res) => {
@@ -51,6 +85,7 @@ router.get("/:boardId", isAuth, async (req, res) => {
   }
 });
 
+//Получение информации о карточке
 router.get("/:boardId/:cardId", isAuth, async (req, res) => {
   try {
     const { boardId, cardId } = req.params;
@@ -73,21 +108,8 @@ router.get("/:boardId/:cardId", isAuth, async (req, res) => {
 
     const card = await Card.findById(cardId)
       .populate("assignedUsers", "username email _id")
+      .populate("attachments.creator", "username email _id")
       .exec();
-
-    // const board = await Board.findById(boardId)
-    // .populate("creator", "username email") // Популируем создателя доски и выбираем только username
-    // .populate("users", "username email")
-    // .populate({
-    //   path: "lists",
-    //   populate: {
-    //     path: "cards",
-    //     populate: {
-    //       path: "assignedUsers",
-    //     },
-    //   },
-    // })
-    // .exec();
 
     res.json(card);
   } catch (err) {
@@ -473,21 +495,136 @@ router.put("/:boardId/:cardId", isAuth, async (req, res) => {
       });
     }
 
-    // ДАТА В ТАКОМ ФОРМАТЕ
-    // console.log(new Date().toUTCString());
-
-    // Изменяем данные карточки, включая метки
+    // Изменяем данные карточки
     const updatedCard = await Card.findById(cardId);
     updatedCard.title = title || updatedCard.title;
     updatedCard.description = description || updatedCard.description;
-    updatedCard.dueDate = dueDate || updatedCard.dueDate;
     updatedCard.attachments = attachments || updatedCard.attachments;
     updatedCard.assignedUsers = assignedUsers || updatedCard.assignedUsers;
     updatedCard.labels = labels || updatedCard.labels;
-    updatedCard.startDate = startDate || updatedCard.startDate;
+    updatedCard.startDate =
+      startDate !== undefined ? startDate : updatedCard.startDate;
+    updatedCard.dueDate = dueDate !== undefined ? dueDate : updatedCard.dueDate;
 
     await updatedCard.save();
-    res.json(updatedCard);
+
+    const card = await Card.findById(cardId)
+      .populate("assignedUsers", "username email _id")
+      .populate("attachments.creator", "username email _id")
+      .exec();
+
+    res.json(card);
+
+    // res.json(updatedCard);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+// Загрузка файлов
+router.post(
+  "/:boardId/:cardId/upload-files",
+  isAuth,
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      const { boardId, cardId } = req.params;
+      const file = req.file;
+
+      const board = await Board.findById(boardId);
+
+      if (!board) {
+        return res.status(404).json({ message: "Доска не найдена" });
+      }
+
+      if (
+        board.creator.toString() !== req.user._id &&
+        !board.users.includes(req.user._id)
+      ) {
+        return res.status(403).json({
+          message:
+            "У вас нет доступа к изменению данных карточек в этом списке",
+        });
+      }
+
+      const updatedCard = await Card.findById(cardId);
+
+      const uploadsPath = path.join(__dirname, "uploads");
+      const relativePath = path.relative(uploadsPath, file.path);
+
+      updatedCard.attachments.push({
+        createdAt: Date.now(),
+        type: file.mimetype,
+        path: relativePath,
+        creator: req.user._id,
+        name: decodeString(file.originalname),
+      });
+
+      updatedCard.attachments.sort((a, b) => b.createdAt - a.createdAt);
+
+      await updatedCard.save();
+
+      res.json(updatedCard.attachments[updatedCard.attachments.length - 1]);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Ошибка сервера" });
+    }
+  }
+);
+
+//Переименовать файл вложения
+router.put("/:boardId/:cardId/attach", isAuth, async (req, res) => {
+  try {
+    const { boardId, cardId } = req.params;
+    const { attachId, name } = req.body;
+
+    const board = await Board.findById(boardId);
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    if (
+      board.creator.toString() !== req.user._id &&
+      !board.users.includes(req.user._id)
+    ) {
+      return res.status(403).json({
+        message: "У вас нет доступа к изменению данных карточек в этом списке",
+      });
+    }
+
+    const updatedCard = await Card.findById(cardId);
+
+    const idx = updatedCard.attachments.findIndex(
+      (att) => att._id.toString() === attachId
+    );
+    if (idx === -1) {
+      return res.status(404).json({ message: "Вложение не найдено" });
+    }
+
+    if (!name) {
+      const filePath = path.join(
+        __dirname,
+        "uploads",
+        updatedCard.attachments[idx].path
+      );
+      await deleteFile(filePath);
+      updatedCard.attachments.splice(idx, 1);
+    } else {
+      updatedCard.attachments[idx].name = name;
+    }
+
+    await updatedCard.save();
+
+    const card = await Card.findById(cardId)
+      .populate("assignedUsers", "username email _id")
+      .populate("attachments.creator", "username email _id")
+      .exec();
+
+    res.json(card);
+
+    // res.json(updatedCard);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
