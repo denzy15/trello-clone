@@ -21,7 +21,6 @@ import {
 } from "../store/slices/boardsSlice";
 import { LocalizationProvider, ruRU } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
 
 const BoardPage = () => {
   const { boardId } = useParams();
@@ -78,7 +77,6 @@ const BoardPage = () => {
   };
 
   const onDragEnd = async (result) => {
-    // console.log(result);
     const { destination, source, draggableId, type } = result;
     if (!destination) {
       return;
@@ -97,7 +95,6 @@ const BoardPage = () => {
       const [targetList] = newOrderedLists.splice(source.index, 1);
       newOrderedLists.splice(destination.index, 0, targetList);
       dispatch(updateListOrder(newOrderedLists));
-      // setOrderedLists(newOrderedLists);
       await axiosInstance
         .put(
           `${SERVER_URL}/api/lists/${currentBoard._id}/move/${draggableId}?newOrder=${destination.index}`
@@ -105,7 +102,6 @@ const BoardPage = () => {
         .catch(() => {
           setError("Ошибка. Не удалось поменять местами списки");
           dispatch(updateListOrder(oldOrderedLists));
-          // setOrderedLists(oldOrderedLists);
           setTimeout(() => {
             setError("");
           }, 3000);

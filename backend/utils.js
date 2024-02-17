@@ -74,3 +74,6 @@ export const deleteFile = async (filePath) => {
     throw error;
   }
 };
+
+
+export const deepCopy = (obj) => JSON.parse(JSON.stringify(obj));

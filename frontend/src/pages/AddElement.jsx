@@ -78,40 +78,9 @@ const AddElement = ({
       })
       .finally(() => {
         setIsCreating(false);
+        setTitle("");
       });
 
-    // if (type === "CARD") {
-    //   await axiosInstance
-    //     .post(`${SERVER_URL}/api/cards/${boardId}/${listId}`, {
-    //       title: state,
-    //     })
-    //     .then(({ data }) => {
-    //       elementArray.push(data);
-    //       setState("");
-    //     })
-    //     .catch(() => {
-    //       toast.error("Не удалось добавить карточку, повторите позже");
-    //     })
-    //     .finally(() => {
-    //       setIsCreating(false);
-    //     });
-    //   return;
-    // }
-
-    // await axiosInstance
-    //   .post(`${SERVER_URL}/api/lists/${boardId}`, {
-    //     title: state,
-    //   })
-    //   .then(({ data }) => {
-    //     elementArray.push(data);
-    //     setState("");
-    //   })
-    //   .catch(() => {
-    //     toast.error("Не удалось добавить список, повторите позже");
-    //   })
-    //   .finally(() => {
-    //     setIsCreating(false);
-    //   });
   };
 
   return (

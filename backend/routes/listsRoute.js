@@ -1,7 +1,8 @@
 import express from "express";
-import { isAuth } from "../utils.js"; // Middleware для авторизации
+import { deepCopy, isAuth } from "../utils.js"; // Middleware для авторизации
 import Board from "../models/board.js";
 import List from "../models/list.js";
+import Card from "../models/card.js";
 
 const router = express.Router();
 
@@ -78,6 +79,7 @@ router.post("/:boardId", isAuth, async (req, res) => {
       cards: [],
       order: board.lists.length,
     });
+
     board.lists.push(newList._id);
     await board.save();
 
@@ -109,7 +111,7 @@ router.delete("/:boardId/:listId", isAuth, async (req, res) => {
         .json({ message: "У вас нет доступа к удалению списка на этой доске" });
     }
 
-    const list = await List.findById(listId);
+    const list = await List.findById(listId).populate("cards").exec();
 
     if (!list) {
       return res.status(404).json({ message: "Список не найден" });
@@ -117,10 +119,19 @@ router.delete("/:boardId/:listId", isAuth, async (req, res) => {
 
     const orderToDelete = list.order;
 
+    const deletedCards = await Card.deleteMany({ _id: { $in: list.cards } });
+
     // Удаление листа из базы данных
     await List.findByIdAndDelete(listId);
 
-    // Обновление порядка оставшихся листов
+    // for (const listId of board.lists) {
+    //   const remainingList = await List.findById(listId);
+    //   if (remainingList && remainingList.order > orderToDelete) {
+    //     remainingList.order--;
+    //     await remainingList.save();
+    //   }
+    // }
+
     for (const listId of board.lists) {
       const remainingList = await List.findById(listId);
       if (remainingList && remainingList.order > orderToDelete) {
@@ -129,9 +140,12 @@ router.delete("/:boardId/:listId", isAuth, async (req, res) => {
       }
     }
 
-    // Удаление листа из списка листов на доске
-    board.lists = board.lists.filter((id) => id.toString() !== listId);
-    await board.save();
+    await Board.findByIdAndUpdate(boardId, {
+      $pull: { lists: listId },
+    });
+
+    // board.lists = board.lists.filter((id) => id.toString() !== listId);
+    // await board.save();
 
     res.json({ message: "Список успешно удален" });
   } catch (err) {
@@ -272,6 +286,149 @@ router.put("/:boardId/move/:listId", isAuth, async (req, res) => {
     await list.save();
 
     res.json({ message: "Список перемещён успешно" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+router.put("/:boardId/copy/:listId", isAuth, async (req, res) => {
+  const { boardId, listId } = req.params;
+  const { title } = req.body;
+
+  try {
+    const board = await Board.findById(boardId).populate("lists").exec();
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    if (
+      board.creator.toString() !== req.user._id &&
+      !board.users.includes(req.user._id)
+    ) {
+      return res.status(403).json({
+        message: "У вас нет доступа к обновлению списка на этой доске",
+      });
+    }
+
+    const sourceList = await List.findById(listId)
+      .populate({
+        path: "cards",
+        populate: [
+          {
+            path: "assignedUsers",
+            select: "username email _id",
+          },
+          {
+            path: "attachments.creator",
+            select: "username email _id",
+          },
+        ],
+      })
+      .exec();
+
+    if (!sourceList) {
+      return res.status(404).json({ message: "Список не найден" });
+    }
+
+    const newCards = await Promise.all(
+      sourceList.cards.map(async (card) => {
+        const { _id, createdAt, ...rest } = card.toObject();
+        const newCard = await Card.create(rest);
+        return newCard._id;
+      })
+    );
+
+    const newList = await List.create({
+      title,
+      cards: newCards,
+      order: board.lists.length,
+    });
+
+    board.lists.push(newList._id);
+    await board.save();
+
+    const responseList = await List.findById(newList._id)
+      .populate({
+        path: "cards",
+        populate: [
+          {
+            path: "assignedUsers",
+            select: "username email _id",
+          },
+          {
+            path: "attachments.creator",
+            select: "username email _id",
+          },
+        ],
+      })
+      .exec();
+
+    res.json(responseList);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+//Перемещение всех карточек из одного списка в другой
+router.put("/:boardId/move-cards", isAuth, async (req, res) => {
+  const { boardId } = req.params;
+  const { sourceListId, resultListId } = req.body;
+
+  try {
+    const board = await Board.findById(boardId);
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    if (
+      board.creator.toString() !== req.user._id &&
+      !board.users.includes(req.user._id)
+    ) {
+      return res.status(403).json({
+        message: "У вас нет доступа к обновлению списка на этой доске",
+      });
+    }
+
+    const sourceList = await List.findById(sourceListId)
+      .populate("cards")
+      .exec();
+    const resultList = await List.findById(resultListId)
+      .populate("cards")
+      .exec();
+
+    if (!sourceList || !resultList) {
+      return res.status(404).json({ message: "Один из списков не найден" });
+    }
+
+    // Сортировка карточек по параметру order
+    sourceList.cards.sort((a, b) => a.order - b.order);
+    resultList.cards.sort((a, b) => a.order - b.order);
+
+    // Перемещение карточек из исходного списка в целевой список
+    resultList.cards.push(...sourceList.cards);
+    sourceList.cards = [];
+
+    // Сохранение изменений в базе данных
+    await resultList.save();
+    await sourceList.save();
+
+    const resultBoard = await Board.findById(boardId)
+      .populate({
+        path: "lists",
+        populate: {
+          path: "cards",
+          populate: {
+            path: "assignedUsers",
+          },
+        },
+      })
+      .exec();
+
+    res.json(resultBoard.lists.sort((a, b) => a.order - b.order));
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });

@@ -12,7 +12,7 @@ import axiosInstance from "../../axiosInterceptor";
 import { toast } from "react-toastify";
 import { updateCard } from "../../store/slices/boardsSlice";
 import { updateCardAttachments } from "../../store/slices/metadataSlice";
-registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
+// registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
 const AttachmentsModal = ({ closeModal }) => {
   const { cardEditing } = useSelector((state) => state.metadata);
@@ -20,11 +20,8 @@ const AttachmentsModal = ({ closeModal }) => {
 
   const dispatch = useDispatch();
 
-  const [files, setFiles] = useState([]);
-
   const handleFileChange = async (event) => {
     const selectedFiles = Array.from(event.target.files);
-    setFiles(selectedFiles);
 
     try {
       for (const file of selectedFiles) {
@@ -75,14 +72,16 @@ const AttachmentsModal = ({ closeModal }) => {
   };
 
   return (
-    <Box>
+    <Box sx={{ py: 2 }}>
       <Button
         component="label"
         variant="contained"
+        fullWidth
         startIcon={<CloudUploadIcon />}
       >
         Загрузить файл
         <input
+          multiple
           onChange={handleFileChange}
           style={{
             clip: "rect(0 0 0 0)",

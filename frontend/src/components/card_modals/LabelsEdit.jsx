@@ -1,4 +1,4 @@
-import { Box, Button, Divider, List, Paper } from "@mui/material";
+import { Box, Button, Divider, List } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LabelListItem from "../LabelListItem";

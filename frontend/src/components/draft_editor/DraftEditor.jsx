@@ -5,6 +5,7 @@ import {
   RichUtils,
   convertToRaw,
   convertFromRaw,
+  AtomicBlockUtils,
 } from "draft-js";
 import Toolbar from "./Toolbar";
 import "./DraftEditor.css";
@@ -18,6 +19,7 @@ import axiosInstance from "../../axiosInterceptor";
 import { SERVER_URL } from "../../constants";
 import { toast } from "react-toastify";
 import { updateCard } from "../../store/slices/boardsSlice";
+import createImagePlugin from "@draft-js-plugins/image";
 
 const DraftEditor = () => {
   const { cardEditing, editableDraft } = useSelector((state) => state.metadata);
@@ -160,6 +162,24 @@ const DraftEditor = () => {
     setEditorState(newState);
     dispatch(toggleEditableDraft());
   };
+
+  // const insertImage = (url) => {
+  //   const contentState = editorState.getCurrentContent();
+  //   const contentStateWithEntity = contentState.createEntity(
+  //     "IMAGE",
+  //     "IMMUTABLE",
+  //     {
+  //       src:
+  //         url ||
+  //         `${SERVER_URL}/65ba1a49e2aef2a321f69cf6/1707887534639_WhatsApp Image 2024-02-07 at 17.08.29.jpeg`,
+  //     }
+  //   );
+  //   const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+  //   const newEditorState = EditorState.set(editorState, {
+  //     currentContent: contentStateWithEntity,
+  //   });
+  //   return AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, "");
+  // };
 
   return (
     <>

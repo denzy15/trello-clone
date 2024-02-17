@@ -62,16 +62,6 @@ router.get("/:boardId", isAuth, async (req, res) => {
       });
     }
 
-    // const cards = [];
-    // for (const listId of board.lists) {
-    //   const list = await List.findById(listId);
-    //   if (list) {
-    //     for (const cardId of list.cards) {
-    //       cards.push(await Card.findById(cardId));
-    //     }
-    //   }
-    // }
-
     const listIds = board.lists; // Получаем массив ID листов
     const lists = await List.find({ _id: { $in: listIds } }); // Находим все листы в одном запросе
 
@@ -573,7 +563,7 @@ router.post(
   }
 );
 
-//Переименовать файл вложения
+//Переименовать или удалить файл вложения
 router.put("/:boardId/:cardId/attach", isAuth, async (req, res) => {
   try {
     const { boardId, cardId } = req.params;
@@ -604,12 +594,12 @@ router.put("/:boardId/:cardId/attach", isAuth, async (req, res) => {
     }
 
     if (!name) {
-      const filePath = path.join(
-        __dirname,
-        "uploads",
-        updatedCard.attachments[idx].path
-      );
-      await deleteFile(filePath);
+      // const filePath = path.join(
+      //   __dirname,
+      //   "uploads",
+      //   updatedCard.attachments[idx].path
+      // );
+      // await deleteFile(filePath);
       updatedCard.attachments.splice(idx, 1);
     } else {
       updatedCard.attachments[idx].name = name;
@@ -623,8 +613,6 @@ router.put("/:boardId/:cardId/attach", isAuth, async (req, res) => {
       .exec();
 
     res.json(card);
-
-    // res.json(updatedCard);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });

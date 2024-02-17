@@ -20,7 +20,7 @@ const LabelListItem = ({
 }) => {
   const isDarkBackground = colorIsDark(label.color);
   const [searchParams, setSearchParams] = useSearchParams();
-  //   debugger
+
   return (
     <ListItem disablePadding sx={{ mb: 1 }}>
       <ListItemIcon>
@@ -46,6 +46,7 @@ const LabelListItem = ({
       >
         <ListItemText
           sx={{
+            maxWidth: 150,
             color: isDarkBackground ? "#ffffff" : "#000000",
             "& span": {
               overflow: "hidden",

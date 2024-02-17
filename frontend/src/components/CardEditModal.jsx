@@ -16,6 +16,8 @@ import {
   ListSubheader,
   Tooltip,
   Button,
+  ClickAwayListener,
+  Chip,
 } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import CloseIcon from "@mui/icons-material/Close";
@@ -24,18 +26,44 @@ import LabelIcon from "@mui/icons-material/LocalOffer";
 import DateIcon from "@mui/icons-material/CalendarMonth";
 import { useDispatch, useSelector } from "react-redux";
 import DynamicModal from "./DynamicModal";
-import { convertUsernameForAvatar, getUserColor } from "../utils";
+import { colorIsDark, convertUsernameForAvatar, getUserColor } from "../utils";
 import { renameCard } from "../store/slices/boardsSlice";
 import axiosInstance from "../axiosInterceptor";
 import { SERVER_URL } from "../constants";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
-import { EditorState, RichUtils } from "draft-js";
 import SubjectIcon from "@mui/icons-material/Subject";
 import DraftEditor from "./draft_editor/DraftEditor";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import CardAttachmentItem from "./CardAttachmentItem";
+import CommentIcon from "@mui/icons-material/Comment";
+
+const renderDateChip = (date) => {
+  const dueDate = dayjs(date);
+  const currentDate = dayjs();
+
+  const daysUntilDue = dueDate.diff(currentDate, "days");
+
+  if (daysUntilDue < 0) {
+    return (
+      <Chip sx={{ m: 1 }} label={"Просрочено"} color="error" size="small" />
+    );
+  }
+
+  if (daysUntilDue < 3) {
+    return (
+      <Chip
+        sx={{ m: 1 }}
+        size="small"
+        color="warning"
+        label={"Скоро истекает"}
+      />
+    );
+  }
+
+  return null;
+};
 
 const listItems = [
   {
@@ -108,7 +136,6 @@ const CardEditModal = ({ close }) => {
     setIsEditingTitle(false);
   };
 
-
   const handleOpenModal = (name, order) => {
     if (currentModalOpened.opened && currentModalOpened.name === name) {
       setCurrentModalOpened({
@@ -121,11 +148,20 @@ const CardEditModal = ({ close }) => {
 
     setCurrentModalOpened({ opened: true, name, order });
   };
+
+  const [showAllAttachments, setShowAllAttachments] = useState(false);
+  const visibleAttachments = showAllAttachments
+    ? cardEditing.card.attachments
+    : cardEditing.card.attachments.slice(0, 5);
+
+  renderDateChip(currentCard.dueDate);
+
   return (
     <Paper
       elevation={1}
       sx={{
         position: "absolute",
+        borderRadius: 0,
         top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
@@ -136,6 +172,8 @@ const CardEditModal = ({ close }) => {
         zIndex: 10,
         overflowY: "auto",
       }}
+      onMouseDown={(e) => e.stopPropagation()}
+      onMouseUp={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
       <IconButton
@@ -149,7 +187,7 @@ const CardEditModal = ({ close }) => {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ pl: 3, position: "relative", display: "inline-block" }}>
+      <Box sx={{ pl: 3, position: "relative", display: "inline-block", maxWidth: "95%" }}>
         {isEditingTitle ? (
           <TextField
             value={currentCard.title}
@@ -165,7 +203,11 @@ const CardEditModal = ({ close }) => {
         ) : (
           <Typography
             variant="h5"
-            sx={{ fontWeight: 600, cursor: "pointer", display: "inline-block" }}
+            sx={{
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "inline-block",
+            }}
             onClick={() => setIsEditingTitle(true)}
           >
             {currentCard.title}
@@ -194,10 +236,11 @@ const CardEditModal = ({ close }) => {
 
       <Stack direction={"row"} sx={{ mt: 3 }}>
         <Box sx={{ pl: 3, flex: 1, position: "relative" }}>
+          {/* Участники */}
           {!!cardEditing.card.assignedUsers.length && (
             <Box sx={{ mt: 2 }}>
-              <Typography sx={{ mb: 1 }} variant="h6">
-                Участники:
+              <Typography sx={{ mb: 0.5 }} variant="body1">
+                Участники
               </Typography>
               <AvatarGroup
                 max={4}
@@ -214,11 +257,61 @@ const CardEditModal = ({ close }) => {
               </AvatarGroup>
             </Box>
           )}
-          <Box>
+          {/* Метки */}
+          {!!cardEditing.card.labels.length && (
+            <Box sx={{ mt: 2 }}>
+              <Typography sx={{ mb: 0.5 }} variant="body1">
+                Метки
+              </Typography>
+              <Stack
+                direction={"row"}
+                display={"inline-flex"}
+                onClick={() => handleOpenModal("Метки", 1)}
+                sx={{flexWrap: "wrap", gap: 1}}
+              >
+                {cardEditing.card.labels.map((lbl) => (
+                  <Box
+                    key={lbl._id}
+                    sx={{
+                      cursor: "pointer",
+                      p: 1,
+                      borderRadius: 1,
+                      bgcolor: lbl.color,
+                      minWidth: 48,
+                      height: 30,
+                      color: colorIsDark(lbl.color) ? "white" : "black",
+                    }}
+                  >
+                    {lbl.title}
+                  </Box>
+                ))}
+                <Box
+                  sx={{
+                    cursor: "pointer",
+                    p: 1,
+                    borderRadius: 1,
+                    bgcolor: "#eeeeee",
+                    minWidth: 48,
+                    height: 30,
+                    fontSize: 25,
+                    fontWeight: 600,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  +
+                </Box>
+              </Stack>
+            </Box>
+          )}
+
+          {/* Даты*/}
+          <Box sx={{ mt: 2 }}>
             {cardEditing.card.startDate && cardEditing.card.dueDate && (
               <>
-                <Typography variant="h6">Даты:</Typography>
-                <Typography
+                <Typography variant="h6">Даты</Typography>
+                <Box
                   onClick={() => handleOpenModal("Дата", 2)}
                   sx={{
                     cursor: "pointer",
@@ -231,12 +324,13 @@ const CardEditModal = ({ close }) => {
                 >
                   {dayjs(cardEditing.card.startDate).format("DD MMM YYYY")} -{" "}
                   {dayjs(cardEditing.card.dueDate).format("DD MMM YYYY, hh:mm")}
-                </Typography>
+                  {renderDateChip(cardEditing.card.dueDate)}
+                </Box>
               </>
             )}
             {cardEditing.card.startDate && !cardEditing.card.dueDate && (
               <>
-                <Typography variant="h6">Начало:</Typography>
+                <Typography variant="h6">Начало</Typography>
                 <Typography
                   onClick={() => handleOpenModal("Дата", 2)}
                   sx={{
@@ -254,8 +348,8 @@ const CardEditModal = ({ close }) => {
             )}
             {!cardEditing.card.startDate && cardEditing.card.dueDate && (
               <>
-                <Typography variant="h6">Срок:</Typography>
-                <Typography
+                <Typography variant="h6">Срок</Typography>
+                <Box
                   onClick={() => handleOpenModal("Дата", 2)}
                   sx={{
                     mt: 1,
@@ -267,20 +361,22 @@ const CardEditModal = ({ close }) => {
                   }}
                 >
                   {dayjs(cardEditing.card.dueDate).format("DD MMM YYYY, hh:mm")}
-                </Typography>
+                  {renderDateChip(cardEditing.card.dueDate)}
+                </Box>
               </>
             )}
           </Box>
+          {/* Описание*/}
           <Box sx={{ width: "100%", position: "relative" }}>
             <SubjectIcon
               sx={{ position: "absolute", top: 4, left: -30, fontSize: 25 }}
             />
             <Typography sx={{ my: 1 }} variant="h6">
-              Описание:
+              Описание
             </Typography>
             <DraftEditor />
           </Box>
-
+          {/* Вложения */}
           {cardEditing.card.attachments.length > 0 && (
             <Box sx={{ position: "relative" }}>
               <AttachFileIcon
@@ -294,7 +390,7 @@ const CardEditModal = ({ close }) => {
               />
               <Stack direction="row" justifyContent="space-between">
                 <Typography sx={{ my: 1 }} variant="h6">
-                  Вложения:
+                  Вложения
                 </Typography>
                 <Button
                   size="small"
@@ -305,20 +401,48 @@ const CardEditModal = ({ close }) => {
                 </Button>
               </Stack>
               <Box
-                sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 3 }}
+                sx={{
+                  mt: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 3,
+                }}
               >
-                {cardEditing.card.attachments.map((att, i) => (
+                {visibleAttachments.map((att, i) => (
                   <CardAttachmentItem key={i} {...att} index={i} />
                 ))}
               </Box>
+              {cardEditing.card.attachments.length > 5 && (
+                <Button
+                  sx={{ mt: 1 }}
+                  variant="outlined"
+                  onClick={() => setShowAllAttachments((pr) => !pr)}
+                >
+                  {!showAllAttachments
+                    ? "Показать остальное (" +
+                      (cardEditing.card.attachments.length -
+                        visibleAttachments.length) +
+                      ")"
+                    : "Показать меньше"}
+                </Button>
+              )}
             </Box>
           )}
+          {/* Комменты */}
+          <Box sx={{ position: "relative", mt: 3 }}>
+            <CommentIcon
+              sx={{ position: "absolute", top: 4, left: -30, fontSize: 25 }}
+            />
+            <Typography sx={{ my: 1 }} variant="h6">
+              Комментарии
+            </Typography>
+          </Box>
         </Box>
         <Box>
           <List
             disablePadding
             subheader={
-              <ListSubheader sx={{ lineHeight: 1 }}>
+              <ListSubheader sx={{ lineHeight: 1, position: "static" }}>
                 Добавить на карточку
               </ListSubheader>
             }
@@ -341,6 +465,7 @@ const CardEditModal = ({ close }) => {
           </List>
         </Box>
       </Stack>
+
       {currentModalOpened.opened && (
         <DynamicModal
           header={currentModalOpened.name}

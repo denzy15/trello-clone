@@ -3,7 +3,6 @@ import {
   Button,
   Divider,
   Popover,
-  Popper,
   Stack,
   TextField,
   Typography,
@@ -25,6 +24,8 @@ import { updateCard } from "../store/slices/boardsSlice";
 const CardAttachmentItem = (props) => {
   const { createdAt, creator, name, path, type, index, _id } = props;
 
+  const [openImage, setOpenImage] = useState(false);
+
   const { boardId } = useParams();
   const { cardEditing } = useSelector((state) => state.metadata);
 
@@ -39,6 +40,7 @@ const CardAttachmentItem = (props) => {
   const id2 = !!anchorEl2 ? "simple-popper-2" : undefined;
 
   const updateAttachName = async (e) => {
+    e.stopPropagation();
     if (!newName) {
       setNewName(name);
       setAnchorEl1(null);
@@ -75,7 +77,8 @@ const CardAttachmentItem = (props) => {
     setAnchorEl1(null);
   };
 
-  const deleteAttachHandler = async () => {
+  const deleteAttachHandler = async (e) => {
+    e.stopPropagation();
     await axiosInstance
       .put(
         `${SERVER_URL}/api/cards/${boardId}/${cardEditing.card._id}/attach`,
@@ -101,10 +104,20 @@ const CardAttachmentItem = (props) => {
     setAnchorEl2(null);
   };
 
+  const handleDownload = () => {
+    const downloadLink = document.createElement("a");
+    downloadLink.href = SERVER_URL + "/" + path;
+    downloadLink.target = "_blank";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  };
+
   return (
     <Stack
       direction="row"
-      alignItems="stretch"
+      alignItems="center"
+      justifyContent={"flex-start"}
       spacing={1}
       sx={{
         borderRadius: 1,
@@ -116,13 +129,18 @@ const CardAttachmentItem = (props) => {
     >
       <Box
         sx={{
-          flexBasis: 150,
-          minHeight: 50,
+          flexBasis: "25%",
           bgcolor: "#b3b3b3",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          aspectRatio: 16 / 9,
         }}
+        onClick={
+          getFileType(type) === "image"
+            ? () => setOpenImage(true)
+            : handleDownload
+        }
       >
         {getFileType(type) === "image" ? (
           <img
@@ -134,7 +152,7 @@ const CardAttachmentItem = (props) => {
           <Typography variant="h6">{getFileExtension(path)}</Typography>
         )}
       </Box>
-      <Box>
+      <Box sx={{ flex: 1 }}>
         <Typography variant="body1" sx={{ fontWeight: 500, fontSize: 16 }}>
           {name}
         </Typography>
@@ -146,7 +164,10 @@ const CardAttachmentItem = (props) => {
             aria-describedby={id1}
             size="small"
             color="inherit"
-            onClick={(e) => setAnchorEl1(e.currentTarget)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setAnchorEl1(e.currentTarget);
+            }}
           >
             Изменить
           </Button>
@@ -154,7 +175,9 @@ const CardAttachmentItem = (props) => {
           <Button
             color="inherit"
             size="small"
-            onClick={(e) => setAnchorEl2(e.currentTarget)}
+            onClick={(e) => {
+              setAnchorEl2(e.currentTarget);
+            }}
           >
             Удалить
           </Button>
@@ -193,7 +216,10 @@ const CardAttachmentItem = (props) => {
           id={id2}
           open={!!anchorEl2}
           anchorEl={anchorEl2}
-          onClose={() => setAnchorEl2(null)}
+          onClose={(e) => {
+            e.stopPropagation();
+            setAnchorEl2(null);
+          }}
           anchorOrigin={{
             vertical: "bottom",
             horizontal: "left",
@@ -222,6 +248,33 @@ const CardAttachmentItem = (props) => {
             </Button>
           </Box>
         </Popover>
+        {openImage && (
+          <Popover
+            sx={{ bgcolor: "rgba(0, 0, 0, 0.5)" }}
+            open={openImage}
+            anchorEl={document.querySelector("#root")}
+            onClose={(e) => {
+              e.stopPropagation();
+              setOpenImage(false);
+            }}
+            anchorOrigin={{
+              vertical: "center",
+              horizontal: "center",
+            }}
+            transformOrigin={{
+              vertical: "center",
+              horizontal: "center",
+            }}
+          >
+            <Box>
+              <img
+                src={`${SERVER_URL}/${path}`}
+                alt={name}
+                style={{ maxWidth: "100%", maxHeight: "100%" }}
+              />
+            </Box>
+          </Popover>
+        )}
       </Box>
     </Stack>
   );

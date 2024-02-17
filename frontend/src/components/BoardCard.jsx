@@ -57,6 +57,7 @@ const BoardCard = (props) => {
                     key={i}
                     sx={{
                       px: 0.5,
+                      minWidth: 40,
                       height: extendedLabels ? "auto" : 8,
                       width: extendedLabels ? "auto" : 40,
                       bgcolor: lbl.color,

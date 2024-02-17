@@ -90,10 +90,15 @@ export const boardsSlice = createSlice({
     updateLists: (state, action) => {
       state.currentBoard.lists = action.payload;
     },
+    
+    deleteList: (state, action) => {
+      state.currentBoard.lists.splice(action.payload.listIndex, 1);
+    },
   },
 });
 
 export const {
+  deleteList,
   updateCard,
   updateBoardCardDates,
   updateLists,
