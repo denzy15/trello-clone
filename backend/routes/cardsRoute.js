@@ -194,7 +194,24 @@ router.delete("/:boardId/:listId/:cardId", isAuth, async (req, res) => {
     await Card.deleteOne(card);
     await list.save();
 
-    res.json({ message: "Карточка успешно удалена" });
+    const responseList = await List.findById(listId)
+      .populate({
+        path: "cards",
+        populate: [
+          {
+            path: "assignedUsers",
+            select: "username email _id",
+          },
+          {
+            path: "attachments.creator",
+            select: "username email _id",
+          },
+        ],
+      })
+      .exec();
+
+    res.json(responseList);
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -468,6 +485,7 @@ router.put("/:boardId/:cardId", isAuth, async (req, res) => {
       assignedUsers,
       labels,
       startDate,
+      comments,
     } = req.body;
 
     const board = await Board.findById(boardId);
@@ -492,15 +510,22 @@ router.put("/:boardId/:cardId", isAuth, async (req, res) => {
     updatedCard.attachments = attachments || updatedCard.attachments;
     updatedCard.assignedUsers = assignedUsers || updatedCard.assignedUsers;
     updatedCard.labels = labels || updatedCard.labels;
+    updatedCard.comments = comments || updatedCard.comments;
     updatedCard.startDate =
       startDate !== undefined ? startDate : updatedCard.startDate;
     updatedCard.dueDate = dueDate !== undefined ? dueDate : updatedCard.dueDate;
+
+    comments &&
+      updatedCard.comments.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
 
     await updatedCard.save();
 
     const card = await Card.findById(cardId)
       .populate("assignedUsers", "username email _id")
       .populate("attachments.creator", "username email _id")
+      .populate("comments.author", "username email _id")
       .exec();
 
     res.json(card);

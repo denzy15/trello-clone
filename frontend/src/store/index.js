@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
 import boardsReducer from "./slices/boardsSlice";
 import metadataReducer from "./slices/metadataSlice";
+import invitationsReducer from "./slices/invitationsSlice";
 import storage from "redux-persist/lib/storage";
 import {
   FLUSH,
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   boards: boardsReducer,
   metadata: metadataReducer,
+  invitations: invitationsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

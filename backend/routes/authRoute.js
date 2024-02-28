@@ -44,7 +44,21 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     // Поиск пользователя по email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate([
+      {
+        path: "invitations",
+        populate: [
+          {
+            path: "board",
+            select: "title",
+          },
+          {
+            path: "inviter",
+            select: "username email",
+          },
+        ],
+      },
+    ]);
 
     if (!user) {
       return res.status(401).json({ message: "Неверный email или пароль" });
@@ -57,12 +71,15 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Неверный email или пароль" });
     }
 
-    res.json({
-      _id: user._id,
-      username: user.username,
-      email,
-      token: generateToken(user),
-    });
+    // const result = await User.findById(user._id, "-password").populate(
+    //   "invitations"
+    // );
+
+    const result = { ...user.toObject(), token: generateToken(user) };
+
+    delete result.password;
+
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });

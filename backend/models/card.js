@@ -55,6 +55,14 @@ const cardSchema = new Schema({
         ref: "User",
         required: true,
       },
+      createdAt: {
+        type: Date,
+        default: () => new Date().toISOString(),
+      },
+      updatedAt: {
+        type: Date,
+        default: null,
+      },
     },
   ],
 });

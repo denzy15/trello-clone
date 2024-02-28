@@ -7,6 +7,7 @@ import authRouter from "./routes/authRoute.js";
 import listsRouter from "./routes/listsRoute.js";
 import cardsRouter from "./routes/cardsRoute.js";
 import usersRouter from "./routes/usersRoute.js";
+import invitationsRouter from "./routes/invitationsRoute.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -36,6 +37,7 @@ app.use("/api/boards", boardsRouter);
 app.use("/api/cards", cardsRouter);
 app.use("/api/lists", listsRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/invite", invitationsRouter);
 
 app.listen(PORT, (error) => {
   if (!error) console.log("Server is Running on port " + PORT);

@@ -18,11 +18,10 @@ export const authSlice = createSlice({
       state.token = action.payload.token;
     },
     signOut: (state, action) => {
-      console.log(initialState);
-      state._id = null
-      state.username = null
-      state.email = null
-      state.token = null
+      state._id = null;
+      state.username = null;
+      state.email = null;
+      state.token = null;
     },
   },
 });

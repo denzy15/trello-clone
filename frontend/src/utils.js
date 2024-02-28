@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import md5 from "md5";
 
 export const convertUsernameForAvatar = (username) => {
@@ -63,4 +64,34 @@ export const getFileType = (type) => {
 export const getFileExtension = (path) => {
   const index = path.lastIndexOf(".");
   return index === -1 ? "file" : path.slice(index + 1);
+};
+
+export const formatDateWithourYear = (date) => {
+  const currentDate = dayjs();
+  const targetDate = dayjs(date);
+
+  if (targetDate.get("year") === currentDate.get("year")) {
+    return targetDate.format("DD MMM HH:mm");
+  }
+
+  return targetDate.format("DD MMM YYYY HH:mm");
+};
+
+export const isExpired = (date) => {
+  const dueDate = dayjs(date);
+  const currentDate = dayjs();
+
+  const daysUntilDue = dueDate.diff(currentDate, "days");
+
+  return daysUntilDue < 0 ? true : false;
+};
+
+export const isUserOnBoard = (userId, board) => {
+  if (board.creator._id === userId) return true;
+
+  for (const user of board.users) {
+    if (user._id === userId) return true;
+  }
+
+  return false;
 };

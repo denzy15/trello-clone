@@ -2,19 +2,12 @@ import {
   Box,
   Divider,
   IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Paper,
   Popover,
   Stack,
   Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { deleteList } from "../store/slices/boardsSlice";
 import CloseIcon from "@mui/icons-material/Close";
 import MainListModal from "./list_modals/MainListModal";
 import MoveCards from "./list_modals/MoveCards";
@@ -35,14 +28,11 @@ const steps = [
 ];
 
 const ListEditModal = (props) => {
-  const { setAnchorEl, anchorEl, index } = props;
-  //   console.log(props);
+  const { setAnchorEl, anchorEl } = props;
 
   const initialState = steps[0];
 
   const [modalState, setModalState] = useState(initialState);
-
-  // const dispatch = useDispatch();
 
   const handleClick = (index) => {
     setModalState(steps[index]);

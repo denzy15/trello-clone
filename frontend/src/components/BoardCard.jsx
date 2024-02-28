@@ -14,7 +14,15 @@ import {
   startCardEdit,
   toggleExtendedLabels,
 } from "../store/slices/metadataSlice";
-import { colorIsDark, convertUsernameForAvatar, getUserColor } from "../utils";
+import {
+  colorIsDark,
+  convertUsernameForAvatar,
+  formatDateWithourYear,
+  getUserColor,
+  isExpired,
+} from "../utils";
+import { AttachFile, ChatBubbleOutlineOutlined, QueryBuilder, Subject } from "@mui/icons-material";
+import dayjs from "dayjs";
 
 const BoardCard = (props) => {
   const { extendedLabels } = useSelector((state) => state.metadata);
@@ -69,8 +77,8 @@ const BoardCard = (props) => {
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       "&:hover": {
-                        opacity: 0.9
-                      }
+                        opacity: 0.9,
+                      },
                     }}
                   >
                     {extendedLabels && lbl.title}
@@ -78,12 +86,83 @@ const BoardCard = (props) => {
                 ))}
               </Box>
               <Typography sx={{ fontWeight: 500 }}>{props.title}</Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2,
+                  flexWrap: "wrap",
+                  cursor: "pointer",
+                  alignItems: "center",
+                  mt: 1,
+                }}
+              >
+                {!!props.dueDate && (
+                  <Tooltip title="Срок карточки">
+                    <Stack
+                      direction={"row"}
+                      alignItems={"center"}
+                      spacing={0.25}
+                      sx={{
+                        p: 0.3,
+                        bgcolor: isExpired(props.dueDate) ? '#FFD5D2' : null,
+                        color: isExpired(props.dueDate) ? 'red' : 'black'
+                      }}
+                    >
+                      <QueryBuilder sx={{ fontSize: 14 }} />
+                      <Typography variant="subtitle2">
+                        {formatDateWithourYear(props.dueDate)}
+                      </Typography>
+                    </Stack>
+                  </Tooltip>
+                )}
+
+                {!!props.attachments.length && (
+                  <Tooltip title={"Вложения"}>
+                    <Stack
+                      direction={"row"}
+                      alignItems={"center"}
+                      spacing={0.25}
+                    >
+                      <AttachFile
+                        sx={{ transform: "rotate(45deg)", fontSize: 14 }}
+                      />
+                      <Typography variant="subtitle2">
+                        {props.attachments.length}
+                      </Typography>
+                    </Stack>
+                  </Tooltip>
+                )}
+
+                {!!props.comments.length && (
+                  <Tooltip title={"Комментарии"}>
+                    <Stack
+                      direction={"row"}
+                      alignItems={"center"}
+                      spacing={0.25}
+                    >
+                      <ChatBubbleOutlineOutlined
+                        sx={{ fontSize: 14 }}
+                      />
+                      <Typography variant="subtitle2">
+                        {props.comments.length}
+                      </Typography>
+                    </Stack>
+                  </Tooltip>
+                )}
+
+                {!!props.description && (
+                  <Tooltip title={"Имеется описание"}>
+                    <Subject sx={{ fontSize: 18 }} />
+                  </Tooltip>
+                )}
+              </Box>
               <Stack direction={"row"}>
                 {props.assignedUsers.length > 0 && (
                   <AvatarGroup
                     key={props._id}
                     max={3}
                     sx={{
+                      cursor: "pointer",
                       ml: "auto",
                       "& .MuiAvatarGroup-avatar": {
                         width: 24,

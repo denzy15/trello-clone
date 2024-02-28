@@ -9,10 +9,10 @@ const router = express.Router();
 // Получение списка всех досок
 router.get("/", isAuth, async (req, res) => {
   try {
-    const userId = req.user._id; // ID пользователя из информации о пользователе
+    const userId = req.user._id;
 
     const boards = await Board.find({
-      $or: [{ creator: userId }, { users: userId }],
+      $or: [{ creator: userId }, { users: { $elemMatch: { userId: userId } } }],
     });
 
     res.json(boards);
@@ -111,6 +111,10 @@ router.get("/:boardId", isAuth, async (req, res) => {
             },
             {
               path: "attachments.creator",
+              select: "username email _id",
+            },
+            {
+              path: "comments.author",
               select: "username email _id",
             },
           ],

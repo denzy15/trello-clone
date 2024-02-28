@@ -88,6 +88,10 @@ export const metadataSlice = createSlice({
       state.cardEditing.card.attachments.splice(action.payload.index, 1);
     },
 
+    updateComments: (state, action) => {
+      state.cardEditing.card.comments = action.payload;
+    },
+
     toggleExtendedLabels: (state, action) => {
       state.extendedLabels = !state.extendedLabels;
     },
@@ -98,6 +102,7 @@ export const metadataSlice = createSlice({
 });
 
 export const {
+  updateComments,
   deleteAttach,
   updateCardAttachName,
   updateCardAttachments,

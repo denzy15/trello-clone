@@ -8,6 +8,7 @@ import { SERVER_URL } from "../constants";
 import { setBoards } from "../store/slices/boardsSlice";
 import { useNavigate } from "react-router-dom";
 import NewBoardModal from "../components/NewBoardModal";
+import { setInvitations } from "../store/slices/invitationsSlice";
 
 const Home = () => {
   const { recent } = useSelector((state) => state.metadata);
@@ -30,7 +31,17 @@ const Home = () => {
         .catch(() => setFetchError("Не удалось загрузить доски"));
     }
 
+    async function fetchNotifications() {
+      await axiosInstance
+        .get(`${SERVER_URL}/api/users/notifications`)
+        .then(({ data }) => {
+          dispatch(setInvitations(data));
+        })
+        .catch(() => setFetchError("Не удалось загрузить новые уведомления"));
+    }
+
     fetchBoards();
+    fetchNotifications();
   }, [dispatch]);
 
   return (

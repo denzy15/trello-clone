@@ -13,8 +13,16 @@ const boardSchema = new Schema({
   },
   users: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      role: {
+        type: String,
+        enum: ["ADMIN", "MEMBER"],
+        default: "MEMBER", 
+      },
     },
   ],
   lists: [
@@ -26,7 +34,7 @@ const boardSchema = new Schema({
   labels: [
     {
       title: { type: String, default: "" },
-      color: { type: String },
+      color: { type: String, default: "#FAFAFA" },
     },
   ],
 });

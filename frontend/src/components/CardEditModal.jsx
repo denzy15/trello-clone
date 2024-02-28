@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -16,8 +16,9 @@ import {
   ListSubheader,
   Tooltip,
   Button,
-  ClickAwayListener,
   Chip,
+  Divider,
+  Popover,
 } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import CloseIcon from "@mui/icons-material/Close";
@@ -26,8 +27,18 @@ import LabelIcon from "@mui/icons-material/LocalOffer";
 import DateIcon from "@mui/icons-material/CalendarMonth";
 import { useDispatch, useSelector } from "react-redux";
 import DynamicModal from "./DynamicModal";
-import { colorIsDark, convertUsernameForAvatar, getUserColor } from "../utils";
-import { renameCard } from "../store/slices/boardsSlice";
+import {
+  colorIsDark,
+  convertUsernameForAvatar,
+  getUserColor,
+  formatDateWithourYear,
+} from "../utils";
+import {
+  renameCard,
+  updateCard,
+  updateList,
+  updateLists,
+} from "../store/slices/boardsSlice";
 import axiosInstance from "../axiosInterceptor";
 import { SERVER_URL } from "../constants";
 import { useParams } from "react-router-dom";
@@ -38,6 +49,9 @@ import DraftEditor from "./draft_editor/DraftEditor";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import CardAttachmentItem from "./CardAttachmentItem";
 import CommentIcon from "@mui/icons-material/Comment";
+import Comment from "./Comment";
+import { stopCardEdit, updateComments } from "../store/slices/metadataSlice";
+import { Close, DeleteOutline } from "@mui/icons-material";
 
 const renderDateChip = (date) => {
   const dueDate = dayjs(date);
@@ -86,9 +100,13 @@ const listItems = [
 
 const CardEditModal = ({ close }) => {
   const { cardEditing } = useSelector((state) => state.metadata);
+  const currentUserInfo = useSelector((state) => state.auth);
+
   const [currentCard, setCurrentCard] = useState(cardEditing.card);
 
   const { boardId } = useParams();
+
+  const [newComment, setNewComment] = useState("");
 
   //ИЗМЕНЕНИЕ ЗАГОЛОВКА
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -99,7 +117,104 @@ const CardEditModal = ({ close }) => {
     order: 0,
   });
 
+  const [anchorEl, setAnchorEl] = useState(null);
+
   const dispatch = useDispatch();
+
+  const handleUpdateComment = async (commentId, newMessage) => {
+    const targetComment = cardEditing.card.comments.find(
+      (c) => c._id === commentId
+    );
+
+    if (!targetComment) {
+      toast.error("Что то пошло не так");
+      return;
+    }
+
+    debugger;
+
+    const copy = { ...targetComment };
+
+    copy.message = newMessage;
+    copy.updatedAt = dayjs().toDate();
+
+    const newComments = cardEditing.card.comments.map((c) =>
+      c._id === commentId ? copy : c
+    );
+
+    await axiosInstance
+      .put(`${SERVER_URL}/api/cards/${boardId}/${currentCard._id}`, {
+        comments: newComments,
+      })
+      .then(({ data }) => {
+        dispatch(
+          updateCard({
+            card: data,
+            listIndex: cardEditing.card.listInfo.index,
+            cardIndex: cardEditing.card.index,
+          })
+        );
+        dispatch(updateComments(data.comments));
+      })
+      .catch((e) => {
+        console.log(e);
+        toast.error("Не удалось обновить комментарий");
+      });
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    const newComments = cardEditing.card.comments.filter(
+      (c) => c._id !== commentId
+    );
+
+    await axiosInstance
+      .put(`${SERVER_URL}/api/cards/${boardId}/${currentCard._id}`, {
+        comments: newComments,
+      })
+      .then(({ data }) => {
+        dispatch(
+          updateCard({
+            card: data,
+            listIndex: cardEditing.card.listInfo.index,
+            cardIndex: cardEditing.card.index,
+          })
+        );
+        dispatch(updateComments(data.comments));
+      })
+      .catch((e) => {
+        console.log(e);
+        toast.error("Не удалось удалить комментарий");
+      });
+  };
+
+  const handleSendComment = async () => {
+    const comment = {
+      message: newComment,
+      author: currentUserInfo._id,
+    };
+
+    const newComments = [...cardEditing.card.comments, comment];
+
+    await axiosInstance
+      .put(`${SERVER_URL}/api/cards/${boardId}/${currentCard._id}`, {
+        comments: newComments,
+      })
+      .then(({ data }) => {
+        dispatch(
+          updateCard({
+            card: data,
+            listIndex: cardEditing.card.listInfo.index,
+            cardIndex: cardEditing.card.index,
+          })
+        );
+        dispatch(updateComments(data.comments));
+        setNewComment("");
+      })
+      .catch((e) => {
+        console.log(e);
+        toast.error("Не удалось отправить комментарий");
+      });
+  };
 
   const handleEditTitle = async (e) => {
     if (e.type === "keydown" && e.key !== "Enter") return;
@@ -149,6 +264,27 @@ const CardEditModal = ({ close }) => {
     setCurrentModalOpened({ opened: true, name, order });
   };
 
+  const handleDeleteCard = async () => {
+    await axiosInstance
+      .delete(
+        `${SERVER_URL}/api/cards/${boardId}/${cardEditing.card.listInfo._id}/${cardEditing.card._id}`
+      )
+      .then(({ data }) => {
+        // setAnchorEl(null);
+        dispatch(
+          updateList({
+            listIndex: cardEditing.card.listInfo.index,
+            list: data,
+          })
+        );
+        dispatch(stopCardEdit());
+      })
+      .catch((e) => {
+        console.log(e);
+        toast.error("Не удалось удалить карточку, попробуйте позже");
+      });
+  };
+
   const [showAllAttachments, setShowAllAttachments] = useState(false);
   const visibleAttachments = showAllAttachments
     ? cardEditing.card.attachments
@@ -162,15 +298,13 @@ const CardEditModal = ({ close }) => {
       sx={{
         position: "absolute",
         borderRadius: 0,
-        top: "50%",
+        top: "50px",
         left: "50%",
-        transform: "translate(-50%, -50%)",
+        transform: "translate(-50%)",
         width: "60%",
         bgcolor: "white",
         p: 4,
-        maxHeight: "100vh",
         zIndex: 10,
-        overflowY: "auto",
       }}
       onMouseDown={(e) => e.stopPropagation()}
       onMouseUp={(e) => e.stopPropagation()}
@@ -187,7 +321,14 @@ const CardEditModal = ({ close }) => {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ pl: 3, position: "relative", display: "inline-block", maxWidth: "95%" }}>
+      <Box
+        sx={{
+          pl: 3,
+          position: "relative",
+          display: "inline-block",
+          maxWidth: "95%",
+        }}
+      >
         {isEditingTitle ? (
           <TextField
             value={currentCard.title}
@@ -267,7 +408,7 @@ const CardEditModal = ({ close }) => {
                 direction={"row"}
                 display={"inline-flex"}
                 onClick={() => handleOpenModal("Метки", 1)}
-                sx={{flexWrap: "wrap", gap: 1}}
+                sx={{ flexWrap: "wrap", gap: 1 }}
               >
                 {cardEditing.card.labels.map((lbl) => (
                   <Box
@@ -322,8 +463,8 @@ const CardEditModal = ({ close }) => {
                     borderRadius: 2,
                   }}
                 >
-                  {dayjs(cardEditing.card.startDate).format("DD MMM YYYY")} -{" "}
-                  {dayjs(cardEditing.card.dueDate).format("DD MMM YYYY, hh:mm")}
+                  {dayjs(cardEditing.card.startDate).format("DD MMM")} —{" "}
+                  {formatDateWithourYear(cardEditing.card.dueDate)}
                   {renderDateChip(cardEditing.card.dueDate)}
                 </Box>
               </>
@@ -360,7 +501,7 @@ const CardEditModal = ({ close }) => {
                     borderRadius: 2,
                   }}
                 >
-                  {dayjs(cardEditing.card.dueDate).format("DD MMM YYYY, hh:mm")}
+                  {dayjs(cardEditing.card.dueDate).format("DD MMM YYYY, HH:mm")}
                   {renderDateChip(cardEditing.card.dueDate)}
                 </Box>
               </>
@@ -437,6 +578,44 @@ const CardEditModal = ({ close }) => {
               Комментарии
             </Typography>
           </Box>
+          <Stack direction={"row"} spacing={1} alignItems={"center"}>
+            <Tooltip
+              title={currentUserInfo.username + ` (${currentUserInfo.email})`}
+            >
+              <Avatar sx={{ bgcolor: getUserColor(currentUserInfo._id) }}>
+                {convertUsernameForAvatar(currentUserInfo.username)}
+              </Avatar>
+            </Tooltip>
+            <TextField
+              multiline
+              placeholder="Напишите комментарий..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              size="small"
+              sx={{ flexGrow: 1 }}
+            />
+          </Stack>
+          {!!newComment && (
+            <Button
+              sx={{ mt: 1, float: "right" }}
+              variant="contained"
+              size="small"
+              onClick={handleSendComment}
+            >
+              Отправить
+            </Button>
+          )}
+          <Divider sx={{ my: 3 }} />
+          <Stack direction={"column"} spacing={2}>
+            {cardEditing.card.comments.map((comment) => (
+              <Comment
+                key={comment._id}
+                handleUpdateComment={handleUpdateComment}
+                handleDeleteComment={handleDeleteComment}
+                {...comment}
+              />
+            ))}
+          </Stack>
         </Box>
         <Box>
           <List
@@ -450,8 +629,8 @@ const CardEditModal = ({ close }) => {
             {listItems.map((item, i) => (
               <ListItem key={i}>
                 <ListItemButton
-                  sx={{ p: 0 }}
-                  onClick={(e) => {
+                  sx={{ p: 0.3 }}
+                  onClick={() => {
                     handleOpenModal(item.name, i);
                   }}
                 >
@@ -463,6 +642,59 @@ const CardEditModal = ({ close }) => {
               </ListItem>
             ))}
           </List>
+          <Divider />
+          <List disablePadding>
+            <ListItem>
+              <ListItemButton
+                onClick={(e) => setAnchorEl(e.currentTarget)}
+                sx={{
+                  p: 0.3,
+                  bgcolor: "#ff6c62",
+                  "&:hover": {
+                    bgcolor: "#e75046",
+                  },
+                }}
+              >
+                <ListItemIcon>
+                  <DeleteOutline />
+                </ListItemIcon>
+                <ListItemText primary="Удалить" />
+              </ListItemButton>
+            </ListItem>
+          </List>
+          <Popover
+            open={!!anchorEl}
+            anchorEl={anchorEl}
+            onClose={() => setAnchorEl(null)}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+          >
+            <Box sx={{ position: "relative", p: 2, maxWidth: 300 }}>
+              <IconButton
+                sx={{ position: "absolute", right: 0, top: 0 }}
+                onClick={() => setAnchorEl(null)}
+              >
+                <Close />
+              </IconButton>
+              <Typography sx={{ textAlign: "center", mb: 1 }} variant="h6">
+                Удаление карточки
+              </Typography>
+              <Typography variant="body2">
+                Все данные о карточке будут удалены, и вы не сможете повторно
+                открыть карточку. Отмена невозможна
+              </Typography>
+              <Button
+                color="error"
+                variant="contained"
+                sx={{ mt: 1.5 }}
+                onClick={handleDeleteCard}
+              >
+                Удалить
+              </Button>
+            </Box>
+          </Popover>
         </Box>
       </Stack>
 

@@ -2,23 +2,21 @@ import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import React from "react";
 
 const MainListModal = ({ handleClick }) => {
+  const items = [
+    { id: 1, text: "Копировать список" },
+    { id: 2, text: "Переместить все карточки" },
+    { id: 3, text: "Удалить список" },
+  ];
+
   return (
     <List>
-      <ListItem alignItems="flex-start" disablePadding>
-        <ListItemButton onClick={() => handleClick(1)}>
-          <ListItemText primary="Копировать список" />
-        </ListItemButton>
-      </ListItem>
-      <ListItem alignItems="flex-start" disablePadding>
-        <ListItemButton onClick={() => handleClick(2)}>
-          <ListItemText primary="Переместить все карточки" />
-        </ListItemButton>
-      </ListItem>
-      <ListItem alignItems="flex-start" disablePadding>
-        <ListItemButton onClick={() => handleClick(3)}>
-          <ListItemText primary="Удалить список" />
-        </ListItemButton>
-      </ListItem>
+      {items.map((item, i) => (
+        <ListItem key={i} alignItems="flex-start" disablePadding>
+          <ListItemButton onClick={() => handleClick(item.id)}>
+            <ListItemText primary={item.text} />
+          </ListItemButton>
+        </ListItem>
+      ))}
     </List>
   );
 };
