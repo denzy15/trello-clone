@@ -94,15 +94,23 @@ export const boardsSlice = createSlice({
     updateList: (state, action) => {
       state.currentBoard.lists[action.payload.listIndex] = action.payload.list;
     },
-    
+
     deleteList: (state, action) => {
       state.currentBoard.lists.splice(action.payload.listIndex, 1);
     },
 
+    updateUsers: (state, action) => {
+      state.currentBoard.users = action.payload;
+    },
+
+    updateBoardDescription: (state, action) => {
+      state.currentBoard.description = action.payload;
+    },
   },
 });
 
 export const {
+  updateUsers,
   updateList,
   deleteList,
   updateCard,

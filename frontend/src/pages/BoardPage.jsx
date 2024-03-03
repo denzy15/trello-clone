@@ -12,7 +12,10 @@ import AddElement from "./AddElement";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import CardEditModal from "../components/CardEditModal";
-import { stopCardEdit } from "../store/slices/metadataSlice";
+import {
+  setMyRoleOnCurrentBoard,
+  stopCardEdit,
+} from "../store/slices/metadataSlice";
 import {
   pickBoard,
   renameList,
@@ -25,6 +28,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 const BoardPage = () => {
   const { boardId } = useParams();
   const [loading, setLoading] = useState(false);
+
+  const { _id: currentUserId } = useSelector((state) => state.auth);
 
   const [error, setError] = useState("");
 
@@ -52,6 +57,24 @@ const BoardPage = () => {
 
     fetchBoardInfo();
   }, []);
+
+  useEffect(() => {
+    const calculateRole = () => {
+      if (currentUserId === currentBoard.creator._id) {
+        return "ADMIN";
+      }
+
+      for (const user of currentBoard.users) {
+        if (user.userId._id === currentUserId) {
+          return user.role;
+        }
+      }
+    };
+
+    if (!!currentBoard.creator) {
+      dispatch(setMyRoleOnCurrentBoard(calculateRole()));
+    }
+  }, [boardId, currentBoard, currentBoard.users, currentUserId, dispatch]);
 
   const handleEditListTitle = async (listId, listIndex, newListTitle) => {
     const oldListTitle = currentBoard.lists[listIndex].title;
@@ -132,14 +155,6 @@ const BoardPage = () => {
 
       const [targetCard] = newOrderedCards.splice(source.index, 1);
       newOrderedCards.splice(destination.index, 0, targetCard);
-      // setOrderedLists((prev) => {
-      //   const updatedLists = [...prev];
-      //   updatedLists[sourceListIndex] = {
-      //     ...updatedLists[sourceListIndex],
-      //     cards: newOrderedCards,
-      //   };
-      //   return updatedLists;
-      // });
       dispatch(
         updateCardOrder({ listIndex: sourceListIndex, cards: newOrderedCards })
       );
@@ -150,14 +165,6 @@ const BoardPage = () => {
           { newOrder: destination.index }
         )
         .catch(() => {
-          // setOrderedLists((prev) => {
-          //   const updatedLists = [...prev];
-          //   updatedLists[sourceListIndex] = {
-          //     ...updatedLists[sourceListIndex],
-          //     cards: oldOrderedCards,
-          //   };
-          //   return updatedLists;
-          // });
           dispatch(
             updateCardOrder({
               listIndex: sourceListIndex,

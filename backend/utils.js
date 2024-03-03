@@ -75,5 +75,28 @@ export const deleteFile = async (filePath) => {
   }
 };
 
-
 export const deepCopy = (obj) => JSON.parse(JSON.stringify(obj));
+
+export const isUserAdmin = (board, reqUserId) => {
+  if (board.creator._id.toString() === reqUserId) return true;
+
+  const u = board.users.find(
+    (user) => user.userId._id.toString() === reqUserId
+  );
+
+  if (u && u.role === "ADMIN") return true;
+
+  return false;
+
+  // return (
+  //   board.users.find((user) => user.userId._id.toString() === reqUserId)
+  //     .role === "ADMIN" || board.creator._id.toString() === reqUserId
+  // );
+};
+
+export const isUserOnBoard = (board, reqUserId) => {
+  return (
+    board.users.some((user) => user.userId._id.toString() === reqUserId) ||
+    board.creator._id.toString() === reqUserId
+  );
+};

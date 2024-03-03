@@ -6,9 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../axiosInterceptor";
 import { SERVER_URL } from "../constants";
 import { setBoards } from "../store/slices/boardsSlice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import NewBoardModal from "../components/NewBoardModal";
 import { setInvitations } from "../store/slices/invitationsSlice";
+import { setMyRoleOnCurrentBoard } from "../store/slices/metadataSlice";
 
 const Home = () => {
   const { recent } = useSelector((state) => state.metadata);
@@ -20,6 +21,8 @@ const Home = () => {
   const [isNewBoardCreating, setIsNewBoardCreating] = useState(false);
 
   const navigate = useNavigate();
+
+  const { boardId } = useParams;
 
   useEffect(() => {
     async function fetchBoards() {
@@ -43,6 +46,10 @@ const Home = () => {
     fetchBoards();
     fetchNotifications();
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(setMyRoleOnCurrentBoard(null));
+  }, [boardId, dispatch]);
 
   return (
     <Box>

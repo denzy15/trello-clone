@@ -9,9 +9,9 @@ import {
 import React from "react";
 import { convertUsernameForAvatar, getUserColor } from "../utils";
 
-const UserListItem = ({ user, disabled, handleAssignUser, checked }) => {
-
-
+const UserListItem = (props) => {
+  // console.log(props);
+  const { user, disabled, handleAssignUser, checked } = props;
 
   return (
     <ListItem

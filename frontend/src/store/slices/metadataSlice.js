@@ -8,12 +8,16 @@ const initialState = {
   },
   extendedLabels: false,
   editableDraft: false,
+  role: null,
 };
 
 export const metadataSlice = createSlice({
   name: "metadata",
   initialState,
   reducers: {
+    setMyRoleOnCurrentBoard: (state, action) => {
+      state.role = action.payload
+    },
     visitBoard: (state, action) => {
       if (!state.recent.includes(action.payload)) {
         state.recent = [...state.recent, action.payload];
@@ -102,6 +106,7 @@ export const metadataSlice = createSlice({
 });
 
 export const {
+  setMyRoleOnCurrentBoard,
   updateComments,
   deleteAttach,
   updateCardAttachName,

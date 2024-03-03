@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 const MainBoardModal = ({ handleClick }) => {
   const { _id } = useSelector((state) => state.auth);
   const { currentBoard } = useSelector((state) => state.boards);
-  console.log(currentBoard);
+  // console.log(currentBoard);
 
   const items = [
     { id: 1, text: "О доске", icon: <Info /> },
@@ -24,10 +24,9 @@ const MainBoardModal = ({ handleClick }) => {
   return (
     <List>
       {items.map((item) => (
-        <ListItem>
+        <ListItem key={item.id}>
           <ListItemButton
             disabled={item.disabled}
-            key={item.id}
             onClick={() => handleClick(item.id)}
           >
             <ListItemIcon>{item.icon}</ListItemIcon>

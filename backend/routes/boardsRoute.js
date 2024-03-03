@@ -2,7 +2,7 @@ import express from "express";
 import Board from "../models/board.js";
 import List from "../models/list.js";
 import Card from "../models/card.js";
-import { isAuth } from "../utils.js";
+import { isAuth, isUserAdmin, isUserOnBoard } from "../utils.js";
 
 const router = express.Router();
 
@@ -78,7 +78,7 @@ router.delete("/:boardId", isAuth, async (req, res) => {
     }
 
     // Проверяем доступ пользователя к доске перед удалением
-    if (board.creator.toString() !== req.user._id) {
+    if (!isUserAdmin(board, req.user._id)(board, req.user._id)) {
       return res
         .status(403)
         .json({ message: "У вас нет доступа к удалению этой доски" });
@@ -100,7 +100,7 @@ router.get("/:boardId", isAuth, async (req, res) => {
 
     const board = await Board.findById(boardId)
       .populate("creator", "username email") // Популируем создателя доски и выбираем только username
-      .populate("users", "username email")
+      .populate("users.userId", "username email")
       .populate({
         path: "lists",
         populate: {
@@ -127,11 +127,7 @@ router.get("/:boardId", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    const isUserInBoard = board.users.some(
-      (user) => user._id.toString() === req.user._id
-    );
-
-    if (board.creator._id.toString() !== req.user._id && !isUserInBoard) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res
         .status(403)
         .json({ message: "У вас нет доступа к этой доске" });
@@ -162,7 +158,7 @@ router.put("/:boardId", isAuth, async (req, res) => {
     }
 
     // Проверяем доступ пользователя к этой доске перед изменением
-    if (board.creator.toString() !== req.user._id) {
+    if (!isUserAdmin(board, req.user._id)) {
       return res
         .status(403)
         .json({ message: "У вас нет доступа к изменению этой доски" });
@@ -187,28 +183,79 @@ router.put("/:boardId", isAuth, async (req, res) => {
   }
 });
 
-// Изменить список пользователей
-router.put("/:boardId/users", isAuth, async (req, res) => {
+// Кикнуть пользователя
+router.put("/:boardId/kick-user", isAuth, async (req, res) => {
   try {
     const { boardId } = req.params;
-    const { users } = req.body;
+    const { userId } = req.body;
 
-    const board = await Board.findById(boardId);
+    const board = await Board.findById(boardId).populate(
+      "users.userId",
+      "username email"
+    );
 
     if (!board) {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (board.creator.toString() !== req.user._id) {
+    if (!isUserAdmin(board, req.user._id)) {
       return res
         .status(403)
-        .json({ message: "У вас нет доступа к изменению этой доски" });
+        .json({ message: "У вас нет прав удалять участников доски" });
     }
 
-    board.users = users;
+    board.users = board.users.filter((u) => u.userId._id.toString() !== userId);
+
     await board.save();
 
-    res.json(board);
+    res.json(board.users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+//Изменить роль пользователя
+router.put("/:boardId/change-user-role", isAuth, async (req, res) => {
+  try {
+    const { boardId } = req.params;
+    const { userId, newRole } = req.body;
+
+    const board = await Board.findById(boardId).populate(
+      "users.userId",
+      "username email"
+    );
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    if (!isUserAdmin(board, req.user._id)) {
+      return res
+        .status(403)
+        .json({ message: "У вас нет доступа к изменению ролей" });
+    }
+
+    for (const user of board.users) {
+      if (user.userId._id.toString() === userId) {
+        if (
+          user.role === "ADMIN" &&
+          newRole === "USER" &&
+          req.user._id !== board.creator._id
+        ) {
+          return res.status(403).json({
+            message: "Вы не можете сделать другого администратора участником",
+          });
+        }
+
+        user.role = newRole;
+        break;
+      }
+    }
+
+    await board.save();
+
+    res.json(board.users);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -234,7 +281,7 @@ router.put("/:boardId/add-label", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (board.creator.toString() !== req.user._id) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res
         .status(403)
         .json({ message: "У вас нет доступа к изменению этой доски" });
@@ -272,7 +319,7 @@ router.put("/:boardId/update-label", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (board.creator.toString() !== req.user._id) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res
         .status(403)
         .json({ message: "У вас нет доступа к изменению этой доски" });
@@ -307,8 +354,6 @@ router.put("/:boardId/delete-label", isAuth, async (req, res) => {
     const { boardId } = req.params;
     const { label } = req.body;
 
-    // console.log(label);
-
     if (
       Object.keys(label).length !== 3 ||
       (!label.title && label.title !== "") ||
@@ -323,7 +368,7 @@ router.put("/:boardId/delete-label", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (board.creator.toString() !== req.user._id) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res
         .status(403)
         .json({ message: "У вас нет доступа к изменению этой доски" });

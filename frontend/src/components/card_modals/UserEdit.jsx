@@ -122,13 +122,13 @@ const UserEdit = (props) => {
             />
             {currentBoard.users.map((user, idx) => (
               <UserListItem
-                checked={isAssigned(user._id)}
+                checked={isAssigned(user.userId._id)}
                 disabled={
                   fetchUserRequest.userId === user._id &&
                   fetchUserRequest.loading
                 }
                 handleAssignUser={handleAssignUser}
-                user={user}
+                user={user.userId}
                 key={idx}
               />
             ))}

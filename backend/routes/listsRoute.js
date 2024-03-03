@@ -28,10 +28,7 @@ router.get("/:boardId", isAuth, async (req, res) => {
     }
 
     // Проверяем доступ пользователя к этой доске перед получением списков
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к просмотру списков на этой доске",
       });
@@ -63,10 +60,7 @@ router.post("/:boardId", isAuth, async (req, res) => {
     }
 
     // Проверяем доступ пользователя к этой доске перед добавлением списка
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к добавлению списка на эту доску",
       });
@@ -102,10 +96,7 @@ router.delete("/:boardId/:listId", isAuth, async (req, res) => {
     }
 
     // Проверяем доступ пользователя к этой доске перед удалением списка
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res
         .status(403)
         .json({ message: "У вас нет доступа к удалению списка на этой доске" });
@@ -167,10 +158,7 @@ router.put("/:boardId/rename/:listId", isAuth, async (req, res) => {
     }
 
     // Проверяем доступ пользователя к этой доске перед обновлением списка
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к обновлению списка на этой доске",
       });
@@ -202,10 +190,7 @@ router.put("/:boardId/move/:listId", isAuth, async (req, res) => {
     }
 
     // Проверяем доступ пользователя к этой доске перед обновлением списка
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к обновлению списка на этой доске",
       });
@@ -303,10 +288,7 @@ router.put("/:boardId/copy/:listId", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к обновлению списка на этой доске",
       });
@@ -384,10 +366,7 @@ router.put("/:boardId/move-cards", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к обновлению списка на этой доске",
       });

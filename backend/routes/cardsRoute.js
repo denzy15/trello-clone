@@ -4,6 +4,8 @@ import {
   decodeString,
   deleteFile,
   isAuth,
+  isUserAdmin,
+  isUserOnBoard,
 } from "../utils.js";
 import Board from "../models/board.js";
 import List from "../models/list.js";
@@ -52,11 +54,7 @@ router.get("/:boardId", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    // Проверяем доступ пользователя к этой доске перед получением карточек
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к просмотру карточек на этой доске",
       });
@@ -87,10 +85,7 @@ router.get("/:boardId/:cardId", isAuth, async (req, res) => {
     }
 
     // Проверяем доступ пользователя к этой доске перед получением карточек
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к просмотру карточек на этой доске",
       });
@@ -126,10 +121,7 @@ router.post("/:boardId/:listId/", isAuth, async (req, res) => {
     }
 
     // Проверяем доступ пользователя к этой доске и списку перед добавлением карточки
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к добавлению карточек в этот список",
       });
@@ -158,10 +150,7 @@ router.delete("/:boardId/:listId/:cardId", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к удалению карточек из этого списка",
       });
@@ -211,7 +200,6 @@ router.delete("/:boardId/:listId/:cardId", isAuth, async (req, res) => {
       .exec();
 
     res.json(responseList);
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -238,10 +226,7 @@ router.put("/:boardId/:cardId/move", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к перемещению карточек на этой доске",
       });
@@ -315,10 +300,7 @@ router.put("/:boardId/:cardId/change-order", isAuth, async (req, res) => {
     }
 
     // Проверяем доступ пользователя к этой доске перед перемещением карточки
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к перемещению карточек на этой доске",
       });
@@ -391,10 +373,7 @@ router.put("/:boardId/:cardId/users", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к изменению данных карточек в этом списке",
       });
@@ -442,10 +421,7 @@ router.put(
         return res.status(404).json({ message: "Доска не найдена" });
       }
 
-      if (
-        board.creator.toString() !== req.user._id &&
-        !board.users.includes(req.user._id)
-      ) {
+      if (!isUserOnBoard(board, req.user._id)) {
         return res.status(403).json({
           message:
             "У вас нет доступа к изменению данных карточек в этом списке",
@@ -494,10 +470,7 @@ router.put("/:boardId/:cardId", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к изменению данных карточек в этом списке",
       });
@@ -553,10 +526,7 @@ router.post(
         return res.status(404).json({ message: "Доска не найдена" });
       }
 
-      if (
-        board.creator.toString() !== req.user._id &&
-        !board.users.includes(req.user._id)
-      ) {
+      if (!isUserOnBoard(board, req.user._id)) {
         return res.status(403).json({
           message:
             "У вас нет доступа к изменению данных карточек в этом списке",
@@ -600,10 +570,7 @@ router.put("/:boardId/:cardId/attach", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (
-      board.creator.toString() !== req.user._id &&
-      !board.users.includes(req.user._id)
-    ) {
+    if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к изменению данных карточек в этом списке",
       });

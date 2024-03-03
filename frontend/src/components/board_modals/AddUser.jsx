@@ -29,13 +29,9 @@ const AddUser = () => {
 
   const [searchResults, setSearchResults] = useState([]);
 
-  const [role, setRole] = useState('')
   const { currentBoard } = useSelector((state) => state.boards);
 
   const modalRef = useRef();
-
-
-
 
   useEffect(() => {
     if (searchQuery === "") {
@@ -112,10 +108,11 @@ const AddUser = () => {
       <Typography sx={{ mt: 3 }}>Пользователи доски:</Typography>
       <Box>
         <Box>
-          <BoardUser {...currentBoard.creator} role={'ADMIN'}/>
-          {currentBoard.users.map((u) => (
-            <ListItem>suka</ListItem>
-          ))}
+          <BoardUser {...currentBoard.creator} role={"ADMIN"} />
+          {currentBoard.users.map((u) => {
+            const { role, userId } = u;
+            return <BoardUser key={u._id} role={role} {...userId} />;
+          })}
         </Box>
       </Box>
     </Box>

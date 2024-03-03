@@ -1,5 +1,5 @@
 import express from "express";
-import { isAuth } from "../utils.js";
+import { isAuth, isUserOnBoard } from "../utils.js";
 import Board from "../models/board.js";
 import User from "../models/user.js";
 import Invitation from "../models/invitation.js";
@@ -17,6 +17,24 @@ router.post("/", isAuth, async (req, res) => {
     }
 
     const user = await User.findById(invitedUser);
+
+    if (isUserOnBoard(board, user._id.toString())) {
+      return res
+        .status(400)
+        .json({ message: "Пользователь уже является участником доски" });
+    }
+
+    const pendingInvitation = await Invitation.findOne({
+      invitedUser: user._id,
+      board: board._id,
+      status: "pending",
+    });
+
+    if (!!pendingInvitation) {
+      return res
+        .status(400)
+        .json({ message: "Приглашение данному пользователю уже отправлено" });
+    }
 
     if (!user) {
       return res.status(404).json({ message: "Пользователь не найден" });
@@ -53,7 +71,7 @@ router.put("/accept", isAuth, async (req, res) => {
     if (invitation.invitedUser.toString() !== req.user._id) {
       return res
         .status(403)
-        .json({ message: "Вы не можете изменить статус приглашения" });
+        .json({ message: "Вы не можете принять чужое приглашение" });
     }
 
     invitation.status = "accepted";
@@ -89,7 +107,7 @@ router.put("/decline", isAuth, async (req, res) => {
     if (invitation.invitedUser.toString() !== req.user._id) {
       return res
         .status(403)
-        .json({ message: "Вы не можете изменить статус приглашения" });
+        .json({ message: "Вы не можете отклонить чужое приглашение" });
     }
 
     invitation.status = "declined";
@@ -112,7 +130,7 @@ router.delete("/:invitationId", isAuth, async (req, res) => {
     if (invitation.invitedUser.toString() !== req.user._id) {
       return res
         .status(403)
-        .json({ message: "Вы не можете удалить приглашениe" });
+        .json({ message: "Вы не можете удалить чужое приглашениe" });
     }
 
     await Invitation.deleteOne({ _id: invitationId });
