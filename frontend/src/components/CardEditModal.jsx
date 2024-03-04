@@ -183,7 +183,9 @@ const CardEditModal = ({ close }) => {
       })
       .catch((e) => {
         console.log(e);
-        toast.error("Не удалось удалить комментарий");
+        toast.error(
+          e.response.data.message || "Не удалось удалить комментарий"
+        );
       });
   };
 
@@ -212,7 +214,9 @@ const CardEditModal = ({ close }) => {
       })
       .catch((e) => {
         console.log(e);
-        toast.error("Не удалось отправить комментарий");
+        toast.error(
+          e.response.data.message || "Не удалось отправить комментарий"
+        );
       });
   };
 
@@ -238,7 +242,9 @@ const CardEditModal = ({ close }) => {
         title: currentCard.title,
       })
       .catch(() => {
-        toast.error("Не удалось переименовать карточку");
+        toast.error(
+          e.response.data.message || "Не удалось переименовать карточку"
+        );
         dispatch(
           renameCard({
             listIndex: currentCard.listInfo.index,
@@ -281,7 +287,10 @@ const CardEditModal = ({ close }) => {
       })
       .catch((e) => {
         console.log(e);
-        toast.error("Не удалось удалить карточку, попробуйте позже");
+        toast.error(
+          e.response.data.message ||
+            "Не удалось удалить карточку, попробуйте позже"
+        );
       });
   };
 
@@ -375,7 +384,7 @@ const CardEditModal = ({ close }) => {
         </Box>
       </Box>
 
-      <Stack direction={"row"} sx={{ mt: 3 }}>
+      <Stack direction={"row"} sx={{ mt: 3 }} spacing={1}>
         <Box sx={{ pl: 3, flex: 1, position: "relative" }}>
           {/* Участники */}
           {!!cardEditing.card.assignedUsers.length && (
@@ -650,6 +659,7 @@ const CardEditModal = ({ close }) => {
                 sx={{
                   p: 0.3,
                   bgcolor: "#ff6c62",
+                  borderRadius: 1,
                   "&:hover": {
                     bgcolor: "#e75046",
                   },

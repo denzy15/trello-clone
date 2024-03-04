@@ -57,14 +57,28 @@ const BoardUser = (props) => {
   };
 
   const ableToMakeAdmin = () => {
-    //   if (currentUser._id === currentBoard.creator._id || myRole === "ADMIN")
-    //     return true;
-
-    //   return false;
-
     return currentUser._id === currentBoard.creator._id || myRole === "ADMIN"
       ? true
       : false;
+  };
+
+  const ableToKick = () => {
+    if (
+      currentUser._id === currentBoard.creator._id &&
+      _id !== currentBoard.creator._id
+    ) {
+      return true;
+    }
+
+    if (_id !== currentBoard.creator._id) {
+      return false;
+    }
+
+    if (myRole === "ADMIN" && role !== "ADMIN") {
+      return true;
+    }
+
+    return false;
   };
 
   const handleDelete = async () => {
@@ -126,11 +140,11 @@ const BoardUser = (props) => {
       <Avatar sx={{ bgcolor: getUserColor(_id) }}>
         {convertUsernameForAvatar(username)}
       </Avatar>
-      <Box>
+      <Box sx={{ flex: 1 }}>
         <Typography>{username}</Typography>
         <Typography variant="subtitle2">{email}</Typography>
       </Box>
-      <FormControl fullWidth>
+      <FormControl>
         <Select
           disabled={myRole !== "ADMIN" || loading}
           labelId="demo-simple-select-label"
@@ -144,10 +158,7 @@ const BoardUser = (props) => {
           <MenuItem value={"MEMBER"} disabled={!ableToMakeMember()}>
             Участник
           </MenuItem>
-          <MenuItem
-            value={"delete"}
-            disabled={currentUser._id === _id || role === "ADMIN"}
-          >
+          <MenuItem value={"delete"} disabled={!ableToKick()}>
             Удалить
           </MenuItem>
         </Select>

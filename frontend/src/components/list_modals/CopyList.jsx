@@ -28,7 +28,7 @@ const CopyList = (props) => {
       })
       .catch((e) => {
         console.log(e);
-        toast.error("Не удалось скопировать список");
+        toast.error(e.response.data.message || "Не удалось скопировать список");
       })
       .finally(() => {
         handleCloseModal();

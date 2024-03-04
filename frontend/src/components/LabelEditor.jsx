@@ -57,8 +57,10 @@ const LabelEditor = (props) => {
         .then(({ data }) => {
           dispatch(addLabel(data));
         });
-    } catch (error) {
-      toast.error("Не удалось создать метку. Попробуйте позже");
+    } catch (e) {
+      toast.error(
+        e.response.data.message || "Не удалось создать метку. Попробуйте позже"
+      );
     } finally {
       back();
     }
@@ -80,8 +82,10 @@ const LabelEditor = (props) => {
         });
       dispatch(updateCardLabel(currentLabel));
       dispatch(updateLabel(currentLabel));
-    } catch (error) {
-      toast.error("Не удалось обновить метку. Попробуйте позже");
+    } catch (e) {
+      toast.error(
+        e.response.data.message || "Не удалось обновить метку. Попробуйте позже"
+      );
     } finally {
       back();
     }
@@ -105,7 +109,9 @@ const LabelEditor = (props) => {
       dispatch(deleteLabel(currentLabel));
       dispatch(removeLabelFromCard(currentLabel));
     } catch (e) {
-      toast.error("Не удалось удалить метку. Попробуйте позже");
+      toast.error(
+        e.response.data.message || "Не удалось удалить метку. Попробуйте позже"
+      );
     } finally {
       close();
     }

@@ -93,8 +93,11 @@ const BoardPage = () => {
       .put(`${SERVER_URL}/api/lists/${boardId}/rename/${listId}`, {
         title: newListTitle,
       })
-      .catch(() => {
-        toast.error("Не удалось переименовать список, попробуйте позже");
+      .catch((e) => {
+        toast.error(
+          e.response.data.message ||
+            "Не удалось переименовать список, попробуйте позже"
+        );
         dispatch(renameList({ listIndex, title: oldListTitle }));
       });
   };

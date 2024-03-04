@@ -23,9 +23,9 @@ import {
   changeInvitationStatus,
   deleteInvitation,
 } from "../store/slices/invitationsSlice";
+import { setBoards } from "../store/slices/boardsSlice";
 
 const Notification = (props) => {
-  // console.log(props);
   const { board, inviter, createdAt, _id, status } = props;
 
   const [loading, setLoading] = useState(false);
@@ -33,23 +33,30 @@ const Notification = (props) => {
   const dispatch = useDispatch();
 
   const handleAccept = async () => {
-    setLoading(true);
-    await axiosInstance
-      .put(`${SERVER_URL}/api/invite/accept`, {
-        boardId: board._id,
-        invitationId: _id,
-      })
-      .then(({ data }) => {
-        dispatch(changeInvitationStatus(data));
-      })
-      .catch((e) => {
-        console.log(e);
-        toast.error("Не удалось принять приглашение, попробуйте позже");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    try {
+      setLoading(true);
+      const response = await axiosInstance.put(
+        `${SERVER_URL}/api/invite/accept`,
+        {
+          boardId: board._id,
+          invitationId: _id,
+        }
+      );
+      dispatch(changeInvitationStatus(response.data));
+      const boardsResponse = await axiosInstance.get(
+        `${SERVER_URL}/api/boards`
+      );
+      dispatch(setBoards(boardsResponse.data));
+    } catch (error) {
+      toast.error(
+        error.response.data.message ||
+          "Не удалось принять приглашение, попробуйте позже"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
+
   const handleDecline = async () => {
     setLoading(true);
     await axiosInstance
@@ -61,7 +68,10 @@ const Notification = (props) => {
       })
       .catch((e) => {
         console.log(e);
-        toast.error("Не удалось отклонить приглашение, попробуйте позже");
+        toast.error(
+          e.response.data.message ||
+            "Не удалось отклонить приглашение, попробуйте позже"
+        );
       })
       .finally(() => {
         setLoading(false);
@@ -72,12 +82,15 @@ const Notification = (props) => {
     setLoading(true);
     await axiosInstance
       .delete(`${SERVER_URL}/api/invite/${_id}`)
-      .then(({ data }) => {
+      .then(() => {
         dispatch(deleteInvitation({ _id }));
       })
       .catch((e) => {
         console.log(e);
-        toast.error("Не удалось удалить уведомление, попробуйте позже");
+        toast.error(
+          e.response.data.message ||
+            "Не удалось удалить уведомление, попробуйте позже"
+        );
       })
       .finally(() => {
         setLoading(false);

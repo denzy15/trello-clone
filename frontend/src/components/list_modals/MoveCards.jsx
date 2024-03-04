@@ -31,7 +31,9 @@ const MoveCards = (props) => {
       })
       .catch((e) => {
         console.log(e);
-        toast.error("Не удалось переместить карточки");
+        toast.error(
+          e.response.data.message || "Не удалось переместить карточки"
+        );
       })
       .finally(() => {
         handleCloseModal();

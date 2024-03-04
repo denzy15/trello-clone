@@ -35,8 +35,9 @@ const UserSearchResultItem = (props) => {
         setInvited(true);
       })
       .catch((e) => {
-        console.log(e);
-        toast.error("Не удалось пригласить пользователя");
+        toast.warn(
+          e.response.data.message || "Не удалось пригласить пользователя"
+        );
       });
   };
 

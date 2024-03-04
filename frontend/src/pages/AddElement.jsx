@@ -69,18 +69,18 @@ const AddElement = ({
             )
           : dispatch(createList(data));
       })
-      .catch(() => {
+      .catch((e) => {
         toast.error(
-          `Не удалось добавить ${
-            type === "CARD" ? "карточку" : "список"
-          }, повторите позже`
+          e.response.data.message ||
+            `Не удалось добавить ${
+              type === "CARD" ? "карточку" : "список"
+            }, повторите позже`
         );
       })
       .finally(() => {
         setIsCreating(false);
         setTitle("");
       });
-
   };
 
   return (

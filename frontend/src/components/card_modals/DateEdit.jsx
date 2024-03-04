@@ -17,9 +17,7 @@ import axiosInstance from "../../axiosInterceptor";
 import { SERVER_URL } from "../../constants";
 import { toast } from "react-toastify";
 import { updateCardDates } from "../../store/slices/metadataSlice";
-import {
-  updateCard,
-} from "../../store/slices/boardsSlice";
+import { updateCard } from "../../store/slices/boardsSlice";
 
 const DateEdit = ({ closeModal }) => {
   const { cardEditing } = useSelector((state) => state.metadata);
@@ -53,7 +51,10 @@ const DateEdit = ({ closeModal }) => {
         }
       )
       .catch((e) => {
-        toast.error("Не удалось обновить дату, попробуйте позже");
+        toast.error(
+          e.response.data.message ||
+            "Не удалось обновить дату, попробуйте позже"
+        );
       })
       .finally(() => {
         closeModal();
@@ -76,7 +77,6 @@ const DateEdit = ({ closeModal }) => {
         dueDate: dueDateActive ? dueDate.toString() : null,
       })
     );
-
   };
 
   const handleDelete = async () => {
@@ -98,8 +98,10 @@ const DateEdit = ({ closeModal }) => {
         })
       );
       dispatch(updateCardDates({ startDate: null, dueDate: null }));
-    } catch (error) {
-      toast.error("Не удалось обновить дату, попробуйте позже");
+    } catch (e) {
+      toast.error(
+        e.response.data.message || "Не удалось обновить дату, попробуйте позже"
+      );
     } finally {
       closeModal();
     }

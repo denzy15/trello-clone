@@ -58,8 +58,8 @@ const LabelsEdit = ({ closeModal }) => {
           labels,
         })
       );
-    } catch (error) {
-      toast.error("Не удалось изменить список меток");
+    } catch (e) {
+      toast.error(e.response.data.message ||"Не удалось изменить список меток");
     } finally {
       setFetchLabelRequest({
         loading: false,

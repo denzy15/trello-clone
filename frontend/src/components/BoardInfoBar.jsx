@@ -24,6 +24,8 @@ import AboutBoard from "./board_modals/AboutBoard";
 import DeleteBoard from "./board_modals/DeleteBoard";
 import AddUser from "./board_modals/AddUser";
 import LeaveBoard from "./board_modals/LeaveBoard";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleEditableDraft } from "../store/slices/metadataSlice";
 
 const steps = [
   {
@@ -51,6 +53,15 @@ const BoardInfoBar = (props) => {
     setModalState(steps[index]);
   };
 
+  const dispatch = useDispatch();
+  const { editableDraft } = useSelector((state) => state.metadata);
+
+  const handleCloseDrawer = () => {
+    setOpenDrawer(false);
+    if (editableDraft) dispatch(toggleEditableDraft());
+    setModalState(steps[0]);
+  };
+
   return (
     <>
       <Stack
@@ -68,12 +79,8 @@ const BoardInfoBar = (props) => {
           <MoreHoriz />
         </IconButton>
       </Stack>
-      <Drawer
-        anchor="right"
-        open={openDrawer}
-        onClose={() => setOpenDrawer(false)}
-      >
-        <Box sx={{ minWidth: 300, p: 1 }}>
+      <Drawer anchor="right" open={openDrawer} onClose={handleCloseDrawer}>
+        <Box sx={{ minWidth: 300, p: 1, maxWidth: 500 }}>
           <Stack
             direction={"row"}
             alignItems={"start"}

@@ -52,9 +52,10 @@ const List = (props) => {
           sx={{
             position: "relative",
             p: 1,
-            minWidth: 250,
+            // minWidth: 250,
             bgcolor: "#ededed",
-            maxWidth: 300
+            minWidth: 300,  
+            maxWidth: 350
           }}
           ref={provided.innerRef}
           {...provided.draggableProps}
@@ -106,7 +107,7 @@ const List = (props) => {
                   sx={{
                     mt: 1,
                     maxHeight: 450,
-                    overflow: "auto",
+                    overflowY: "auto",
                     p: 0.1,
                     bgcolor: sn.isDraggingOver ? "#bdbdbd" : null,
                     minHeight: sn.isDraggingOver ? 45 : 15,
@@ -122,7 +123,6 @@ const List = (props) => {
                       key={card._id}
                       index={idx}
                       listInfo={rest}
-                      // listTitle={newListTitle}
                       {...card}
                     />
                   ))}

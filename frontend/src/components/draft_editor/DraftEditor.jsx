@@ -17,22 +17,38 @@ import {
 import axiosInstance from "../../axiosInterceptor";
 import { SERVER_URL } from "../../constants";
 import { toast } from "react-toastify";
-import { updateCard } from "../../store/slices/boardsSlice";
+import {
+  updateBoardDescription,
+  updateCard,
+} from "../../store/slices/boardsSlice";
 
 const DraftEditor = () => {
-  const { cardEditing, editableDraft } = useSelector((state) => state.metadata);
+  const { cardEditing, editableDraft, role } = useSelector(
+    (state) => state.metadata
+  );
   const { currentBoard } = useSelector((state) => state.boards);
 
   const dispatch = useDispatch();
 
   const createEditorState = () => {
-    if (!cardEditing.card.description) {
+    if (cardEditing.isEditing) {
+      if (!cardEditing.card.description) {
+        return EditorState.createEmpty();
+      }
+
+      const contentState = convertFromRaw(
+        JSON.parse(cardEditing.card.description)
+      );
+      const newEditorState = EditorState.createWithContent(contentState);
+
+      return newEditorState;
+    }
+
+    if (!currentBoard.description) {
       return EditorState.createEmpty();
     }
 
-    const contentState = convertFromRaw(
-      JSON.parse(cardEditing.card.description)
-    );
+    const contentState = convertFromRaw(JSON.parse(currentBoard.description));
     const newEditorState = EditorState.createWithContent(contentState);
 
     return newEditorState;
@@ -42,6 +58,8 @@ const DraftEditor = () => {
   const editor = useRef(null);
 
   const focusEditor = () => {
+    if (role !== "ADMIN") return;
+
     if (!editableDraft) dispatch(toggleEditableDraft());
     editor.current.focus();
   };
@@ -55,7 +73,6 @@ const DraftEditor = () => {
     return false;
   };
 
-  // FOR INLINE STYLES
   const styleMap = {
     CODE: {
       backgroundColor: "rgba(0, 0, 0, 0.05)",
@@ -91,7 +108,6 @@ const DraftEditor = () => {
     },
   };
 
-  // FOR BLOCK LEVEL STYLES(Returns CSS Class From DraftEditor.css)
   const myBlockStyleFn = (contentBlock) => {
     const type = contentBlock.getType();
     switch (type) {
@@ -120,8 +136,22 @@ const DraftEditor = () => {
         `${SERVER_URL}/api/cards/${currentBoard._id}/${cardEditing.card._id}`
       );
       return data;
-    } catch (error) {
-      throw new Error("Failed to update card description");
+    } catch (e) {
+      throw new Error(
+        e.response.data.message || "Не удалось сохранить описание"
+      );
+    }
+  };
+
+  const updateBoardDescriptionOnServer = async (contentString) => {
+    try {
+      await axiosInstance.put(`${SERVER_URL}/api/boards/${currentBoard._id}`, {
+        description: contentString,
+      });
+    } catch (e) {
+      throw new Error(
+        e.response.data.message || "Не удалось сохранить описание"
+      );
     }
   };
 
@@ -131,6 +161,12 @@ const DraftEditor = () => {
     const contentString = JSON.stringify(contentRaw);
 
     try {
+      if (!cardEditing.isEditing) {
+        await updateBoardDescriptionOnServer(contentString);
+        dispatch(updateBoardDescription(contentString));
+        return;
+      }
+
       const updatedCardData = await updateCardDescriptionOnServer(
         contentString
       );
@@ -142,8 +178,11 @@ const DraftEditor = () => {
           card: updatedCardData,
         })
       );
-    } catch (error) {
-      toast.error("Не удалось обновить описание, попробуйте позже");
+    } catch (e) {
+      toast.error(
+        e.response.data.message ||
+          "Не удалось обновить описание, попробуйте позже"
+      );
     } finally {
       dispatch(toggleEditableDraft());
     }
@@ -156,7 +195,7 @@ const DraftEditor = () => {
   };
 
   return (
-    <>
+    <React.Fragment>
       <Box
         sx={{
           border: !editableDraft ? "none" : "1px solid #1976d2",
@@ -165,6 +204,7 @@ const DraftEditor = () => {
           p: 1,
           pl: editableDraft && 0,
           maxWidth: "100%",
+          fontFamily: "Montserrat, sans-serif",
         }}
         onClick={focusEditor}
       >
@@ -210,7 +250,7 @@ const DraftEditor = () => {
           </Button>
         </Stack>
       )}
-    </>
+    </React.Fragment>
   );
 };
 

@@ -1,5 +1,5 @@
 import express from "express";
-import { deepCopy, isAuth } from "../utils.js"; // Middleware для авторизации
+import { deepCopy, isAuth, isUserOnBoard } from "../utils.js"; // Middleware для авторизации
 import Board from "../models/board.js";
 import List from "../models/list.js";
 import Card from "../models/card.js";
@@ -114,14 +114,6 @@ router.delete("/:boardId/:listId", isAuth, async (req, res) => {
 
     // Удаление листа из базы данных
     await List.findByIdAndDelete(listId);
-
-    // for (const listId of board.lists) {
-    //   const remainingList = await List.findById(listId);
-    //   if (remainingList && remainingList.order > orderToDelete) {
-    //     remainingList.order--;
-    //     await remainingList.save();
-    //   }
-    // }
 
     for (const listId of board.lists) {
       const remainingList = await List.findById(listId);

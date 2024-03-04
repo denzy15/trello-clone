@@ -78,15 +78,26 @@ router.delete("/:boardId", isAuth, async (req, res) => {
     }
 
     // Проверяем доступ пользователя к доске перед удалением
-    if (!isUserAdmin(board, req.user._id)(board, req.user._id)) {
+    if (!isUserAdmin(board, req.user._id)) {
       return res
         .status(403)
         .json({ message: "У вас нет доступа к удалению этой доски" });
     }
 
-    const deletedBoard = await Board.findByIdAndDelete(boardId);
+    const lists = await List.find({ _id: { $in: board.lists } });
 
-    res.json(deletedBoard);
+    // Удалить каждую карточку в этих списках
+    for (const list of lists) {
+      await Card.deleteMany({ _id: { $in: list.cards } });
+    }
+
+    // Удалить каждый список
+    await List.deleteMany({ _id: { $in: board.lists } });
+
+    // Удалить саму доску
+    await Board.deleteOne(board);
+
+    res.json({ message: "Доска и все ее списки и карточки успешно удалены" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -183,16 +194,53 @@ router.put("/:boardId", isAuth, async (req, res) => {
   }
 });
 
+//Покинуть доску
+router.put("/:boardId/leave", isAuth, async (req, res) => {
+  try {
+    const { boardId } = req.params;
+
+    const board = await Board.findById(boardId).populate("lists").exec();
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    if (!isUserOnBoard(board, req.user._id)) {
+      return res
+        .status(403)
+        .json({ message: "Вы не являетесь участником данной доски" });
+    }
+
+    board.users = board.users.filter(
+      (u) => u.userId.toString() !== req.user._id
+    );
+
+    for (const list of board.lists) {
+      for (const cardId of list.cards) {
+        const card = await Card.findById(cardId);
+        card.assignedUsers = card.assignedUsers.filter(
+          (u) => u._id.toString() !== req.user._id
+        );
+        await card.save();
+      }
+    }
+
+    await board.save();
+
+    res.json({ message: `Вы успешно покинули доску ` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
 // Кикнуть пользователя
 router.put("/:boardId/kick-user", isAuth, async (req, res) => {
   try {
     const { boardId } = req.params;
     const { userId } = req.body;
 
-    const board = await Board.findById(boardId).populate(
-      "users.userId",
-      "username email"
-    );
+    const board = await Board.findById(boardId).populate("lists").exec();
 
     if (!board) {
       return res.status(404).json({ message: "Доска не найдена" });
@@ -204,11 +252,27 @@ router.put("/:boardId/kick-user", isAuth, async (req, res) => {
         .json({ message: "У вас нет прав удалять участников доски" });
     }
 
-    board.users = board.users.filter((u) => u.userId._id.toString() !== userId);
+    if (board.creator.toString() === userId) {
+      return res
+        .status(403)
+        .json({ message: "Вы не можете удалить админа с доски" });
+    }
+
+    board.users = board.users.filter((u) => u.userId.toString() !== userId);
+
+    for (const list of board.lists) {
+      for (const cardId of list.cards) {
+        const card = await Card.findById(cardId);
+        card.assignedUsers = card.assignedUsers.filter(
+          (u) => u._id.toString() !== userId
+        );
+        await card.save();
+      }
+    }
 
     await board.save();
 
-    res.json(board.users);
+    res.json({ message: `Пользователь успешно удалён` });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });

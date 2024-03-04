@@ -19,8 +19,7 @@ const DeleteList = (props) => {
         dispatch(deleteList({ listIndex: index }));
       })
       .catch((e) => {
-        console.log(e);
-        toast.error("Не удалось удалить список");
+        toast.error(e.response.data.message || "Не удалось удалить список");
       })
       .finally(() => {
         handleCloseModal();

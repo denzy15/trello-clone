@@ -2,20 +2,20 @@ import { Avatar, Box, Divider, Stack, Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 import { convertUsernameForAvatar, getUserColor } from "../../utils";
+import DraftEditor from "../draft_editor/DraftEditor";
 
 const AboutBoard = () => {
   const { currentBoard } = useSelector((state) => state.boards);
 
   const boardAdmins = [];
 
+  boardAdmins.push(currentBoard.creator);
+
   for (const u of currentBoard.users) {
-    boardAdmins.push(currentBoard.creator);
     if (u.role === "ADMIN") {
       boardAdmins.push(u.userId);
     }
   }
-
-  // console.log(boardAdmins);
 
   return (
     <Box sx={{ p: 2 }}>
@@ -42,10 +42,11 @@ const AboutBoard = () => {
           ))}
         </Stack>
       </Box>
-      <Box sx={{my: 2}}>
+      <Box sx={{ my: 2 }}>
         <Typography sx={{ fontWeight: 500, fontSize: 16, mb: 1 }}>
           Описание:
         </Typography>
+        <DraftEditor />
       </Box>
     </Box>
   );

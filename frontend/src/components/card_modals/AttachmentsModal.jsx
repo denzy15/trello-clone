@@ -66,8 +66,10 @@ const AttachmentsModal = ({ closeModal }) => {
         dispatch(updateCardAttachments(data.attachments));
       }
       closeModal();
-    } catch (error) {
-      toast.error("Ошибка при отправке файлов: " + error);
+    } catch (e) {
+      toast.error(
+        e.response.data.message || "Ошибка при отправке файлов: " + e
+      );
     }
   };
 

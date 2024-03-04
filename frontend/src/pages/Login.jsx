@@ -65,7 +65,10 @@ const Login = () => {
       })
       .catch((e) => {
         console.log(e);
-        setErrors((prev) => ({ ...prev, common: "Неверный логин или пароль" }));
+        setErrors((prev) => ({
+          ...prev,
+          common: e.response.data.message || "Неверный логин или пароль",
+        }));
       });
   };
 

@@ -1,4 +1,4 @@
-import { Delete, ExitToApp, Group, Info, PersonAdd } from "@mui/icons-material";
+import { Delete, ExitToApp, Group, Info } from "@mui/icons-material";
 import {
   List,
   ListItem,
@@ -12,13 +12,23 @@ import { useSelector } from "react-redux";
 const MainBoardModal = ({ handleClick }) => {
   const { _id } = useSelector((state) => state.auth);
   const { currentBoard } = useSelector((state) => state.boards);
-  // console.log(currentBoard);
+  const { role } = useSelector((state) => state.metadata);
 
   const items = [
     { id: 1, text: "О доске", icon: <Info /> },
     { id: 2, text: "Участники", icon: <Group /> },
-    { id: 3, text: "Покинуть доску", icon: <ExitToApp /> },
-    { id: 4, text: "Удалить доску", icon: <Delete />, disabled: true },
+    {
+      id: 3,
+      text: "Покинуть доску",
+      icon: <ExitToApp />,
+      disabled: currentBoard.creator._id === _id,
+    },
+    {
+      id: 4,
+      text: "Удалить доску",
+      icon: <Delete />,
+      disabled: role !== "ADMIN",
+    },
   ];
 
   return (

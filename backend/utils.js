@@ -95,6 +95,7 @@ export const isUserAdmin = (board, reqUserId) => {
 };
 
 export const isUserOnBoard = (board, reqUserId) => {
+
   return (
     board.users.some((user) => user.userId._id.toString() === reqUserId) ||
     board.creator._id.toString() === reqUserId

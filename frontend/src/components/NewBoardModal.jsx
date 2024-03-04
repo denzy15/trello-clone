@@ -32,8 +32,8 @@ const NewBoardModal = ({ close }) => {
           dispatch(addBoard(data));
           close();
         });
-    } catch (error) {
-      toast.error("Не удалось создать доску, попробуйте позже");
+    } catch (e) {
+      toast.error(e.response.data.message ||"Не удалось создать доску, попробуйте позже");
     }
   };
 

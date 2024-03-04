@@ -68,8 +68,10 @@ const UserEdit = (props) => {
       dispatch(
         type === "add" ? addUserToCard(user) : removeUserFromCard(user._id)
       );
-    } catch (error) {
-      toast.error("Не удалось изменить список пользователей");
+    } catch (e) {
+      toast.error(
+        e.response.data.message || "Не удалось изменить список пользователей"
+      );
     } finally {
       setFetchUserRequest({
         loading: false,

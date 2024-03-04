@@ -111,6 +111,7 @@ export const boardsSlice = createSlice({
 
 export const {
   updateUsers,
+  updateBoardDescription,
   updateList,
   deleteList,
   updateCard,

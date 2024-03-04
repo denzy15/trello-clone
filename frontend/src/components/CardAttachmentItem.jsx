@@ -64,15 +64,11 @@ const CardAttachmentItem = (props) => {
           })
         );
       })
-      .catch(() => {
-        toast.error("Не удалось обновить название");
+      .catch((e) => {
+        toast.error(e.response.data.message || "Не удалось обновить название");
       });
 
     dispatch(updateCardAttachName({ index, name: newName }));
-
-    // const { data } = await axiosInstance.get(
-    //   `${SERVER_URL}/api/cards/${boardId}/${cardEditing.card._id}`
-    // );
 
     setAnchorEl1(null);
   };
@@ -96,7 +92,7 @@ const CardAttachmentItem = (props) => {
         );
       })
       .catch((e) => {
-        toast.error("Не удалось удалить вложение");
+        toast.error(e.response.data.message || "Не удалось удалить вложение");
       });
 
     dispatch(deleteAttach({ index }));
