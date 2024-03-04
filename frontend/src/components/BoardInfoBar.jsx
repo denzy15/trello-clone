@@ -16,6 +16,7 @@ import {
   ListItemIcon,
   ListItemText,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
@@ -26,6 +27,11 @@ import AddUser from "./board_modals/AddUser";
 import LeaveBoard from "./board_modals/LeaveBoard";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleEditableDraft } from "../store/slices/metadataSlice";
+import axiosInstance from "../axiosInterceptor";
+import { useParams } from "react-router-dom";
+import { SERVER_URL } from "../constants";
+import { toast } from "react-toastify";
+import { updateBoardTitle } from "../store/slices/boardsSlice";
 
 const steps = [
   {
@@ -45,6 +51,7 @@ const steps = [
 ];
 
 const BoardInfoBar = (props) => {
+  // debugger
   const [openDrawer, setOpenDrawer] = useState(false);
 
   const [modalState, setModalState] = useState(steps[0]);
@@ -55,6 +62,37 @@ const BoardInfoBar = (props) => {
 
   const dispatch = useDispatch();
   const { editableDraft } = useSelector((state) => state.metadata);
+
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [newTitle, setNewTitle] = useState(props.title);
+
+  const { boardId } = useParams();
+
+  const handleEditTitle = async (e) => {
+    if (e.type === "keydown" && e.key !== "Enter") return;
+
+    if (!newTitle || newTitle === props.title) {
+      setNewTitle(props.title);
+      setIsEditingTitle(false);
+      return;
+    }
+
+    await axiosInstance
+      .put(`${SERVER_URL}/api/boards/${boardId}`, {
+        title: newTitle,
+      })
+      .then(() => {
+        dispatch(updateBoardTitle(newTitle));
+      })
+      .catch((e) => {
+        setNewTitle(props.title);
+        toast.error(
+          e.response.data.message || "Не удалось обновить название доски"
+        );
+      });
+
+    setIsEditingTitle(false);
+  };
 
   const handleCloseDrawer = () => {
     setOpenDrawer(false);
@@ -74,7 +112,26 @@ const BoardInfoBar = (props) => {
           borderBottom: "1px solid #b7b7b7",
         }}
       >
-        <Typography variant="h5">{props.title}</Typography>
+        {isEditingTitle ? (
+          <TextField
+            value={newTitle}
+            autoFocus
+            onBlur={handleEditTitle}
+            onKeyDown={handleEditTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+          />
+        ) : (
+          <Typography
+            variant="h5"
+            sx={{
+              cursor: "pointer",
+              display: "inline-block",
+            }}
+            onClick={() => setIsEditingTitle(true)}
+          >
+            {newTitle || props.title}
+          </Typography>
+        )}
         <IconButton onClick={() => setOpenDrawer(true)}>
           <MoreHoriz />
         </IconButton>

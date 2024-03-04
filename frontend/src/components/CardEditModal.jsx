@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -37,7 +37,6 @@ import {
   renameCard,
   updateCard,
   updateList,
-  updateLists,
 } from "../store/slices/boardsSlice";
 import axiosInstance from "../axiosInterceptor";
 import { SERVER_URL } from "../constants";
@@ -559,7 +558,7 @@ const CardEditModal = ({ close }) => {
                 }}
               >
                 {visibleAttachments.map((att, i) => (
-                  <CardAttachmentItem key={i} {...att} index={i} />
+                  <CardAttachmentItem key={att._id} {...att} index={i} />
                 ))}
               </Box>
               {cardEditing.card.attachments.length > 5 && (

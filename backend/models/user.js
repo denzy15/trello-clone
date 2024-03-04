@@ -14,12 +14,6 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  invitations: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Invitation",
-    },
-  ],
 });
 
 const User = model("User", userSchema);

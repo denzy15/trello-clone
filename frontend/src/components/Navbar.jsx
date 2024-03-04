@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { signOut } from "../store/slices/authSlice";
 import { convertUsernameForAvatar, getUserColor } from "../utils";
 import { Notifications } from "@mui/icons-material";
-import Notification from "./Notification";
+import Invitation from "./Invitation";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -99,15 +99,17 @@ const Navbar = () => {
           <Box sx={{ p: 2 }}>
             <Typography sx={{ mb: 1 }}>УВЕДОМЛЕНИЯ</Typography>
             <Divider />
-            <Stack direction={"column"} spacing={1.5} sx={{ mt: 2 }}>
+            <Stack
+              direction={"column"}
+              spacing={1.5}
+              sx={{ mt: 2, overflow: "auto", maxWidth: 300, maxHeight: 400 }}
+            >
               {invitations.length === 0 ? (
                 <Box>
                   <Typography>Нет уведомлений</Typography>
                 </Box>
               ) : (
-                invitations.map((inv) => (
-                  <Notification key={inv._id} {...inv} />
-                ))
+                invitations.map((inv) => <Invitation key={inv._id} {...inv} />)
               )}
             </Stack>
           </Box>

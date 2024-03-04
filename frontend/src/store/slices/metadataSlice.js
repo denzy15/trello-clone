@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  recent: [],
+  // recent: [],
   cardEditing: {
     isEditing: false,
     card: null,
@@ -16,23 +16,23 @@ export const metadataSlice = createSlice({
   initialState,
   reducers: {
     setMyRoleOnCurrentBoard: (state, action) => {
-      state.role = action.payload
+      state.role = action.payload;
     },
-    visitBoard: (state, action) => {
-      if (!state.recent.includes(action.payload)) {
-        state.recent = [...state.recent, action.payload];
-        return;
-      }
+    // visitBoard: (state, action) => {
+    //   if (!state.recent.includes(action.payload)) {
+    //     state.recent = [...state.recent, action.payload];
+    //     return;
+    //   }
 
-      const index = state.recent.indexOf(action.payload);
+    //   const index = state.recent.indexOf(action.payload);
 
-      if (index > 0) {
-        state.recent.splice(index, 1).push(action.payload);
-      }
-    },
-    clearRecent: (state, action) => {
-      state.recent = [];
-    },
+    //   if (index > 0) {
+    //     state.recent.splice(index, 1).push(action.payload);
+    //   }
+    // },
+    // clearRecent: (state, action) => {
+    //   state.recent = [];
+    // },
     startCardEdit: (state, action) => {
       state.cardEditing = {
         card: action.payload,
@@ -108,6 +108,7 @@ export const metadataSlice = createSlice({
 export const {
   setMyRoleOnCurrentBoard,
   updateComments,
+
   deleteAttach,
   updateCardAttachName,
   updateCardAttachments,
@@ -118,10 +119,9 @@ export const {
   addLabelToCard,
   updateCardLabel,
   removeLabelFromCard,
-  visitBoard,
   addUserToCard,
   removeUserFromCard,
-  clearRecent,
+
   startCardEdit,
   stopCardEdit,
   updateCardEditingInfo,

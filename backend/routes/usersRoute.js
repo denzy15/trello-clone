@@ -1,6 +1,7 @@
 import express from "express";
-import { convertUsersResponse, isAuth } from "../utils.js";
+import { isAuth } from "../utils.js";
 import User from "../models/user.js";
+import Invitation from "../models/invitation.js";
 
 const router = express.Router();
 
@@ -29,23 +30,12 @@ router.get("/", isAuth, async (req, res) => {
 
 router.get("/notifications", isAuth, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).populate([
-      {
-        path: "invitations",
-        populate: [
-          {
-            path: "board",
-            select: "title",
-          },
-          {
-            path: "inviter",
-            select: "username email",
-          },
-        ],
-      },
-    ]);
+    const invitations = await Invitation.find({ invitedUser: req.user._id })
+      .populate("inviter", "username email")
+      .populate("board", "title");
+    // .populate("invitedUser", "username email");
 
-    res.json(user.invitations);
+    res.json(invitations.sort((a, b) => b.createdAt - a.createdAt));
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });

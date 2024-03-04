@@ -46,9 +46,6 @@ router.post("/", isAuth, async (req, res) => {
       inviter: req.user._id,
     });
 
-    user.invitations.push(invitation._id);
-    await user.save();
-
     res.json(invitation);
   } catch (err) {
     console.error(err);

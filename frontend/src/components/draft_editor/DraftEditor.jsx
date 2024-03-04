@@ -58,7 +58,7 @@ const DraftEditor = () => {
   const editor = useRef(null);
 
   const focusEditor = () => {
-    if (role !== "ADMIN") return;
+    if (!cardEditing.isEditing && role !== "ADMIN") return;
 
     if (!editableDraft) dispatch(toggleEditableDraft());
     editor.current.focus();
@@ -227,7 +227,11 @@ const DraftEditor = () => {
           <Editor
             readOnly={!editableDraft}
             ref={editor}
-            placeholder="Введите описание..."
+            placeholder={
+              !cardEditing.isEditing && role !== "ADMIN"
+                ? "Описание отсутствует"
+                : "Введите описание..."
+            }
             handleKeyCommand={handleKeyCommand}
             editorState={editorState}
             customStyleMap={styleMap}

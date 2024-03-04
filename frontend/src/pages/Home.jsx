@@ -1,18 +1,25 @@
-import { Alert, Box, Container, Grid, Paper, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Container,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import ScheduleIcon from "@mui/icons-material/Schedule";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../axiosInterceptor";
 import { SERVER_URL } from "../constants";
-import { setBoards } from "../store/slices/boardsSlice";
+import { quitBoard, setBoards } from "../store/slices/boardsSlice";
 import { useNavigate, useParams } from "react-router-dom";
 import NewBoardModal from "../components/NewBoardModal";
 import { setInvitations } from "../store/slices/invitationsSlice";
 import { setMyRoleOnCurrentBoard } from "../store/slices/metadataSlice";
+import { ViewKanbanOutlined } from "@mui/icons-material";
 
 const Home = () => {
-  const { recent } = useSelector((state) => state.metadata);
   const { boards } = useSelector((state) => state.boards);
 
   const dispatch = useDispatch();
@@ -21,8 +28,6 @@ const Home = () => {
   const [isNewBoardCreating, setIsNewBoardCreating] = useState(false);
 
   const navigate = useNavigate();
-
-  const { boardId } = useParams;
 
   useEffect(() => {
     async function fetchBoards() {
@@ -49,32 +54,25 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(setMyRoleOnCurrentBoard(null));
-  }, [boardId, dispatch]);
+    dispatch(quitBoard());
+  }, [dispatch]);
 
   return (
     <Box>
       <Navbar />
       <Container>
         {!!fetchError && <Alert severity="error">{fetchError}</Alert>}
-        {recent.length !== 0 && (
-          <Box>
-            <Typography
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                fontWeight: 600,
-              }}
-            >
-              <ScheduleIcon />
-              Недавно просмотренные:
-            </Typography>
-          </Box>
-        )}
+
         <Box>
-          <Typography variant="h6" sx={{ my: 3 }}>
-            Ваши рабочие пространства:
-          </Typography>
+          <Stack
+            direction={"row"}
+            spacing={1}
+            alignItems={"center"}
+            sx={{ my: 2 }}
+          >
+            <ViewKanbanOutlined />
+            <Typography variant="h6">Ваши рабочие пространства:</Typography>
+          </Stack>
           <Grid container spacing={2}>
             {boards.map((board, idx) => (
               <Grid

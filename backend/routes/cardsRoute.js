@@ -564,7 +564,14 @@ router.put("/:boardId/:cardId/attach", isAuth, async (req, res) => {
     const { boardId, cardId } = req.params;
     const { attachId, name } = req.body;
 
-    const board = await Board.findById(boardId);
+    const board = await Board.findById(boardId)
+      .populate({
+        path: "lists",
+        populate: {
+          path: "cards",
+        },
+      })
+      .exec();
 
     if (!board) {
       return res.status(404).json({ message: "Доска не найдена" });
@@ -578,23 +585,36 @@ router.put("/:boardId/:cardId/attach", isAuth, async (req, res) => {
 
     const updatedCard = await Card.findById(cardId);
 
-    const idx = updatedCard.attachments.findIndex(
+    const attachmentIndex = updatedCard.attachments.findIndex(
       (att) => att._id.toString() === attachId
     );
-    if (idx === -1) {
+
+    if (attachmentIndex === -1) {
       return res.status(404).json({ message: "Вложение не найдено" });
     }
 
     if (!name) {
-      // const filePath = path.join(
-      //   __dirname,
-      //   "uploads",
-      //   updatedCard.attachments[idx].path
-      // );
-      // await deleteFile(filePath);
-      updatedCard.attachments.splice(idx, 1);
+      const attachmentPath = updatedCard.attachments[attachmentIndex].path;
+
+      const filePath = path.join(__dirname, "uploads", attachmentPath);
+      updatedCard.attachments.splice(attachmentIndex, 1);
+
+      // Проверяем, есть ли другие карточки с вложением с таким же путем
+      const isNotUnique = await Card.aggregate([
+        {
+          $match: {
+            _id: { $ne: updatedCard._id },
+            "attachments.path": attachmentPath,
+          },
+        },
+        { $limit: 1 },
+      ]);
+
+      if (!isNotUnique.length) {
+        await deleteFile(filePath);
+      }
     } else {
-      updatedCard.attachments[idx].name = name;
+      updatedCard.attachments[attachmentIndex].name = name;
     }
 
     await updatedCard.save();

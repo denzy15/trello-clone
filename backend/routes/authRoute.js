@@ -44,21 +44,7 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     // Поиск пользователя по email
-    const user = await User.findOne({ email }).populate([
-      {
-        path: "invitations",
-        populate: [
-          {
-            path: "board",
-            select: "title",
-          },
-          {
-            path: "inviter",
-            select: "username email",
-          },
-        ],
-      },
-    ]);
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(401).json({ message: "Неверный email или пароль" });
@@ -70,10 +56,6 @@ router.post("/login", async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Неверный email или пароль" });
     }
-
-    // const result = await User.findById(user._id, "-password").populate(
-    //   "invitations"
-    // );
 
     const result = { ...user.toObject(), token: generateToken(user) };
 

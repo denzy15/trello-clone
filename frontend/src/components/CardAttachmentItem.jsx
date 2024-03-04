@@ -22,7 +22,7 @@ import { toast } from "react-toastify";
 import { updateCard } from "../store/slices/boardsSlice";
 
 const CardAttachmentItem = (props) => {
-  const { createdAt, creator, name, path, type, index, _id } = props;
+  const { createdAt, name, path, type, index, _id } = props;
 
   const [openImage, setOpenImage] = useState(false);
 
@@ -262,11 +262,11 @@ const CardAttachmentItem = (props) => {
               horizontal: "center",
             }}
           >
-            <Box>
+            <Box sx={{}}>
               <img
                 src={`${SERVER_URL}/${path}`}
                 alt={name}
-                style={{ maxWidth: "100%", maxHeight: "100%" }}
+                style={{ width: "100%", height: "100%" }}
               />
             </Box>
           </Popover>

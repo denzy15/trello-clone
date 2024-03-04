@@ -25,7 +25,7 @@ import {
 } from "../store/slices/invitationsSlice";
 import { setBoards } from "../store/slices/boardsSlice";
 
-const Notification = (props) => {
+const Invitation = (props) => {
   const { board, inviter, createdAt, _id, status } = props;
 
   const [loading, setLoading] = useState(false);
@@ -119,8 +119,18 @@ const Notification = (props) => {
         <Typography>{inviter.username}</Typography>
       </Stack>
       <Typography>
-        пригласил вас на доску{" "}
-        <span style={{ textDecoration: "underline" }}>{board.title}</span>
+        Пригласил вас на доску{" "}
+        {board ? (
+          <>
+            <span style={{ textDecoration: "underline" }}>{board.title}</span>
+          </>
+        ) : (
+          <span style={{ fontStyle: "italic", textDecoration: "line-through" }}>
+            Доска удалена
+          </span>
+        )}
+        {/* пригласил вас на доску{" "}
+        <span style={{ textDecoration: "underline" }}>{board.title}</span> */}
       </Typography>
       <Typography variant="caption">
         {formatDateWithourYear(createdAt)}
@@ -150,4 +160,4 @@ const Notification = (props) => {
   );
 };
 
-export default Notification;
+export default Invitation;

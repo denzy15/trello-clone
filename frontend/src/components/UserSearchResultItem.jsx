@@ -64,8 +64,13 @@ const UserSearchResultItem = (props) => {
         secondary={
           <>
             <Typography
-              sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
-              variant="subtitle2"
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                fontSize: 12,
+                display: "block",
+              }}
+              variant="caption"
             >
               {email}
             </Typography>

@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useParams } from "react-router-dom";
 import "./App.css";
 import { Box } from "@mui/material";
 import Home from "./pages/Home";
@@ -13,6 +13,11 @@ import dayjs from "dayjs";
 
 function App() {
   dayjs.locale("ru");
+
+  const { boardId } = useParams();
+
+  // console.log(boardId);
+
   return (
     <Box className="App">
       <Routes>

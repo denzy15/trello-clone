@@ -263,7 +263,7 @@ const BoardPage = () => {
     >
       <Box>
         <Navbar />
-        <BoardInfoBar {...currentBoard} />
+        <BoardInfoBar title={currentBoard.title} />
         <Box
           sx={{
             px: 1,

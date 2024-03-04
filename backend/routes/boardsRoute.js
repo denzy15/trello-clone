@@ -131,7 +131,6 @@ router.get("/:boardId", isAuth, async (req, res) => {
           ],
         },
       })
-
       .exec();
 
     if (!board) {

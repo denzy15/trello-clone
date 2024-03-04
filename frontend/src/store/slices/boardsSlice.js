@@ -106,10 +106,14 @@ export const boardsSlice = createSlice({
     updateBoardDescription: (state, action) => {
       state.currentBoard.description = action.payload;
     },
+    updateBoardTitle: (state, action) => {
+      state.currentBoard.title = action.payload;
+    },
   },
 });
 
 export const {
+  updateBoardTitle,
   updateUsers,
   updateBoardDescription,
   updateList,
