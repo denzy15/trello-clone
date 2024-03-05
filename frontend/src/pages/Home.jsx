@@ -48,8 +48,9 @@ const Home = () => {
         .catch(() => setFetchError("Не удалось загрузить новые уведомления"));
     }
 
-    fetchBoards();
-    fetchNotifications();
+    fetchBoards().then(() => {
+      fetchNotifications();
+    });
   }, [dispatch]);
 
   useEffect(() => {

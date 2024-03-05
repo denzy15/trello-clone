@@ -23,8 +23,11 @@ export const authSlice = createSlice({
       state.email = null;
       state.token = null;
     },
+    changeUsername: (state, action) => {
+      state.username = action.payload;
+    },
   },
 });
 
-export const { login, signOut } = authSlice.actions;
+export const { login, signOut, changeUsername } = authSlice.actions;
 export default authSlice.reducer;

@@ -22,7 +22,11 @@ export const isAuth = (req, res, next) => {
     const token = authorization.slice(7, authorization.length);
     jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
       if (err) {
-        res.status(401).send({ message: "Неверный токен" });
+        if (err.name === "TokenExpiredError") {
+          res.status(403).send({ message: "Срок действия токена истек" });
+        } else {
+          res.status(401).send({ message: "Неверный токен" });
+        }
       } else {
         req.user = decode;
         next();
@@ -95,7 +99,6 @@ export const isUserAdmin = (board, reqUserId) => {
 };
 
 export const isUserOnBoard = (board, reqUserId) => {
-
   return (
     board.users.some((user) => user.userId._id.toString() === reqUserId) ||
     board.creator._id.toString() === reqUserId

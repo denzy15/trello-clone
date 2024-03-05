@@ -78,15 +78,6 @@ const BoardPage = () => {
 
   const handleEditListTitle = async (listId, listIndex, newListTitle) => {
     const oldListTitle = currentBoard.lists[listIndex].title;
-
-    // setOrderedLists((prev) => {
-    //   const updatedLists = [...prev];
-    //   updatedLists[listIndex] = {
-    //     ...updatedLists[listIndex],
-    //     title: newListTitle,
-    //   };
-    //   return updatedLists;
-    // });
     dispatch(renameList({ listIndex, title: newListTitle }));
 
     await axiosInstance

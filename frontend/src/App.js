@@ -10,14 +10,10 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "draft-js/dist/Draft.css";
 import dayjs from "dayjs";
+import Profile from "./pages/Profile";
 
 function App() {
   dayjs.locale("ru");
-
-  const { boardId } = useParams();
-
-  // console.log(boardId);
-
   return (
     <Box className="App">
       <Routes>
@@ -36,6 +32,14 @@ function App() {
           element={
             <ProtectedRoute>
               <BoardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

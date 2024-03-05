@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signOut } from "../store/slices/authSlice";
 import { convertUsernameForAvatar, getUserColor } from "../utils";
@@ -23,6 +23,8 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector((state) => state.auth);
   const { invitations } = useSelector((state) => state.invitations);
+
+  const navigate = useNavigate();
 
   const [notifAnchorEl, setNotifAnchorEl] = useState(null);
   const [profileAnchorEl, setProfileAnchorEl] = useState(null);
@@ -143,7 +145,12 @@ const Navbar = () => {
               </Avatar>
               <Typography>{userInfo.username}</Typography>
             </Stack>
-            <Button sx={{ justifyContent: "start" }} color="inherit" fullWidth>
+            <Button
+              onClick={() => navigate("/profile")}
+              sx={{ justifyContent: "start" }}
+              color="inherit"
+              fullWidth
+            >
               Настройки
             </Button>
             <Button
