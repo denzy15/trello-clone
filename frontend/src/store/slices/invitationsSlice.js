@@ -27,9 +27,16 @@ export const invitationsSlice = createSlice({
         (inv) => inv._id !== action.payload._id
       );
     },
+    setNewInvitation: (state, action) => {
+      state.invitations.push(action.payload);
+    },
   },
 });
 
-export const { changeInvitationStatus, deleteInvitation, setInvitations } =
-  invitationsSlice.actions;
+export const {
+  changeInvitationStatus,
+  setNewInvitation,
+  deleteInvitation,
+  setInvitations,
+} = invitationsSlice.actions;
 export default invitationsSlice.reducer;

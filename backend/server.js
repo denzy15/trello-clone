@@ -9,6 +9,7 @@ import cardsRouter from "./routes/cardsRoute.js";
 import usersRouter from "./routes/usersRoute.js";
 import invitationsRouter from "./routes/invitationsRoute.js";
 import path from "path";
+import sse from './sse.js'; 
 import { fileURLToPath } from "url";
 
 const PORT = 5000;
@@ -29,9 +30,19 @@ mongoose
 
 const app = express();
 
+
+
+
 app.use(express.static(path.join(__dirname, "uploads")));
 app.use(cors());
 app.use(express.json());
+
+app.get('/sse', (req, res, next) => {
+  res.flush = () => {};
+  next();
+}, sse.init);
+
+
 app.use("/api/auth", authRouter);
 app.use("/api/boards", boardsRouter);
 app.use("/api/cards", cardsRouter);

@@ -3,6 +3,7 @@ import { isAuth, isUserOnBoard } from "../utils.js";
 import Board from "../models/board.js";
 import User from "../models/user.js";
 import Invitation from "../models/invitation.js";
+import sse from "../sse.js";
 
 const router = express.Router();
 
@@ -45,6 +46,12 @@ router.post("/", isAuth, async (req, res) => {
       invitedUser,
       inviter: req.user._id,
     });
+
+    const SSEinvitation = await Invitation.findById(invitation._id)
+      .populate("inviter", "username email")
+      .populate("board", "title");
+
+    sse.send(SSEinvitation);
 
     res.json(invitation);
   } catch (err) {

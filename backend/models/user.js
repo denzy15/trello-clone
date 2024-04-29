@@ -14,6 +14,8 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
 });
 
 const User = model("User", userSchema);

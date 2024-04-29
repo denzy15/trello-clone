@@ -8,7 +8,6 @@ import GridLoader from "react-spinners/GridLoader";
 import List from "../components/List";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import BoardInfoBar from "../components/BoardInfoBar";
-import AddElement from "./AddElement";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import CardEditModal from "../components/CardEditModal";
@@ -24,6 +23,7 @@ import {
 } from "../store/slices/boardsSlice";
 import { LocalizationProvider, ruRU } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import AddElement from "../components/AddElement";
 
 const BoardPage = () => {
   const { boardId } = useParams();
@@ -56,7 +56,7 @@ const BoardPage = () => {
     }
 
     fetchBoardInfo();
-  }, []);
+  }, [boardId, dispatch]);
 
   useEffect(() => {
     const calculateRole = () => {

@@ -3,6 +3,7 @@ import authReducer from "./slices/authSlice";
 import boardsReducer from "./slices/boardsSlice";
 import metadataReducer from "./slices/metadataSlice";
 import invitationsReducer from "./slices/invitationsSlice";
+import themeReducer from "./slices/themeSlice";
 import storage from "redux-persist/lib/storage";
 import {
   FLUSH,
@@ -22,6 +23,7 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
+  theme: themeReducer,
   auth: authReducer,
   boards: boardsReducer,
   metadata: metadataReducer,

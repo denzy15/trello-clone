@@ -10,9 +10,10 @@ import React, { useState } from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 import BoardCard from "./BoardCard";
 import { useParams } from "react-router-dom";
-import AddElement from "../pages/AddElement";
+
 import EditColumnIcon from "@mui/icons-material/MoreHoriz";
 import ListEditModal from "./ListEditModal";
+import AddElement from "./AddElement";
 
 const List = (props) => {
   const { cards, _id: listId, index, title } = props;

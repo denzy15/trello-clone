@@ -20,6 +20,7 @@ export const getUserColor = (userId) => {
   return color;
 };
 
+// delete and replace with getContrastColor
 export const colorIsDark = (color) => {
   let hexColor = color;
 
@@ -51,6 +52,20 @@ export const colorIsDark = (color) => {
 
   // Возвращение значения: true для темного фона, false для светлого
   return brightness < 128;
+};
+
+export const getContrastColor = (backgroundColor) => {
+  const brightness = parseInt(backgroundColor.substring(1), 16);
+  const r = (brightness >> 16) & 255;
+  const g = (brightness >> 8) & 255;
+  const b = brightness & 255;
+
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  if (luminance > 0.5) {
+    return "#000000";
+  } else {
+    return "#ffffff";
+  }
 };
 
 export const getFileType = (type) => {

@@ -92,10 +92,6 @@ export const isUserAdmin = (board, reqUserId) => {
 
   return false;
 
-  // return (
-  //   board.users.find((user) => user.userId._id.toString() === reqUserId)
-  //     .role === "ADMIN" || board.creator._id.toString() === reqUserId
-  // );
 };
 
 export const isUserOnBoard = (board, reqUserId) => {

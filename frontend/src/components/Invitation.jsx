@@ -12,23 +12,29 @@ import React, { useState } from "react";
 import {
   convertUsernameForAvatar,
   formatDateWithourYear,
+  getContrastColor,
   getUserColor,
 } from "../utils";
 import { RemoveCircleOutline } from "@mui/icons-material";
 import axiosInstance from "../axiosInterceptor";
 import { SERVER_URL } from "../constants";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   changeInvitationStatus,
   deleteInvitation,
 } from "../store/slices/invitationsSlice";
 import { setBoards } from "../store/slices/boardsSlice";
+import { getTheme } from "../theme";
 
 const Invitation = (props) => {
   const { board, inviter, createdAt, _id, status } = props;
 
   const [loading, setLoading] = useState(false);
+
+  const { mode } = useSelector((state) => state.theme);
+
+  const theme = getTheme(mode);
 
   const dispatch = useDispatch();
 
@@ -99,7 +105,12 @@ const Invitation = (props) => {
 
   return (
     <Box
-      sx={{ bgcolor: "#eeeeee", borderRadius: 2, p: 1, position: "relative" }}
+      sx={{
+        bgcolor: theme.palette.background.paper,
+        borderRadius: 2,
+        p: 1,
+        position: "relative",
+      }}
     >
       <IconButton
         onClick={handleDelete}
@@ -112,7 +123,12 @@ const Invitation = (props) => {
       <Stack direction={"row"} spacing={1} alignItems={"center"}>
         {" "}
         <Tooltip title={inviter.email}>
-          <Avatar sx={{ bgcolor: getUserColor(inviter._id) }}>
+          <Avatar
+            sx={{
+              bgcolor: getUserColor(inviter._id),
+              color: getContrastColor(getUserColor(inviter._id)),
+            }}
+          >
             {convertUsernameForAvatar(inviter.username)}
           </Avatar>
         </Tooltip>

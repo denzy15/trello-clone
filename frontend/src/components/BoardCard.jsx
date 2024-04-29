@@ -21,8 +21,12 @@ import {
   getUserColor,
   isExpired,
 } from "../utils";
-import { AttachFile, ChatBubbleOutlineOutlined, QueryBuilder, Subject } from "@mui/icons-material";
-import dayjs from "dayjs";
+import {
+  AttachFile,
+  ChatBubbleOutlineOutlined,
+  QueryBuilder,
+  Subject,
+} from "@mui/icons-material";
 
 const BoardCard = (props) => {
   const { extendedLabels } = useSelector((state) => state.metadata);
@@ -104,8 +108,8 @@ const BoardCard = (props) => {
                       spacing={0.25}
                       sx={{
                         p: 0.3,
-                        bgcolor: isExpired(props.dueDate) ? '#FFD5D2' : null,
-                        color: isExpired(props.dueDate) ? 'red' : 'black'
+                        bgcolor: isExpired(props.dueDate) ? "#FFD5D2" : null,
+                        color: isExpired(props.dueDate) ? "red" : "black",
                       }}
                     >
                       <QueryBuilder sx={{ fontSize: 14 }} />
@@ -140,9 +144,7 @@ const BoardCard = (props) => {
                       alignItems={"center"}
                       spacing={0.25}
                     >
-                      <ChatBubbleOutlineOutlined
-                        sx={{ fontSize: 14 }}
-                      />
+                      <ChatBubbleOutlineOutlined sx={{ fontSize: 14 }} />
                       <Typography variant="subtitle2">
                         {props.comments.length}
                       </Typography>

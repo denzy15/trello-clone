@@ -19,6 +19,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login } from "../store/slices/authSlice";
+import { SERVER_URL } from "../constants";
 
 const initialFormData = {
   email: "",
@@ -56,7 +57,7 @@ const Login = () => {
     setErrors((prev) => ({ ...prev, password: "" }));
 
     axios
-      .post("http://localhost:5000/api/auth/login", formData)
+      .post(`${SERVER_URL}/api/auth/login`, formData)
       .then(({ data }) => {
         dispatch(login(data));
         navigate("/");
@@ -189,14 +190,30 @@ const Login = () => {
                   {errors.common}
                 </Alert>
               )}
-              <Button
-                variant="contained"
-                color="secondary"
-                sx={{ maxWidth: 150, mt: 5 }}
-                onClick={handleLogin}
+              <Stack
+                direction={"row"}
+                spacing={2}
+                alignItems={"center"}
+                sx={{ mt: 5 }}
               >
-                Войти
-              </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  sx={{ maxWidth: 150 }}
+                  onClick={handleLogin}
+                >
+                  Войти
+                </Button>
+                <Typography
+                  sx={{
+                    "& a": {
+                      color: "#6534d9",
+                    },
+                  }}
+                >
+                  <Link to="/forgotPassword">Забыли пароль?</Link>
+                </Typography>
+              </Stack>
             </FormControl>
           </Box>
         </Box>

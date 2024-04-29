@@ -13,7 +13,29 @@ router.get("/", isAuth, async (req, res) => {
 
     const boards = await Board.find({
       $or: [{ creator: userId }, { users: { $elemMatch: { userId: userId } } }],
-    });
+    })
+      .populate("creator", "username email") // Популируем создателя доски
+      .populate("users.userId", "username email") // Популируем пользователей доски
+      .populate({
+        path: "lists",
+        populate: {
+          path: "cards",
+          populate: [
+            {
+              path: "assignedUsers",
+            },
+            {
+              path: "attachments.creator",
+              select: "username email _id",
+            },
+            {
+              path: "comments.author",
+              select: "username email _id",
+            },
+          ],
+        },
+      })
+      .exec();
 
     res.json(boards);
   } catch (err) {

@@ -30,15 +30,6 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchBoards() {
-      await axiosInstance
-        .get(`${SERVER_URL}/api/boards`)
-        .then(({ data }) => {
-          dispatch(setBoards(data));
-        })
-        .catch(() => setFetchError("Не удалось загрузить доски"));
-    }
-
     async function fetchNotifications() {
       await axiosInstance
         .get(`${SERVER_URL}/api/users/notifications`)
@@ -48,9 +39,17 @@ const Home = () => {
         .catch(() => setFetchError("Не удалось загрузить новые уведомления"));
     }
 
-    fetchBoards().then(() => {
-      fetchNotifications();
-    });
+    async function fetchBoards() {
+      await axiosInstance
+        .get(`${SERVER_URL}/api/boards`)
+        .then(({ data }) => {
+          dispatch(setBoards(data));
+        })
+        .catch(() => setFetchError("Не удалось загрузить доски"));
+    }
+
+    fetchBoards();
+    fetchNotifications();
   }, [dispatch]);
 
   useEffect(() => {
