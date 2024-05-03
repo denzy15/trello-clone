@@ -18,6 +18,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { SERVER_URL } from "../constants";
 import { toast } from "react-toastify";
 import { changeUsername } from "../store/slices/authSlice";
+import { getTheme } from "../theme";
 
 const passwordEditData = {
   oldPass: "",
@@ -91,6 +92,12 @@ const Profile = () => {
   };
 
   const dispatch = useDispatch();
+
+  const {mode} = useSelector(state=>state.theme)
+
+  const theme = getTheme(mode)
+
+
   const handleSaveNewUsername = async (e) => {
     if (e.type === "keydown" && e.key !== "Enter") return;
 
@@ -144,7 +151,7 @@ const Profile = () => {
                   borderRadius: 1,
                   transition: "0.3s",
                   "&:hover": {
-                    bgcolor: "#e0e0e0",
+                    bgcolor: theme.palette.action.disabledBackground
                   },
                 }}
                 onClick={() => setEditingUsername(true)}

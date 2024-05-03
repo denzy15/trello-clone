@@ -1,0 +1,49 @@
+[{
+  "_id": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "username": "Daniil Mirshanov",
+  "email": "dmirshanov@mail.ru",
+  "password": "$2a$10$M4ycf.JABRPnuuhoUBKQe.c8wXn0bJNQuR2c5NypTc5LyrXc39bQ.",
+  "__v": 2,
+  "resetPasswordExpires": {
+    "$date": "2024-04-28T08:38:43.266Z"
+  },
+  "resetPasswordToken": "3db6824d6976758a6b593a72eced2906f004acfc"
+},
+{
+  "_id": {
+    "$oid": "65bc81683d07858fcab31e01"
+  },
+  "username": "Alina",
+  "email": "alya.sapukova@mail.ru",
+  "password": "$2a$10$B.fzT89wea/tj3ez3PztcO0t5p9Q0LUpYS9gEmee0PD0ecs/jUATa",
+  "__v": 2
+},
+{
+  "_id": {
+    "$oid": "65bc81933d07858fcab31e06"
+  },
+  "username": "JASON STATHAM",
+  "email": "j_statham@mail.ru",
+  "password": "$2a$10$cgEXMMw8Kp9duonX5S.YueVj3Idg9w/x/tcyvrg6EtkFu3NtvYkGa",
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "65e413eae5bb00ebc9b877b8"
+  },
+  "username": "ATAMAN",
+  "email": "lol@mail.ru",
+  "password": "$2a$10$uk4nbenle9wmvbl9Dqm74.ElwbEN6eQA/.8IJ3.qdyWEUKRECytZa",
+  "__v": 2
+},
+{
+  "_id": {
+    "$oid": "662cf4b18e715fcbc8577c62"
+  },
+  "username": "boss",
+  "email": "dmirshanov2002@mail.ru",
+  "password": "$2a$10$aYZJ5iYHyjTs.JS0vn.jquyEKl8kew5HA1LkTf6Fm4K6N0FxveQa.",
+  "__v": 0
+}]

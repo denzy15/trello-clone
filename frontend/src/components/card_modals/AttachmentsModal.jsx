@@ -1,9 +1,6 @@
-import React, { useState } from "react";
-import { FilePond, registerPlugin } from "react-filepond";
+import React from "react";
 import "filepond/dist/filepond.min.css";
 import { Box, Button } from "@mui/material";
-import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import { useDispatch, useSelector } from "react-redux";
 import { SERVER_URL } from "../../constants";
@@ -12,7 +9,6 @@ import axiosInstance from "../../axiosInterceptor";
 import { toast } from "react-toastify";
 import { updateCard } from "../../store/slices/boardsSlice";
 import { updateCardAttachments } from "../../store/slices/metadataSlice";
-// registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
 const AttachmentsModal = ({ closeModal }) => {
   const { cardEditing } = useSelector((state) => state.metadata);

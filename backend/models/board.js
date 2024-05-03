@@ -21,7 +21,7 @@ const boardSchema = new Schema({
       role: {
         type: String,
         enum: ["ADMIN", "MEMBER"],
-        default: "MEMBER", 
+        default: "MEMBER",
       },
     },
   ],
@@ -37,6 +37,17 @@ const boardSchema = new Schema({
       color: { type: String, default: "#FAFAFA" },
     },
   ],
+  backgrounds: [
+    {
+      path: String,
+      name: String,
+    },
+  ],
+  currentBackground: {
+    type: String,
+    required: true,
+    default: "backgrounds/common/snow.svg",
+  },
 });
 
 const Board = model("Board", boardSchema);

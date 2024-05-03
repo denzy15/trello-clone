@@ -18,9 +18,6 @@ export const invitationsSlice = createSlice({
           break;
         }
       }
-      // state.invitations = state.invitations.map((inv) =>
-      //   inv._id === action.payload._id ? action.payload : inv
-      // );
     },
     deleteInvitation: (state, action) => {
       state.invitations = state.invitations.filter(
@@ -28,7 +25,7 @@ export const invitationsSlice = createSlice({
       );
     },
     setNewInvitation: (state, action) => {
-      state.invitations.push(action.payload);
+      state.invitations.unshift(action.payload);
     },
   },
 });

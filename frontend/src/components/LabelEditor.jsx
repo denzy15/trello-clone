@@ -13,7 +13,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { MuiColorInput } from "mui-color-input";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { colorIsDark } from "../utils";
+import { getContrastColor } from "../utils";
 import {
   addLabel,
   deleteLabel,
@@ -27,6 +27,8 @@ import {
 import axiosInstance from "../axiosInterceptor";
 import { SERVER_URL } from "../constants";
 import { toast } from "react-toastify";
+import themeSlice from "../store/slices/themeSlice";
+import { getTheme } from "../theme";
 
 const LabelEditor = (props) => {
   const [searchParams] = useSearchParams();
@@ -34,6 +36,8 @@ const LabelEditor = (props) => {
   const dispatch = useDispatch();
 
   const { currentBoard } = useSelector((state) => state.boards);
+  const { mode } = useSelector((state) => state.theme);
+  const theme = getTheme(mode);
 
   const newLabel = searchParams.get("labelId") === "newLabel" ? true : false;
 
@@ -178,7 +182,7 @@ const LabelEditor = (props) => {
             p: 1,
             overflow: "hidden",
             textOverflow: "ellipsis",
-            color: colorIsDark(currentLabel.color) ? "#ffffff" : "#000000",
+            color: getContrastColor(currentLabel.color),
           }}
         >
           {currentLabel.title}
@@ -244,8 +248,8 @@ const LabelEditor = (props) => {
             textAlign: "center",
             p: 2,
             position: "absolute",
-            bgcolor: "InfoBackground",
             right: 0,
+            bgcolor: theme.palette.background.default,
             bottom: 20,
           }}
         >

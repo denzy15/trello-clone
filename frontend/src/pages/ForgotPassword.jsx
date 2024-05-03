@@ -2,19 +2,24 @@ import React, { useState } from "react";
 import {
   Button,
   TextField,
-  Container,
   Typography,
   Box,
   Paper,
+  Stack,
 } from "@mui/material";
 import axiosInstance from "../axiosInterceptor";
 import { SERVER_URL } from "../constants";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { getTheme } from "../theme";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [sended, setSended] = useState(false);
+
+  const { mode } = useSelector((state) => state.theme);
+  const theme = getTheme(mode);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,23 +71,22 @@ const ForgotPassword = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Button
-            disabled={sended}
-            type="submit"
-            variant="contained"
-            color="secondary"
-          >
-            Восстановить
-          </Button>
+          <Stack direction={"row"} alignItems={"center"} spacing={2}>
+            <Button disabled={sended} type="submit" variant="contained">
+              Восстановить
+            </Button>
+            <Typography
+              sx={{
+                mt: 2,
+                "& > a": {
+                  color: theme.palette.text.secondary,
+                },
+              }}
+            >
+              <Link to="/login">Вернуться на страницу входа</Link>
+            </Typography>
+          </Stack>
         </form>
-        <Typography
-          sx={{
-            mt: 2,
-            display: sended ? "block" : "none",
-          }}
-        >
-          <Link to="/login">Вернуться на страницу входа</Link>
-        </Typography>
       </Paper>
     </Box>
   );

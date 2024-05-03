@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import React from "react";
-import { colorIsDark } from "../utils";
+import { getContrastColor } from "../utils";
 import { useSearchParams } from "react-router-dom";
 
 const LabelListItem = ({
@@ -18,7 +18,6 @@ const LabelListItem = ({
   handleAssignLabel,
   startEdit,
 }) => {
-  const isDarkBackground = colorIsDark(label.color);
   const [searchParams, setSearchParams] = useSearchParams();
 
   return (
@@ -47,7 +46,7 @@ const LabelListItem = ({
         <ListItemText
           sx={{
             maxWidth: 150,
-            color: isDarkBackground ? "#ffffff" : "#000000",
+            color: getContrastColor(label.color),
             "& span": {
               overflow: "hidden",
               textOverflow: "ellipsis",

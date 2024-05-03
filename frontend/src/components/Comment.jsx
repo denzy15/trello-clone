@@ -15,6 +15,7 @@ import React, { useState } from "react";
 import {
   convertUsernameForAvatar,
   formatDateWithourYear,
+  getContrastColor,
   getUserColor,
 } from "../utils";
 import { useSelector } from "react-redux";
@@ -42,7 +43,12 @@ const Comment = (props) => {
   return (
     <Stack direction={"row"} spacing={1} alignItems={"center"}>
       <Tooltip title={author.username + ` (${author.email})`}>
-        <Avatar sx={{ bgcolor: getUserColor(author._id) }}>
+        <Avatar
+          sx={{
+            bgcolor: getUserColor(author._id),
+            color: getContrastColor(getUserColor(author._id)),
+          }}
+        >
           {convertUsernameForAvatar(author.username)}
         </Avatar>
       </Tooltip>
@@ -93,7 +99,11 @@ const Comment = (props) => {
               size="small"
               variant="text"
             >
-              <Button disabled={currentUserInfo._id !== author._id} sx={{ fontSize: 10 }} onClick={() => setIsEditing(true)}>
+              <Button
+                disabled={currentUserInfo._id !== author._id}
+                sx={{ fontSize: 10 }}
+                onClick={() => setIsEditing(true)}
+              >
                 Изменить
               </Button>
               <Button

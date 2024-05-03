@@ -6,6 +6,7 @@ import {
   isAuth,
   isUserAdmin,
   isUserOnBoard,
+  sendBoardUpdate,
 } from "../utils.js";
 import Board from "../models/board.js";
 import List from "../models/list.js";
@@ -25,7 +26,6 @@ const storage = multer.diskStorage({
     const boardId = req.params.boardId;
     const dirPath = path.join(__dirname, "uploads", boardId);
 
-    // Создаем директории при их отсутствии
     try {
       await createDirectories(dirPath);
       cb(null, dirPath);
@@ -133,6 +133,8 @@ router.post("/:boardId/:listId/", isAuth, async (req, res) => {
     await list.save();
 
     res.status(201).json(newCard);
+
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -200,6 +202,8 @@ router.delete("/:boardId/:listId/:cardId", isAuth, async (req, res) => {
       .exec();
 
     res.json(responseList);
+
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -280,6 +284,8 @@ router.put("/:boardId/:cardId/move", isAuth, async (req, res) => {
     await assignedList.save();
 
     res.json({ message: "Карточка успешно перемещена в новый список" });
+
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -355,6 +361,7 @@ router.put("/:boardId/:cardId/change-order", isAuth, async (req, res) => {
     await list.save();
 
     res.json({ message: "Порядок изменён успешно" });
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -401,6 +408,7 @@ router.put("/:boardId/:cardId/users", isAuth, async (req, res) => {
 
     await updatedCard.save();
     res.json(updatedCard);
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -442,6 +450,7 @@ router.put(
       }
 
       res.status(200).json({ message: "Метка успешно удалена из карточки" });
+      await sendBoardUpdate(boardId, req.user._id);
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Ошибка сервера" });
@@ -502,8 +511,7 @@ router.put("/:boardId/:cardId", isAuth, async (req, res) => {
       .exec();
 
     res.json(card);
-
-    // res.json(updatedCard);
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -551,6 +559,7 @@ router.post(
       await updatedCard.save();
 
       res.json(updatedCard.attachments[updatedCard.attachments.length - 1]);
+      await sendBoardUpdate(boardId, req.user._id);
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Ошибка сервера" });
@@ -625,6 +634,7 @@ router.put("/:boardId/:cardId/attach", isAuth, async (req, res) => {
       .exec();
 
     res.json(card);
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });

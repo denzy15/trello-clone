@@ -1,13 +1,7 @@
 import {
   Alert,
-  Avatar,
   Box,
-  Checkbox,
   List,
-  ListItem,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemText,
   TextField,
   Typography,
 } from "@mui/material";
@@ -19,11 +13,8 @@ import { toast } from "react-toastify";
 import {
   addUserToCard,
   removeUserFromCard,
-  startCardEdit,
-  updateCardEditingInfo,
 } from "../../store/slices/metadataSlice";
 import { changeCardAssignedUsers } from "../../store/slices/boardsSlice";
-import { convertUsernameForAvatar, getUserColor } from "../../utils";
 import UserListItem from "../UserListItem";
 
 const UserEdit = (props) => {
@@ -81,6 +72,7 @@ const UserEdit = (props) => {
   };
 
   const handleSearch = (event) => {
+    // debugger
     const searchValue = event.target.value.toLowerCase();
     setUserSearchValue(searchValue);
 
@@ -96,6 +88,8 @@ const UserEdit = (props) => {
     ) {
       filteredUsers.push(currentBoard.creator);
     }
+
+    console.log(filteredUsers);
 
     setUserSearchResult(filteredUsers);
   };
@@ -124,13 +118,13 @@ const UserEdit = (props) => {
             />
             {currentBoard.users.map((user, idx) => (
               <UserListItem
-                checked={isAssigned(user.userId._id)}
+                checked={isAssigned(user._id)}
                 disabled={
                   fetchUserRequest.userId === user._id &&
                   fetchUserRequest.loading
                 }
                 handleAssignUser={handleAssignUser}
-                user={user.userId}
+                user={user}
                 key={idx}
               />
             ))}

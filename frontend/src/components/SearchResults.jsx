@@ -1,17 +1,9 @@
-import {
-  Paper,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  Box,
-  ClickAwayListener,
-} from "@mui/material";
+import { Paper, Typography, List, ClickAwayListener, Box } from "@mui/material";
 import SearchResultItem from "./SearchResultItem";
+import GridLoader from "react-spinners/GridLoader";
 
-const SearchResults = ({ results,handleClickAway }) => {
-  if (!results) return null;
+const SearchResults = ({ results, handleClickAway }) => {
+  // if (!results) return null;
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
@@ -33,15 +25,25 @@ const SearchResults = ({ results,handleClickAway }) => {
         <Typography variant="h6" gutterBottom>
           Результаты поиска
         </Typography>
-        <List disablePadding>
-          {results.map((result) => (
-            <SearchResultItem handleClickAway={handleClickAway} {...result} key={result._id} />
-          ))}
-        </List>
-        {!results.length && (
-          <Typography variant="body1">
-            По вашему запросу ничего не найдено.
-          </Typography>
+        {!results ? (
+          <GridLoader color="#875ceb" size={10} />
+        ) : (
+          <>
+            <List disablePadding>
+              {results.map((result) => (
+                <SearchResultItem
+                  handleClickAway={handleClickAway}
+                  {...result}
+                  key={result._id}
+                />
+              ))}
+            </List>
+            {!results.length && (
+              <Typography variant="body1">
+                По вашему запросу ничего не найдено.
+              </Typography>
+            )}
+          </>
         )}
       </Paper>
     </ClickAwayListener>

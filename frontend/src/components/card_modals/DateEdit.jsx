@@ -18,10 +18,13 @@ import { SERVER_URL } from "../../constants";
 import { toast } from "react-toastify";
 import { updateCardDates } from "../../store/slices/metadataSlice";
 import { updateCard } from "../../store/slices/boardsSlice";
+import { getTheme } from "../../theme";
 
 const DateEdit = ({ closeModal }) => {
   const { cardEditing } = useSelector((state) => state.metadata);
   const { currentBoard } = useSelector((state) => state.boards);
+  const { mode } = useSelector((state) => state.theme);
+  const theme = getTheme(mode);
 
   const [startDate, setStartDate] = useState(
     dayjs(cardEditing.card.startDate || dayjs())
@@ -123,7 +126,11 @@ const DateEdit = ({ closeModal }) => {
         direction={"row"}
         alignItems={"center"}
         spacing={2}
-        sx={{ bgcolor: "#e0e0e0", borderRadius: 2 }}
+        sx={{
+          borderRadius: 2,
+          borderBottom: `2px solid ${theme.palette.text.primary}`,
+          borderTop: `2px solid ${theme.palette.text.primary}`,
+        }}
       >
         <FormControlLabel
           control={
@@ -154,7 +161,11 @@ const DateEdit = ({ closeModal }) => {
         direction={"row"}
         alignItems={"center"}
         spacing={2}
-        sx={{ bgcolor: "#e0e0e0", borderRadius: 2 }}
+        sx={{
+          borderBottom: `2px solid ${theme.palette.text.primary}`,
+          borderTop: `2px solid ${theme.palette.text.primary}`,
+          borderRadius: 2,
+        }}
       >
         <FormControlLabel
           control={

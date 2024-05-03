@@ -17,11 +17,14 @@ import axiosInstance from "../axiosInterceptor";
 import { SERVER_URL } from "../constants";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { getTheme } from "../theme";
 
 const UserSearchResultItem = (props) => {
   const { _id, email, username } = props;
 
   const { currentBoard } = useSelector((state) => state.boards);
+  const { mode } = useSelector((state) => state.theme);
+  const theme = getTheme(mode);
 
   const [invited, setInvited] = useState(false);
 
@@ -46,7 +49,7 @@ const UserSearchResultItem = (props) => {
   return (
     <ListItem
       sx={{
-        bgcolor: isOnBoard ? "#e0e0e0" : null,
+        bgcolor: isOnBoard ? theme.palette.action.disabledBackground : null,
       }}
       secondaryAction={
         <IconButton onClick={handleInvite} disabled={invited || isOnBoard}>

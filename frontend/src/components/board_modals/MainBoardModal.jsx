@@ -1,4 +1,4 @@
-import { Delete, ExitToApp, Group, Info } from "@mui/icons-material";
+import { Delete, ExitToApp, Group, Info, Wallpaper } from "@mui/icons-material";
 import {
   List,
   ListItem,
@@ -17,14 +17,15 @@ const MainBoardModal = ({ handleClick }) => {
   const items = [
     { id: 1, text: "О доске", icon: <Info /> },
     { id: 2, text: "Участники", icon: <Group /> },
+    { id: 3, text: "Сменить фон", icon: <Wallpaper /> },
     {
-      id: 3,
+      id: 4,
       text: "Покинуть доску",
       icon: <ExitToApp />,
       disabled: currentBoard.creator._id === _id,
     },
     {
-      id: 4,
+      id: 5,
       text: "Удалить доску",
       icon: <Delete />,
       disabled: role !== "ADMIN",

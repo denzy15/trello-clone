@@ -21,6 +21,7 @@ import {
   updateBoardDescription,
   updateCard,
 } from "../../store/slices/boardsSlice";
+import { getTheme } from "../../theme";
 
 const DraftEditor = () => {
   const { cardEditing, editableDraft, role } = useSelector(
@@ -194,17 +195,23 @@ const DraftEditor = () => {
     dispatch(toggleEditableDraft());
   };
 
+  const { mode } = useSelector((state) => state.theme);
+  const theme = getTheme(mode);
+
   return (
     <React.Fragment>
       <Box
         sx={{
-          border: !editableDraft ? "none" : "1px solid #1976d2",
-          bgcolor: "#fff",
+          border: !editableDraft
+            ? "none"
+            : `1px solid ${theme.palette.background.paper}`,
+          bgcolor: "#f5f5f5",
           borderRadius: 1,
           p: 1,
           pl: editableDraft && 0,
           maxWidth: "100%",
           fontFamily: "Montserrat, sans-serif",
+          color: "#000",
         }}
         onClick={focusEditor}
       >
@@ -219,7 +226,6 @@ const DraftEditor = () => {
             px: 2,
             py: 1,
             minHeight: editableDraft ? 100 : 60,
-            // pb: editableDraft ? 10 : 4,
             borderRadius: 2,
             maxWidth: "100%",
           }}

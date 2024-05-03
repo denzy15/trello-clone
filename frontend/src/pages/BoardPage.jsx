@@ -1,4 +1,4 @@
-import { Alert, Backdrop, Box, Button, Container, Stack } from "@mui/material";
+import { Alert, Backdrop, Box, Stack } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useParams } from "react-router-dom";
@@ -47,8 +47,6 @@ const BoardPage = () => {
         .get(`${SERVER_URL}/api/boards/${boardId}`)
         .then(({ data }) => {
           dispatch(pickBoard(data));
-
-          // setOrderedLists(data.lists);
         })
         .finally(() => {
           setLoading(false);
@@ -65,7 +63,7 @@ const BoardPage = () => {
       }
 
       for (const user of currentBoard.users) {
-        if (user.userId._id === currentUserId) {
+        if (user._id === currentUserId) {
           return user.role;
         }
       }
@@ -74,7 +72,14 @@ const BoardPage = () => {
     if (!!currentBoard.creator) {
       dispatch(setMyRoleOnCurrentBoard(calculateRole()));
     }
-  }, [boardId, currentBoard, currentBoard.users, currentUserId, dispatch]);
+  }, [
+    boardId,
+    currentBoard,
+    currentBoard.users,
+    currentUserId,
+    dispatch,
+    currentBoard.currentBackground,
+  ]);
 
   const handleEditListTitle = async (listId, listIndex, newListTitle) => {
     const oldListTitle = currentBoard.lists[listIndex].title;
@@ -252,7 +257,13 @@ const BoardPage = () => {
         ruRU.components.MuiLocalizationProvider.defaultProps.localeText
       }
     >
-      <Box>
+      <Box
+        sx={{
+          background: `url(${SERVER_URL}/${currentBoard.currentBackground})`,
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+        }}
+      >
         <Navbar />
         <BoardInfoBar title={currentBoard.title} />
         <Box

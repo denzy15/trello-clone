@@ -1,7 +1,11 @@
 import { Avatar, Box, Divider, Stack, Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
-import { convertUsernameForAvatar, getUserColor } from "../../utils";
+import {
+  convertUsernameForAvatar,
+  getContrastColor,
+  getUserColor,
+} from "../../utils";
 import DraftEditor from "../draft_editor/DraftEditor";
 
 const AboutBoard = () => {
@@ -13,7 +17,7 @@ const AboutBoard = () => {
 
   for (const u of currentBoard.users) {
     if (u.role === "ADMIN") {
-      boardAdmins.push(u.userId);
+      boardAdmins.push(u);
     }
   }
 
@@ -27,7 +31,12 @@ const AboutBoard = () => {
           {boardAdmins.map((adm) => (
             <React.Fragment key={adm._id}>
               <Stack direction={"row"} spacing={1}>
-                <Avatar sx={{ bgcolor: getUserColor(adm._id) }}>
+                <Avatar
+                  sx={{
+                    bgcolor: getUserColor(adm._id),
+                    color: getContrastColor(getUserColor(adm._id)),
+                  }}
+                >
                   {convertUsernameForAvatar(adm.username)}
                 </Avatar>
                 <Box>

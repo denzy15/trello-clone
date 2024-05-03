@@ -1,0 +1,807 @@
+[{
+  "_id": {
+    "$oid": "65be1950f17c6ec971dcf4e4"
+  },
+  "title": "redux",
+  "attachments": [
+    {
+      "createdAt": {
+        "$date": "2024-02-17T10:22:48.408Z"
+      },
+      "type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "path": "65ba1a49e2aef2a321f69cf6\\1708165368328_Digital marketing 1.docx",
+      "creator": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "name": "Digital marketing 1.docx",
+      "_id": {
+        "$oid": "65d088f86cef9ad57ed439d6"
+      }
+    },
+    {
+      "createdAt": {
+        "$date": "2024-02-14T05:12:14.707Z"
+      },
+      "type": "application/pdf",
+      "path": "65ba1a49e2aef2a321f69cf6\\1707887534692_Хан-тенри 3Д.pdf",
+      "creator": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "name": "Хан-тенри 3Д.pdf",
+      "_id": {
+        "$oid": "65cc4bae6b70835778368dc2"
+      }
+    },
+    {
+      "createdAt": {
+        "$date": "2024-02-14T05:04:03.873Z"
+      },
+      "type": "application/pdf",
+      "path": "65ba1a49e2aef2a321f69cf6\\1707887043869_коллаж6.pdf",
+      "creator": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "name": "коллаж6.pdf",
+      "_id": {
+        "$oid": "65cc49c3125a69b5f80d37cd"
+      }
+    }
+  ],
+  "assignedUsers": [
+    {
+      "$oid": "65b9ddcee2aef2a321f69cb9"
+    }
+  ],
+  "order": 6,
+  "createdAt": {
+    "$date": "2024-02-03T10:45:36.822Z"
+  },
+  "labels": [],
+  "comments": [],
+  "__v": 104,
+  "dueDate": {
+    "$date": "2024-05-02T09:00:11.000Z"
+  },
+  "startDate": {
+    "$date": "2024-05-01T07:57:44.000Z"
+  },
+  "description": "{\"blocks\":[{\"key\":\"1mvma\",\"text\":\"kazak eline +1 jigit\",\"type\":\"header-one\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"5dvvs\",\"text\":\"firsh\",\"type\":\"unordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"a0jq1\",\"text\":\"second\",\"type\":\"unordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"4dsqf\",\"text\":\"third\",\"type\":\"unordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}"
+},
+{
+  "_id": {
+    "$oid": "65be24de8d197a9d7fce5a66"
+  },
+  "title": "че там",
+  "assignedUsers": [
+    {
+      "$oid": "65b9ddcee2aef2a321f69cb9"
+    }
+  ],
+  "order": 11,
+  "createdAt": {
+    "$date": "2024-02-03T11:34:54.490Z"
+  },
+  "labels": [
+    {
+      "title": "СРОЧНО",
+      "color": "rgb(255, 70, 81)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cf8"
+      }
+    },
+    {
+      "title": "НЕ СРОЧНО",
+      "color": "rgb(99, 230, 53)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cfa"
+      }
+    },
+    {
+      "title": "СРЕДНЕ",
+      "color": "rgb(211, 227, 29)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cfb"
+      }
+    }
+  ],
+  "comments": [
+    {
+      "message": "согласна",
+      "author": {
+        "$oid": "65bc81683d07858fcab31e01"
+      },
+      "createdAt": {
+        "$date": "2024-03-03T05:14:49.873Z"
+      },
+      "updatedAt": null,
+      "_id": {
+        "$oid": "65e40749667e131de4e31075"
+      }
+    },
+    {
+      "message": "рома лох",
+      "author": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "createdAt": {
+        "$date": "2024-02-25T08:14:16.643Z"
+      },
+      "updatedAt": {
+        "$date": "2024-05-01T07:20:49.250Z"
+      },
+      "_id": {
+        "$oid": "65daf6d879d9480d9ec80ae9"
+      }
+    }
+  ],
+  "__v": 55,
+  "dueDate": {
+    "$date": "2027-02-12T19:05:13.000Z"
+  },
+  "startDate": {
+    "$date": "2024-02-05T06:14:13.000Z"
+  },
+  "description": "{\"blocks\":[{\"key\":\"a7smf\",\"text\":\"Сделать:\",\"type\":\"header-one\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"2kmp2\",\"text\":\"dddd\",\"type\":\"unordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"8h9fi\",\"text\":\"dsada\",\"type\":\"unordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"dt025\",\"text\":\"dagfaa\",\"type\":\"unordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"f0ajh\",\"text\":\"faggaga\",\"type\":\"unordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+  "attachments": [
+    {
+      "createdAt": {
+        "$date": "2024-02-13T12:44:51.456Z"
+      },
+      "type": "application/octet-stream",
+      "path": "65ba1a49e2aef2a321f69cf6\\1707828291453_картина harita tablo.dwg",
+      "creator": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "name": "картина harita tablo.dwg",
+      "_id": {
+        "$oid": "65cb644361ca610440d5b020"
+      }
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "65ccb3fb6b70835778369717"
+  },
+  "title": "добавление фото И ССЫЛОК в editor",
+  "description": "{\"blocks\":[{\"key\":\"7c553\",\"text\":\"в пизду это делать\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 0,
+  "createdAt": {
+    "$date": "2024-02-14T12:37:15.653Z"
+  },
+  "attachments": [],
+  "labels": [],
+  "comments": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65ccb45e6b7083577836974e"
+  },
+  "title": "добавление пользователей на доску ",
+  "description": "",
+  "startDate": {
+    "$date": "2024-02-02T10:54:00.000Z"
+  },
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 10,
+  "createdAt": {
+    "$date": "2024-02-14T12:38:54.547Z"
+  },
+  "attachments": [],
+  "labels": [],
+  "comments": [
+    {
+      "message": "готово все\nмы молодцы",
+      "author": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "updatedAt": null,
+      "_id": {
+        "$oid": "65f6ddbc0481b966c8c86247"
+      },
+      "createdAt": {
+        "$date": "2024-03-17T12:10:36.410Z"
+      }
+    },
+    {
+      "message": "ну емае",
+      "author": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "createdAt": {
+        "$date": "2024-02-25T09:39:39.222Z"
+      },
+      "updatedAt": null,
+      "_id": {
+        "$oid": "65db0adb79d9480d9ec80b23"
+      }
+    },
+    {
+      "message": "тест",
+      "author": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "createdAt": {
+        "$date": "2024-02-19T09:37:29.285Z"
+      },
+      "updatedAt": null,
+      "_id": {
+        "$oid": "65d32159165b2f1564e5285c"
+      }
+    },
+    {
+      "message": "danila super",
+      "author": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "createdAt": {
+        "$date": "2024-02-19T09:26:32.295Z"
+      },
+      "updatedAt": null,
+      "_id": {
+        "$oid": "65d31ec875cc61a0e34c306c"
+      }
+    }
+  ],
+  "__v": 47
+},
+{
+  "_id": {
+    "$oid": "65ccb47a6b70835778369758"
+  },
+  "title": "дизайн пизже сделать",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 0,
+  "createdAt": {
+    "$date": "2024-02-14T12:39:22.188Z"
+  },
+  "attachments": [],
+  "labels": [
+    {
+      "title": "НЕ СРОЧНО",
+      "color": "rgb(99, 230, 53)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cfa"
+      }
+    }
+  ],
+  "comments": [],
+  "__v": 5
+},
+{
+  "_id": {
+    "$oid": "65ccb74b6b70835778369793"
+  },
+  "title": "поиск в навбаре сделать",
+  "description": "{\"blocks\":[{\"key\":\"4dp95\",\"text\":\"hello world\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 5,
+  "createdAt": {
+    "$date": "2024-02-14T12:51:23.262Z"
+  },
+  "attachments": [],
+  "labels": [
+    {
+      "title": "НЕ СРОЧНО",
+      "color": "rgb(99, 230, 53)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cfa"
+      }
+    },
+    {
+      "title": "Напоследок",
+      "color": "rgb(210, 170, 170)",
+      "_id": {
+        "$oid": "65be2de88b177e8ba76e0c94"
+      }
+    },
+    {
+      "title": "СРОЧНО",
+      "color": "rgb(255, 70, 81)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cf8"
+      }
+    }
+  ],
+  "comments": [],
+  "__v": 30
+},
+{
+  "_id": {
+    "$oid": "65d07b583db56c972a207f7a"
+  },
+  "title": "сделать обработчик который проверяет нужны ли файлы и чистит при необходимости",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 7,
+  "createdAt": {
+    "$date": "2024-02-17T09:24:40.604Z"
+  },
+  "attachments": [],
+  "labels": [],
+  "comments": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65d08e276cef9ad57ed43c21"
+  },
+  "title": "отображение дат на карточке",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 9,
+  "createdAt": {
+    "$date": "2024-02-17T10:44:55.134Z"
+  },
+  "attachments": [],
+  "labels": [],
+  "comments": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65db34c0b25dd5e42c1ba513"
+  },
+  "title": "фильтры карточек",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 1,
+  "createdAt": {
+    "$date": "2024-02-25T12:38:24.491Z"
+  },
+  "attachments": [],
+  "labels": [],
+  "comments": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65e40974667e131de4e31126"
+  },
+  "title": "правильно выводить ошибки в toastere   toast.error(e.response.data.message || 'сообщение')",
+  "description": "{\"blocks\":[{\"key\":\"43skg\",\"text\":\"toast.error(e.response.data.message || 'сообщение')\",\"type\":\"header-four\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 8,
+  "createdAt": {
+    "$date": "2024-03-03T05:24:04.314Z"
+  },
+  "attachments": [],
+  "labels": [],
+  "comments": [],
+  "__v": 2
+},
+{
+  "_id": {
+    "$oid": "65e57585d4dd2815b1f796d2"
+  },
+  "title": "sha256 ",
+  "description": "{\"blocks\":[{\"key\":\"7udsi\",\"text\":\"i know\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":6,\"style\":\"BOLD\"},{\"offset\":0,\"length\":6,\"style\":\"HIGHLIGHT\"}],\"entityRanges\":[],\"data\":{}},{\"key\":\"d2j2\",\"text\":\"you see\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":7,\"style\":\"BOLD\"},{\"offset\":0,\"length\":7,\"style\":\"HIGHLIGHT\"}],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+  "startDate": null,
+  "dueDate": {
+    "$date": "2024-02-27T07:00:57.000Z"
+  },
+  "attachments": [
+    {
+      "createdAt": {
+        "$date": "2024-03-04T10:26:28.770Z"
+      },
+      "type": "image/jpeg",
+      "path": "65ba1a49e2aef2a321f69cf6\\1709547988764_крис04.jpg",
+      "creator": {
+        "$oid": "65bc81933d07858fcab31e06"
+      },
+      "name": "tututu",
+      "_id": {
+        "$oid": "65e5a1d4e60f5649caa20d95"
+      }
+    },
+    {
+      "createdAt": {
+        "$date": "2024-03-04T10:26:28.674Z"
+      },
+      "type": "image/jpeg",
+      "path": "65ba1a49e2aef2a321f69cf6\\1709547988669_1крис04.jpg",
+      "creator": {
+        "$oid": "65bc81933d07858fcab31e06"
+      },
+      "name": "bara bara bara",
+      "_id": {
+        "$oid": "65e5a1d4e60f5649caa20d4f"
+      }
+    }
+  ],
+  "assignedUsers": [],
+  "labels": [
+    {
+      "title": "СРОЧНО",
+      "color": "rgb(255, 70, 81)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cf8"
+      }
+    },
+    {
+      "title": "НЕ СРОЧНО",
+      "color": "rgb(99, 230, 53)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cfa"
+      }
+    },
+    {
+      "title": "СРЕДНЕ",
+      "color": "rgb(211, 227, 29)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cfb"
+      }
+    },
+    {
+      "title": "Напоследок",
+      "color": "rgb(210, 170, 170)",
+      "_id": {
+        "$oid": "65be2de88b177e8ba76e0c94"
+      }
+    }
+  ],
+  "order": 12,
+  "comments": [],
+  "__v": 32,
+  "createdAt": {
+    "$date": "2024-03-04T07:17:25.930Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "65e5bc86682e91caddd9317f"
+  },
+  "title": "task 1",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [
+    {
+      "$oid": "65bc81683d07858fcab31e01"
+    },
+    {
+      "$oid": "65b9ddcee2aef2a321f69cb9"
+    }
+  ],
+  "order": 0,
+  "createdAt": {
+    "$date": "2024-03-04T12:20:22.384Z"
+  },
+  "attachments": [],
+  "labels": [
+    {
+      "title": "",
+      "color": "#4bce97",
+      "_id": {
+        "$oid": "65e5b8a1f6061fcea6f38047"
+      }
+    },
+    {
+      "title": "",
+      "color": "#f5cd47",
+      "_id": {
+        "$oid": "65e5b8a1f6061fcea6f38048"
+      }
+    },
+    {
+      "title": "",
+      "color": "#f87168",
+      "_id": {
+        "$oid": "65e5b8a1f6061fcea6f38049"
+      }
+    },
+    {
+      "title": "",
+      "color": "#579dff",
+      "_id": {
+        "$oid": "65e5b8a1f6061fcea6f3804a"
+      }
+    }
+  ],
+  "comments": [],
+  "__v": 10
+},
+{
+  "_id": {
+    "$oid": "65e5bfdd682e91caddd93406"
+  },
+  "title": "адаптив",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 0,
+  "createdAt": {
+    "$date": "2024-03-04T12:34:37.614Z"
+  },
+  "attachments": [],
+  "labels": [],
+  "comments": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65f6a7b40481b966c8c86185"
+  },
+  "title": "skeleton",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 0,
+  "createdAt": {
+    "$date": "2024-03-17T08:20:04.208Z"
+  },
+  "attachments": [],
+  "labels": [
+    {
+      "title": "Напоследок",
+      "color": "rgb(210, 170, 170)",
+      "_id": {
+        "$oid": "65be2de88b177e8ba76e0c94"
+      }
+    }
+  ],
+  "comments": [],
+  "__v": 3
+},
+{
+  "_id": {
+    "$oid": "66011c3ab43887a920ce827f"
+  },
+  "title": "trello",
+  "description": "{\"blocks\":[{\"key\":\"bc7co\",\"text\":\"omg\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [
+    {
+      "$oid": "65bc81683d07858fcab31e01"
+    }
+  ],
+  "order": 0,
+  "createdAt": {
+    "$date": "2024-03-25T06:39:54.817Z"
+  },
+  "attachments": [],
+  "labels": [],
+  "comments": [
+    {
+      "message": "clone",
+      "author": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "updatedAt": null,
+      "_id": {
+        "$oid": "66011ccdb43887a920ce8325"
+      },
+      "createdAt": {
+        "$date": "2024-03-25T06:42:21.918Z"
+      }
+    }
+  ],
+  "__v": 2
+},
+{
+  "_id": {
+    "$oid": "66011c4ab43887a920ce8294"
+  },
+  "title": "backend",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 0,
+  "createdAt": {
+    "$date": "2024-03-25T06:40:10.752Z"
+  },
+  "attachments": [],
+  "labels": [],
+  "comments": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66011c4fb43887a920ce829f"
+  },
+  "title": "frontend",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 1,
+  "createdAt": {
+    "$date": "2024-03-25T06:40:15.402Z"
+  },
+  "attachments": [],
+  "labels": [],
+  "comments": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66011c56b43887a920ce82aa"
+  },
+  "title": "database",
+  "description": "{\"blocks\":[{\"key\":\"80tic\",\"text\":\"mongoDB\",\"type\":\"header-one\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"84h2h\",\"text\":\"model\",\"type\":\"ordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"6r8f8\",\"text\":\"routes\",\"type\":\"ordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+  "startDate": {
+    "$date": "2024-03-29T06:40:32.000Z"
+  },
+  "dueDate": {
+    "$date": "2024-03-30T06:00:32.000Z"
+  },
+  "assignedUsers": [],
+  "order": 2,
+  "createdAt": {
+    "$date": "2024-03-25T06:40:22.248Z"
+  },
+  "attachments": [
+    {
+      "createdAt": {
+        "$date": "2024-03-25T06:41:07.070Z"
+      },
+      "type": "image/png",
+      "path": "65e5b8a1f6061fcea6f38046\\1711348867053_enhanced-image (18).png",
+      "creator": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "name": "enhanced-image (18).png",
+      "_id": {
+        "$oid": "66011c83b43887a920ce82c7"
+      }
+    }
+  ],
+  "labels": [
+    {
+      "title": "",
+      "color": "#4bce97",
+      "_id": {
+        "$oid": "65e5b8a1f6061fcea6f38047"
+      }
+    }
+  ],
+  "comments": [
+    {
+      "message": "hello world",
+      "author": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "updatedAt": null,
+      "_id": {
+        "$oid": "66011c9ab43887a920ce82dc"
+      },
+      "createdAt": {
+        "$date": "2024-03-25T06:41:30.208Z"
+      }
+    }
+  ],
+  "__v": 5
+},
+{
+  "_id": {
+    "$oid": "662f2c4f2884bf49fcced196"
+  },
+  "title": "Темы",
+  "description": "{\"blocks\":[{\"key\":\"6o9p1\",\"text\":\"добавить темуню и свтелую темы\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"7sq4q\",\"text\":\"адаптация остальных цветов под тему\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":35,\"style\":\"UNDERLINE\"}],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 4,
+  "createdAt": {
+    "$date": "2024-04-29T05:12:47.044Z"
+  },
+  "attachments": [
+    {
+      "createdAt": {
+        "$date": "2024-05-02T10:23:59.892Z"
+      },
+      "type": "image/jpeg",
+      "path": "65ba1a49e2aef2a321f69cf6\\1714645439885_freze_mo.jpg",
+      "creator": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "name": "freze_mo.jpg",
+      "_id": {
+        "$oid": "663369bfa90c4c8071a6c9e6"
+      }
+    }
+  ],
+  "labels": [],
+  "comments": [],
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "6631f93424e46087e7f591ea"
+  },
+  "title": "изменение фона доски",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 3,
+  "createdAt": {
+    "$date": "2024-05-01T08:11:32.611Z"
+  },
+  "attachments": [
+    {
+      "createdAt": {
+        "$date": "2024-05-02T11:36:11.769Z"
+      },
+      "type": "image/jpeg",
+      "path": "65ba1a49e2aef2a321f69cf6\\1714649771758_2.jpg",
+      "creator": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "name": "emae",
+      "_id": {
+        "$oid": "66337aab50ed80d2d4739a62"
+      }
+    }
+  ],
+  "labels": [],
+  "comments": [],
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "6631f9e524e46087e7f592bc"
+  },
+  "title": "навбар внутри доски темнее фона доски",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 1,
+  "createdAt": {
+    "$date": "2024-05-01T08:14:29.167Z"
+  },
+  "attachments": [],
+  "labels": [
+    {
+      "title": "Напоследок",
+      "color": "rgb(210, 170, 170)",
+      "_id": {
+        "$oid": "65be2de88b177e8ba76e0c94"
+      }
+    }
+  ],
+  "comments": [],
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "66333899f0c7047734634ca6"
+  },
+  "title": "сортировка уведомлений",
+  "description": "",
+  "startDate": null,
+  "dueDate": null,
+  "assignedUsers": [],
+  "order": 2,
+  "createdAt": {
+    "$date": "2024-05-02T06:54:17.831Z"
+  },
+  "attachments": [],
+  "labels": [],
+  "comments": [],
+  "__v": 0
+}]

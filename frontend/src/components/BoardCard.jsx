@@ -15,9 +15,9 @@ import {
   toggleExtendedLabels,
 } from "../store/slices/metadataSlice";
 import {
-  colorIsDark,
   convertUsernameForAvatar,
   formatDateWithourYear,
+  getContrastColor,
   getUserColor,
   isExpired,
 } from "../utils";
@@ -27,9 +27,13 @@ import {
   QueryBuilder,
   Subject,
 } from "@mui/icons-material";
+import { getTheme } from "../theme";
 
 const BoardCard = (props) => {
   const { extendedLabels } = useSelector((state) => state.metadata);
+  const { mode } = useSelector((state) => state.theme);
+
+  const theme = getTheme(mode);
 
   const dispatch = useDispatch();
 
@@ -49,7 +53,7 @@ const BoardCard = (props) => {
           <Paper
             onClick={handleOpenModal}
             elevation={2}
-            sx={{ p: 1 }}
+            sx={{ p: 1, bgcolor: theme.palette.background.default }}
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
@@ -70,12 +74,11 @@ const BoardCard = (props) => {
                     sx={{
                       px: 0.5,
                       minWidth: 40,
-                      height: extendedLabels ? "auto" : 8,
-                      width: extendedLabels ? "auto" : 40,
+                      minHeight: 8,
                       bgcolor: lbl.color,
                       fontSize: 12,
                       borderRadius: 1.5,
-                      color: colorIsDark(lbl.color) ? "#ffffff" : "#000000",
+                      color: getContrastColor(lbl.color),
                       transition: "0.3s",
                       cursor: "pointer",
                       overflow: "hidden",
@@ -109,7 +112,9 @@ const BoardCard = (props) => {
                       sx={{
                         p: 0.3,
                         bgcolor: isExpired(props.dueDate) ? "#FFD5D2" : null,
-                        color: isExpired(props.dueDate) ? "red" : "black",
+                        color: isExpired(props.dueDate)
+                          ? "red"
+                          : theme.palette.text.primary,
                       }}
                     >
                       <QueryBuilder sx={{ fontSize: 14 }} />
@@ -180,7 +185,10 @@ const BoardCard = (props) => {
                       >
                         <Avatar
                           key={idx}
-                          sx={{ bgcolor: getUserColor(user._id) }}
+                          sx={{
+                            bgcolor: getUserColor(user._id),
+                            color: getContrastColor(getUserColor(user._id)),
+                          }}
                         >
                           {convertUsernameForAvatar(user.username)}
                         </Avatar>

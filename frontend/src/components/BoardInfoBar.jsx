@@ -32,6 +32,7 @@ import { useParams } from "react-router-dom";
 import { SERVER_URL } from "../constants";
 import { toast } from "react-toastify";
 import { updateBoardTitle } from "../store/slices/boardsSlice";
+import BackgroundPicker from "./board_modals/BackgroundPicker";
 
 const steps = [
   {
@@ -40,6 +41,7 @@ const steps = [
   },
   { title: "О доске", component: AboutBoard },
   { title: "Участники", component: AddUser },
+  { title: "Сменить фон", component: BackgroundPicker },
   {
     title: "Покинуть доску",
     component: LeaveBoard,
@@ -107,9 +109,10 @@ const BoardInfoBar = (props) => {
         sx={{
           alignItems: "center",
           justifyContent: "space-between",
-          bgcolor: "rgba(0, 0, 0, 0.1)",
+          bgcolor: "rgba(0, 0, 0, 0.75)",
           p: 2,
           borderBottom: "1px solid #b7b7b7",
+          color: "white",
         }}
       >
         {isEditingTitle ? (
@@ -132,7 +135,7 @@ const BoardInfoBar = (props) => {
             {newTitle || props.title}
           </Typography>
         )}
-        <IconButton onClick={() => setOpenDrawer(true)}>
+        <IconButton color="inherit" onClick={() => setOpenDrawer(true)}>
           <MoreHoriz />
         </IconButton>
       </Stack>

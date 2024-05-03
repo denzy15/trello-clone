@@ -1,5 +1,7 @@
 import fs from "fs";
 import jwt from "jsonwebtoken";
+import Board from "./models/board.js";
+import sse from "./sse.js";
 ("jsonwebtoken");
 
 export const generateToken = (user) => {
@@ -91,7 +93,6 @@ export const isUserAdmin = (board, reqUserId) => {
   if (u && u.role === "ADMIN") return true;
 
   return false;
-
 };
 
 export const isUserOnBoard = (board, reqUserId) => {
@@ -99,4 +100,47 @@ export const isUserOnBoard = (board, reqUserId) => {
     board.users.some((user) => user.userId._id.toString() === reqUserId) ||
     board.creator._id.toString() === reqUserId
   );
+};
+
+export const sendBoardUpdate = async (boardId, initiator) => {
+  const board = await Board.findById(boardId)
+    .populate("creator", "username email")
+    .populate("users.userId", "username email")
+    .populate({
+      path: "lists",
+      populate: {
+        path: "cards",
+        populate: [
+          {
+            path: "assignedUsers",
+          },
+          {
+            path: "attachments.creator",
+            select: "username email _id",
+          },
+          {
+            path: "comments.author",
+            select: "username email _id",
+          },
+        ],
+      },
+    })
+    .lean();
+
+  const formattedUsers = board.users.map((user) => ({
+    _id: user.userId._id,
+    role: user.role,
+    username: user.userId.username,
+    email: user.userId.email,
+  }));
+
+  board.users = formattedUsers;
+
+  board.lists.sort((a, b) => a.order - b.order);
+
+  board.lists.forEach((list) => {
+    list.cards.sort((a, b) => a.order - b.order);
+  });
+
+  sse.send({ boardId, board, initiator }, "boardUpdate");
 };

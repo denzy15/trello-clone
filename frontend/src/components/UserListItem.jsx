@@ -7,10 +7,13 @@ import {
   ListItemText,
 } from "@mui/material";
 import React from "react";
-import { convertUsernameForAvatar, getUserColor } from "../utils";
+import {
+  convertUsernameForAvatar,
+  getContrastColor,
+  getUserColor,
+} from "../utils";
 
 const UserListItem = (props) => {
-  // console.log(props);
   const { user, disabled, handleAssignUser, checked } = props;
 
   return (
@@ -30,7 +33,12 @@ const UserListItem = (props) => {
         onClick={() => handleAssignUser(user)}
       >
         <ListItemAvatar>
-          <Avatar sx={{ bgcolor: getUserColor(user._id) }}>
+          <Avatar
+            sx={{
+              bgcolor: getUserColor(user._id),
+              color: getContrastColor(getUserColor(user._id)),
+            }}
+          >
             {convertUsernameForAvatar(user.username)}
           </Avatar>
         </ListItemAvatar>

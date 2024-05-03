@@ -20,6 +20,7 @@ import axiosInstance from "../axiosInterceptor";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { updateCard } from "../store/slices/boardsSlice";
+import { getTheme } from "../theme";
 
 const CardAttachmentItem = (props) => {
   const { createdAt, name, path, type, index, _id } = props;
@@ -28,6 +29,8 @@ const CardAttachmentItem = (props) => {
 
   const { boardId } = useParams();
   const { cardEditing } = useSelector((state) => state.metadata);
+  const { mode } = useSelector((state) => state.theme);
+  const theme = getTheme(mode);
 
   const dispatch = useDispatch();
 
@@ -119,14 +122,14 @@ const CardAttachmentItem = (props) => {
         borderRadius: 1,
         cursor: "pointer",
         "&:hover": {
-          bgcolor: "#f5f5f5",
+          bgcolor: theme.palette.divider,
         },
       }}
     >
       <Box
         sx={{
           flexBasis: "25%",
-          bgcolor: "#b3b3b3",
+          bgcolor: theme.palette.text.secondary,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -145,7 +148,15 @@ const CardAttachmentItem = (props) => {
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
-          <Typography variant="h6">{getFileExtension(path)}</Typography>
+          <Typography
+            sx={{
+              color: theme.palette.background.default,
+              fontSize: 18,
+              fontWeight: 600,
+            }}
+          >
+            {getFileExtension(path)}
+          </Typography>
         )}
       </Box>
       <Box sx={{ flex: 1 }}>
@@ -155,7 +166,10 @@ const CardAttachmentItem = (props) => {
         <Typography variant="subtitle2">
           Добавлено {dayjs(createdAt).format("DD.MM.YYYY, в HH:mm")}
         </Typography>
-        <Stack direction={"row"} sx={{ color: "gray", mt: 0.5 }}>
+        <Stack
+          direction={"row"}
+          sx={{ color: theme.palette.text.secondary, mt: 0.5 }}
+        >
           <Button
             aria-describedby={id1}
             size="small"
@@ -192,7 +206,7 @@ const CardAttachmentItem = (props) => {
             horizontal: "left",
           }}
         >
-          <Box sx={{ py: 1, px: 2, bgcolor: "#f5f5f5" }}>
+          <Box sx={{ py: 1, px: 2 }}>
             <Typography sx={{ textAlign: "center", mb: 1, fontWeight: 500 }}>
               Изменить вложение
             </Typography>
@@ -225,7 +239,7 @@ const CardAttachmentItem = (props) => {
             horizontal: "left",
           }}
         >
-          <Box sx={{ py: 1, px: 2, bgcolor: "#f5f5f5", maxWidth: 300 }}>
+          <Box sx={{ py: 1, px: 2, maxWidth: 300 }}>
             <Typography sx={{ textAlign: "center", mb: 1, fontWeight: 500 }}>
               Удалить вложениe
             </Typography>

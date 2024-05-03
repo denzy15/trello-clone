@@ -1,24 +1,48 @@
 import { Search } from "@mui/icons-material";
 import { Box, InputAdornment, TextField } from "@mui/material";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import SearchResults from "./SearchResults";
+import axiosInstance from "../axiosInterceptor";
+import { SERVER_URL } from "../constants";
+import { setBoards } from "../store/slices/boardsSlice";
+import { toast } from "react-toastify";
 
 const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [searchResults, setSearchResults] = useState(null);
 
-  const { boards } = useSelector((state) => state.boards);
+  const { boards, currentBoard } = useSelector((state) => state.boards);
+  const dispatch = useDispatch();
 
-  const handleSearch = (event) => {
+  const handleSearch = async (event) => {
     const searchTerm = event.target.value.toLowerCase();
     if (!event.target.value) {
       setSearchResults(null);
       return;
     }
-    const filteredResults = [];
 
+    if (!!currentBoard && (!boards || !boards.length)) {
+      await axiosInstance
+        .get(`${SERVER_URL}/api/boards`)
+        .then(({ data }) => {
+          dispatch(setBoards(data));
+          filterResults(searchTerm, data);
+        })
+        .catch((e) =>
+          toast.error(
+            e.response.data.message ||
+              "Не удалось загрузить информацию о досках"
+          )
+        );
+    } else {
+      filterResults(searchTerm, boards);
+    }
+  };
+
+  const filterResults = (searchTerm, boards) => {
+    const filteredResults = [];
     boards.forEach((board) => {
       const lowerBoardTitle = board.title.toLowerCase();
 
@@ -56,12 +80,10 @@ const SearchBar = () => {
           }
         });
       });
+
+      setSearchResults(filteredResults);
     });
-
-    setSearchResults(filteredResults);
   };
-
-  //   console.log(searchResults);
 
   const handleClickAway = () => {
     setSearchResults(null);
@@ -87,10 +109,12 @@ const SearchBar = () => {
         }}
         onInput={(event) => handleSearch(event)}
       />
-      <SearchResults
-        handleClickAway={handleClickAway}
-        results={searchResults}
-      />
+      {!!searchQuery && (
+        <SearchResults
+          handleClickAway={handleClickAway}
+          results={searchResults}
+        />
+      )}
     </Box>
   );
 };

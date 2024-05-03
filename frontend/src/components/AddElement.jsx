@@ -14,6 +14,7 @@ import { SERVER_URL } from "../constants";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { createCard, createList } from "../store/slices/boardsSlice";
+import { getTheme } from "../theme";
 
 const AddElement = ({
   isCreating,
@@ -27,6 +28,9 @@ const AddElement = ({
 
   // const { currentBoard } = useSelector((state) => state.boards);
   const [title, setTitle] = useState("");
+
+  const { mode } = useSelector((state) => state.theme);
+  const theme = getTheme(mode);
 
   const dispatch = useDispatch();
 
@@ -90,7 +94,7 @@ const AddElement = ({
           variant="text"
           fullWidth
           startIcon={<AddIcon />}
-          sx={{ color: "black" }}
+          sx={{ color: theme.palette.text.secondary }}
           onClick={() => setIsCreating(true)}
         >
           Добавить {type === "CARD" ? "карточку" : "новый список"}
@@ -102,7 +106,6 @@ const AddElement = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             fullWidth
-            color="secondary"
             placeholder={`Добавить заголовок ${
               type === "CARD" ? "карточки" : "списка"
             } `}
@@ -110,7 +113,6 @@ const AddElement = ({
           <Stack sx={{ mt: 1 }} spacing={1} direction={"row"}>
             <Button
               variant="contained"
-              color="secondary"
               onClick={createNewElementHandler}
             >
               Добавить {type === "CARD" ? "карточку" : "новый список"}

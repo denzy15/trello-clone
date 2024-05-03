@@ -12,6 +12,8 @@ import {
   Code,
 } from "@mui/icons-material";
 import { Box, Button } from "@mui/material";
+import { useSelector } from "react-redux";
+import { getTheme } from "../../theme";
 
 const Toolbar = ({ editorState, setEditorState }) => {
   const tools = [
@@ -116,14 +118,17 @@ const Toolbar = ({ editorState, setEditorState }) => {
     }
   };
 
+  const { mode } = useSelector((state) => state.theme);
+  const theme = getTheme(mode);
+
   return (
     <Box className="toolbar-grid">
       {tools.map((item, idx) => (
         <Button
           sx={{
             color: isActive(item.style, item.method)
-              ? "rgba(0, 0, 0, 1)"
-              : "rgba(0, 0, 0, 0.3)",
+              ? theme.palette.common.black
+              : "#a5a5a5",
           }}
           key={`${item.label}-${idx}`}
           title={item.label}
@@ -133,7 +138,6 @@ const Toolbar = ({ editorState, setEditorState }) => {
           {item.icon || item.label}
         </Button>
       ))}
-     
     </Box>
   );
 };

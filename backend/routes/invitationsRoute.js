@@ -1,5 +1,5 @@
 import express from "express";
-import { isAuth, isUserOnBoard } from "../utils.js";
+import { isAuth, isUserOnBoard, sendBoardUpdate } from "../utils.js";
 import Board from "../models/board.js";
 import User from "../models/user.js";
 import Invitation from "../models/invitation.js";
@@ -51,7 +51,7 @@ router.post("/", isAuth, async (req, res) => {
       .populate("inviter", "username email")
       .populate("board", "title");
 
-    sse.send(SSEinvitation);
+    sse.send(SSEinvitation, "invitation");
 
     res.json(invitation);
   } catch (err) {
@@ -96,6 +96,8 @@ router.put("/accept", isAuth, async (req, res) => {
     await invitation.save();
 
     res.json(invitation);
+
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });

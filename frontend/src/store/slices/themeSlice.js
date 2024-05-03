@@ -1,23 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// Определение начального состояния для режима темы
 const initialState = {
-  mode: "dark", // Значение по умолчанию
+  mode: "light",
 };
 
 export const themeSlice = createSlice({
   name: "theme",
   initialState,
   reducers: {
-    // Экшн для смены режима темы
     toggleTheme: (state) => {
       state.mode = state.mode === "light" ? "dark" : "light";
+    },
+    setTheme: (state, action) => {
+      state.mode = action.payload;
     },
   },
 });
 
-// Экспорт экшнов
-export const { toggleTheme } = themeSlice.actions;
+export const { toggleTheme, setTheme } = themeSlice.actions;
 
-// Экспорт редьюсера
 export default themeSlice.reducer;

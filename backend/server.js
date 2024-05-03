@@ -9,7 +9,7 @@ import cardsRouter from "./routes/cardsRoute.js";
 import usersRouter from "./routes/usersRoute.js";
 import invitationsRouter from "./routes/invitationsRoute.js";
 import path from "path";
-import sse from './sse.js'; 
+import sse from "./sse.js";
 import { fileURLToPath } from "url";
 
 const PORT = 5000;
@@ -19,29 +19,37 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const dbConnection =
+  process.env.NODE_ENV === "test"
+    ? process.env.TEST_DB_URI
+    : process.env.MONGODB_URI;
+
 mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log("SUCCESSFULLY CONNECTED TO DB");
-  })
-  .catch((err) => {
-    console.log(err.message);
-  });
+  .connect(dbConnection)
+  .then(() => console.log("SUCCESSFULLY CONNECTED TO DB"))
+  .catch((err) => console.log(err.message));
 
 const app = express();
 
-
-
-
 app.use(express.static(path.join(__dirname, "uploads")));
+app.use(
+  "/backgrounds/common",
+  express.static(path.join(__dirname, "backgrounds", "common"))
+);
+
+app.use("/backgrounds", express.static(path.join(__dirname, "backgrounds")));
+
 app.use(cors());
 app.use(express.json());
 
-app.get('/sse', (req, res, next) => {
-  res.flush = () => {};
-  next();
-}, sse.init);
-
+app.get(
+  "/sse",
+  (req, res, next) => {
+    res.flush = () => {};
+    next();
+  },
+  sse.init
+);
 
 app.use("/api/auth", authRouter);
 app.use("/api/boards", boardsRouter);
@@ -54,3 +62,5 @@ app.listen(PORT, (error) => {
   if (!error) console.log("Server is Running on port " + PORT);
   else console.log("Error occurred, server can't start", error);
 });
+
+export default app;

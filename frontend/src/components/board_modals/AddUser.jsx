@@ -1,23 +1,10 @@
-import {
-  Avatar,
-  Box,
-  FormControl,
-  InputLabel,
-  List,
-  ListItem,
-  Paper,
-  Select,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, List, Paper, TextField, Typography } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import axiosInstance from "../../axiosInterceptor";
 import { SERVER_URL } from "../../constants";
 import GridLoader from "react-spinners/GridLoader";
 import UserSearchResultItem from "../UserSearchResultItem";
 import { useSelector } from "react-redux";
-import { convertUsernameForAvatar, getUserColor } from "../../utils";
 import BoardUser from "../BoardUser";
 
 const AddUser = () => {
@@ -109,10 +96,9 @@ const AddUser = () => {
       <Box>
         <Box>
           <BoardUser {...currentBoard.creator} role={"ADMIN"} />
-          {currentBoard.users.map((u) => {
-            const { role, userId } = u;
-            return <BoardUser key={u._id} role={role} {...userId} />;
-          })}
+          {currentBoard.users.map((u) => (
+            <BoardUser key={u._id} {...u} />
+          ))}
         </Box>
       </Box>
     </Box>

@@ -1,0 +1,198 @@
+[{
+  "_id": {
+    "$oid": "65ba1a49e2aef2a321f69cf6"
+  },
+  "title": "DIPLOMA",
+  "description": "{\"blocks\":[{\"key\":\"ep2f5\",\"text\":\"Правила:\",\"type\":\"header-two\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"bvqq\",\"text\":\"много не пиздеть\",\"type\":\"unordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"die79\",\"text\":\"не создавать тупые карточки\",\"type\":\"unordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"f2f2e\",\"text\":\"не ебать мне мозги\",\"type\":\"unordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+  "creator": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "users": [
+    {
+      "userId": {
+        "$oid": "65bc81683d07858fcab31e01"
+      },
+      "role": "MEMBER",
+      "_id": {
+        "$oid": "66334697e38a99d3daf6336f"
+      }
+    }
+  ],
+  "lists": [
+    {
+      "$oid": "65ba1d31e2aef2a321f69d42"
+    },
+    {
+      "$oid": "65ba1d42e2aef2a321f69d54"
+    },
+    {
+      "$oid": "65bcab12e1089d54efd90a58"
+    },
+    {
+      "$oid": "65e5561fd4dd2815b1f794af"
+    }
+  ],
+  "labels": [
+    {
+      "title": "СРОЧНО",
+      "color": "rgb(255, 70, 81)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cf8"
+      }
+    },
+    {
+      "title": "НЕ СРОЧНО",
+      "color": "rgb(99, 230, 53)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cfa"
+      }
+    },
+    {
+      "title": "СРЕДНЕ",
+      "color": "rgb(211, 227, 29)",
+      "_id": {
+        "$oid": "65ba1a49e2aef2a321f69cfb"
+      }
+    },
+    {
+      "title": "Напоследок",
+      "color": "rgb(210, 170, 170)",
+      "_id": {
+        "$oid": "65be2de88b177e8ba76e0c94"
+      }
+    }
+  ],
+  "__v": 79,
+  "currentBackground": "backgrounds/common/flower.svg",
+  "backgrounds": [
+    {
+      "path": "backgrounds/65ba1a49e2aef2a321f69cf6/1714722999443_s56.jpg",
+      "name": "s56.jpg",
+      "_id": {
+        "$oid": "663498b7cd25707cfcce1004"
+      }
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "65e5b8a1f6061fcea6f38046"
+  },
+  "title": "board 2",
+  "description": "",
+  "creator": {
+    "$oid": "65bc81683d07858fcab31e01"
+  },
+  "lists": [
+    {
+      "$oid": "65e5bc82682e91caddd93174"
+    },
+    {
+      "$oid": "66011c2bb43887a920ce8274"
+    },
+    {
+      "$oid": "66011c41b43887a920ce8289"
+    }
+  ],
+  "labels": [
+    {
+      "title": "",
+      "color": "#4bce97",
+      "_id": {
+        "$oid": "65e5b8a1f6061fcea6f38047"
+      }
+    },
+    {
+      "title": "",
+      "color": "#f5cd47",
+      "_id": {
+        "$oid": "65e5b8a1f6061fcea6f38048"
+      }
+    },
+    {
+      "title": "",
+      "color": "#f87168",
+      "_id": {
+        "$oid": "65e5b8a1f6061fcea6f38049"
+      }
+    },
+    {
+      "title": "",
+      "color": "#579dff",
+      "_id": {
+        "$oid": "65e5b8a1f6061fcea6f3804a"
+      }
+    },
+    {
+      "title": "",
+      "color": "#579dff",
+      "_id": {
+        "$oid": "65e5b8a1f6061fcea6f3804b"
+      }
+    }
+  ],
+  "users": [
+    {
+      "userId": {
+        "$oid": "65b9ddcee2aef2a321f69cb9"
+      },
+      "role": "MEMBER",
+      "_id": {
+        "$oid": "6633676791f2a7432b05f52f"
+      }
+    }
+  ],
+  "__v": 12,
+  "backgrounds": [],
+  "currentBackground": "backgrounds/common/alien.svg"
+},
+{
+  "_id": {
+    "$oid": "662dfed134b57d6b664809a9"
+  },
+  "title": "Gavno",
+  "description": "",
+  "creator": {
+    "$oid": "662cf4b18e715fcbc8577c62"
+  },
+  "lists": [],
+  "labels": [
+    {
+      "title": "",
+      "color": "#4bce97",
+      "_id": {
+        "$oid": "662dfed134b57d6b664809aa"
+      }
+    },
+    {
+      "title": "",
+      "color": "#f5cd47",
+      "_id": {
+        "$oid": "662dfed134b57d6b664809ab"
+      }
+    },
+    {
+      "title": "",
+      "color": "#f87168",
+      "_id": {
+        "$oid": "662dfed134b57d6b664809ac"
+      }
+    },
+    {
+      "title": "",
+      "color": "#579dff",
+      "_id": {
+        "$oid": "662dfed134b57d6b664809ad"
+      }
+    },
+    {
+      "title": "",
+      "color": "#579dff",
+      "_id": {
+        "$oid": "662dfed134b57d6b664809ae"
+      }
+    }
+  ],
+  "users": [],
+  "__v": 2
+}]

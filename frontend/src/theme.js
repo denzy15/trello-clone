@@ -9,7 +9,7 @@ const lightTheme = createTheme({
     mode: "light",
     background: {
       default: "#ffffff",
-      paper: "#f7f7f7",
+      paper: "#e0e0e0",
     },
     text: {
       primary: "#000000",
@@ -19,10 +19,9 @@ const lightTheme = createTheme({
       main: "#1976d2",
     },
     secondary: {
-      main: "#dc004e",
+      main: "#6d1b7b",
     },
   },
-  // Другие стили...
 });
 
 // Темная тема
@@ -44,12 +43,11 @@ const darkTheme = createTheme({
       main: "#90caf9",
     },
     secondary: {
-      main: "#f48fb1",
+      main: "#6d1b7b",
     },
   },
 });
 
-// Функция для выбора темы
 export const getTheme = (mode) => {
   return mode === "light" ? lightTheme : darkTheme;
 };

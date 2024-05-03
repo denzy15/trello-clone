@@ -11,7 +11,11 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useRef, useState } from "react";
-import { convertUsernameForAvatar, getUserColor } from "../utils";
+import {
+  convertUsernameForAvatar,
+  getContrastColor,
+  getUserColor,
+} from "../utils";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../axiosInterceptor";
 import { SERVER_URL } from "../constants";
@@ -91,7 +95,6 @@ const BoardUser = (props) => {
         dispatch(updateUsers(data));
       })
       .catch((e) => {
-        console.log(e);
         toast.error(
           e.response.data.message ||
             "Не удалось удалить пользователя, попробуйте позже"
@@ -137,7 +140,12 @@ const BoardUser = (props) => {
       direction={"row"}
       sx={{ mb: 1 }}
     >
-      <Avatar sx={{ bgcolor: getUserColor(_id) }}>
+      <Avatar
+        sx={{
+          bgcolor: getUserColor(_id),
+          color: getContrastColor(getUserColor(_id)),
+        }}
+      >
         {convertUsernameForAvatar(username)}
       </Avatar>
       <Box sx={{ flex: 1 }}>

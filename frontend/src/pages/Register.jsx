@@ -18,8 +18,11 @@ import EmailIcon from "@mui/icons-material/Email";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../store/slices/authSlice";
+
+import lightThemeImage from "../assets/auth-image-2.jpg";
+import { getTheme } from "../theme";
 
 const initialFormData = {
   username: "",
@@ -49,6 +52,9 @@ const Register = () => {
 
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState(initialErrorsData);
+
+  const { mode } = useSelector((state) => state.theme);
+  const theme = getTheme(mode);
 
   const handleLogin = () => {
     if (!formData.username) {
@@ -149,7 +155,8 @@ const Register = () => {
           <Typography
             sx={{
               "& a": {
-                color: "#6534d9",
+                textDecoration: "underline",
+                color: theme.palette.secondary.main,
               },
             }}
           >
@@ -167,10 +174,7 @@ const Register = () => {
               },
             }}
           >
-            <img
-              src="https://kartinki.pibig.info/uploads/posts/2023-04/1680919882_kartinki-pibig-info-p-lyudi-kartinki-dlya-prezentatsii-arti-3.jpg"
-              alt="hey!"
-            />
+            <img alt="hey!" src={lightThemeImage} />
           </Box>
           <Box sx={{ flexBasis: "50%" }}>
             <Typography variant="h4">Добро пожаловать!</Typography>

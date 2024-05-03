@@ -17,9 +17,12 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../store/slices/authSlice";
 import { SERVER_URL } from "../constants";
+import { getTheme } from "../theme";
+
+import lightThemeImage from "../assets/auth-image-2.jpg";
 
 const initialFormData = {
   email: "",
@@ -36,6 +39,9 @@ const Login = () => {
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const { mode } = useSelector((state) => state.theme);
+  const theme = getTheme(mode);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -96,6 +102,7 @@ const Login = () => {
           component={Stack}
           direction={"row"}
           justifyContent={"space-between"}
+          sx={{ mb: 2 }}
         >
           <Typography sx={{ fontWeight: 600, fontSize: 18 }}>
             Trello Clone
@@ -103,7 +110,8 @@ const Login = () => {
           <Typography
             sx={{
               "& a": {
-                color: "#6534d9",
+                textDecoration: "underline",
+                color: theme.palette.secondary.main,
               },
             }}
           >
@@ -120,10 +128,7 @@ const Login = () => {
               },
             }}
           >
-            <img
-              src="https://kartinki.pibig.info/uploads/posts/2023-04/1680919882_kartinki-pibig-info-p-lyudi-kartinki-dlya-prezentatsii-arti-3.jpg"
-              alt="hey!"
-            />
+            <img src={lightThemeImage} alt="hey!" />
           </Box>
           <Box sx={{ flexBasis: "50%" }}>
             <Typography variant="h4">С возвращением!</Typography>

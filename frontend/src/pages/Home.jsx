@@ -13,14 +13,18 @@ import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../axiosInterceptor";
 import { SERVER_URL } from "../constants";
 import { quitBoard, setBoards } from "../store/slices/boardsSlice";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import NewBoardModal from "../components/NewBoardModal";
 import { setInvitations } from "../store/slices/invitationsSlice";
 import { setMyRoleOnCurrentBoard } from "../store/slices/metadataSlice";
 import { ViewKanbanOutlined } from "@mui/icons-material";
+import { getTheme } from "../theme";
 
 const Home = () => {
   const { boards } = useSelector((state) => state.boards);
+  const { mode } = useSelector((state) => state.theme);
+
+  const theme = getTheme(mode);
 
   const dispatch = useDispatch();
 
@@ -82,12 +86,15 @@ const Home = () => {
                 onClick={() => navigate(`boards/${board._id}`)}
               >
                 <Paper
-                  elevation={1}
+                  elevation={4}
                   sx={{
                     cursor: "pointer",
                     p: 2,
                     pb: 6,
-                    bgcolor: "#bce1bc",
+                    color: "white",
+                    background: `linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5)), url(${SERVER_URL}/${board.currentBackground})`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundSize: "cover",
                     fontFamily: "Montserrat, sans-serif",
                     fontWeight: 600,
                     lineHeight: 1.2,
@@ -107,14 +114,14 @@ const Home = () => {
                   cursor: "pointer",
                   p: 1,
                   minHeight: 80,
-                  bgcolor: "#f5f5f5",
+                  bgcolor: theme.palette.action.disabled,
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 600,
                   lineHeight: 1.2,
                   transition: "0.3s",
                   position: "relative",
                   "&:hover": {
-                    bgcolor: "#bdbdbd",
+                    opacity: 0.8,
                   },
                 }}
                 onClick={() => setIsNewBoardCreating((v) => !v)}

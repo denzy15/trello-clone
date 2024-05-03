@@ -2,9 +2,55 @@ import express from "express";
 import Board from "../models/board.js";
 import List from "../models/list.js";
 import Card from "../models/card.js";
-import { isAuth, isUserAdmin, isUserOnBoard } from "../utils.js";
+import {
+  createDirectories,
+  decodeString,
+  deleteFile,
+  isAuth,
+  isUserAdmin,
+  isUserOnBoard,
+  sendBoardUpdate,
+} from "../utils.js";
+import sse from "../sse.js";
+import multer from "multer";
+import { fileURLToPath } from "url";
+import path from "path";
 
 const router = express.Router();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename).slice(0, -7);
+
+const boardBackgroundStorage = multer.diskStorage({
+  destination: async function (req, file, cb) {
+    const boardId = req.params.boardId;
+    const dirPath = path.join(__dirname, "backgrounds", boardId);
+
+    try {
+      await createDirectories(dirPath);
+      cb(null, dirPath);
+    } catch (error) {
+      cb(error);
+    }
+
+    // fs.access(dirPath, (error) => {
+    //   if (error) {
+    //     return fs.mkdir(dirPath, { recursive: true }, (error) =>
+    //       cb(error, dirPath)
+    //     );
+    //   }
+    //   return cb(null, dirPath);
+    // });
+  },
+  filename: function (req, file, cb) {
+    const timestamp = new Date().getTime();
+    const decodedFilename = decodeString(file.originalname);
+
+    cb(null, `${timestamp}_${decodedFilename}`);
+  },
+});
+
+const uploadBoardBackground = multer({ storage: boardBackgroundStorage });
 
 // Получение списка всех досок
 router.get("/", isAuth, async (req, res) => {
@@ -14,8 +60,8 @@ router.get("/", isAuth, async (req, res) => {
     const boards = await Board.find({
       $or: [{ creator: userId }, { users: { $elemMatch: { userId: userId } } }],
     })
-      .populate("creator", "username email") // Популируем создателя доски
-      .populate("users.userId", "username email") // Популируем пользователей доски
+      .populate("creator", "username email")
+      .populate("users.userId", "username email")
       .populate({
         path: "lists",
         populate: {
@@ -35,9 +81,26 @@ router.get("/", isAuth, async (req, res) => {
           ],
         },
       })
+      .lean()
       .exec();
 
-    res.json(boards);
+    // Преобразование данных пользователей для каждой доски
+    const formattedBoards = boards.map((board) => {
+      const formattedUsers = board.users.map((user) => ({
+        _id: user.userId._id,
+        role: user.role,
+        username: user.userId.username,
+        email: user.userId.email,
+      }));
+
+      return {
+        ...board,
+        users: formattedUsers,
+      };
+    });
+
+    // Отправка преобразованных данных
+    res.json(formattedBoards);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -106,18 +169,20 @@ router.delete("/:boardId", isAuth, async (req, res) => {
         .json({ message: "У вас нет доступа к удалению этой доски" });
     }
 
+    // Получаем все списки на доске
     const lists = await List.find({ _id: { $in: board.lists } });
 
-    // Удалить каждую карточку в этих списках
-    for (const list of lists) {
-      await Card.deleteMany({ _id: { $in: list.cards } });
-    }
+    // Получаем все ID карточек в этих списках
+    const cardIds = lists.reduce((acc, list) => [...acc, ...list.cards], []);
 
-    // Удалить каждый список
+    // Удаляем все карточки, которые принадлежат спискам на доске
+    await Card.deleteMany({ _id: { $in: cardIds } });
+
+    // Удаляем все списки на доске
     await List.deleteMany({ _id: { $in: board.lists } });
 
-    // Удалить саму доску
-    await Board.deleteOne(board);
+    // Удаляем саму доску
+    await Board.deleteOne({ _id: boardId });
 
     res.json({ message: "Доска и все ее списки и карточки успешно удалены" });
   } catch (err) {
@@ -132,7 +197,7 @@ router.get("/:boardId", isAuth, async (req, res) => {
     const { boardId } = req.params;
 
     const board = await Board.findById(boardId)
-      .populate("creator", "username email") // Популируем создателя доски и выбираем только username
+      .populate("creator", "username email")
       .populate("users.userId", "username email")
       .populate({
         path: "lists",
@@ -153,7 +218,7 @@ router.get("/:boardId", isAuth, async (req, res) => {
           ],
         },
       })
-      .exec();
+      .lean();
 
     if (!board) {
       return res.status(404).json({ message: "Доска не найдена" });
@@ -164,6 +229,15 @@ router.get("/:boardId", isAuth, async (req, res) => {
         .status(403)
         .json({ message: "У вас нет доступа к этой доске" });
     }
+
+    const formattedUsers = board.users.map((user) => ({
+      _id: user.userId._id,
+      role: user.role,
+      username: user.userId.username,
+      email: user.userId.email,
+    }));
+
+    board.users = formattedUsers;
 
     board.lists.sort((a, b) => a.order - b.order);
 
@@ -183,7 +257,9 @@ router.put("/:boardId", isAuth, async (req, res) => {
     const { boardId } = req.params;
     const { title, description, labels } = req.body;
 
-    const board = await Board.findById(boardId);
+    let board = await Board.findById(boardId)
+      .populate("users.userId", "username email")
+      .exec();
 
     if (!board) {
       return res.status(404).json({ message: "Доска не найдена" });
@@ -196,19 +272,34 @@ router.put("/:boardId", isAuth, async (req, res) => {
         .json({ message: "У вас нет доступа к изменению этой доски" });
     }
 
-    const updatedBoard = await Board.findByIdAndUpdate(boardId);
-    updatedBoard.title = title || updatedBoard.title;
-    updatedBoard.description = description || updatedBoard.description;
-    updatedBoard.labels = labels || updatedBoard.labels;
+    // Обновление данных доски
+    board.title = title || board.title;
+    board.description = description || board.description;
+    board.labels = labels || board.labels;
 
-    await updatedBoard.save();
-    // const updatedBoard = await Board.findByIdAndUpdate(
-    //   boardId,
-    //   { title, description },
-    //   { new: true }
-    // );
+    await board.save();
 
-    res.json(updatedBoard);
+    // Форматирование пользователей для отправки
+    const formattedUsers = board.users.map((user) => ({
+      _id: user.userId._id,
+      role: user.role,
+      username: user.userId.username,
+      email: user.userId.email,
+    }));
+
+    // Отправка данных доски с отформатированными пользователями
+    res.json({
+      ...board.toObject(), // Преобразование документа Mongoose в объект
+      users: formattedUsers,
+    });
+
+    sse.send(
+      {
+        ...board.toObject(), // Преобразование документа Mongoose в объект
+        users: formattedUsers,
+      },
+      "boardUpdate"
+    );
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -249,6 +340,7 @@ router.put("/:boardId/leave", isAuth, async (req, res) => {
     await board.save();
 
     res.json({ message: `Вы успешно покинули доску ` });
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -261,7 +353,10 @@ router.put("/:boardId/kick-user", isAuth, async (req, res) => {
     const { boardId } = req.params;
     const { userId } = req.body;
 
-    const board = await Board.findById(boardId).populate("lists").exec();
+    const board = await Board.findById(boardId)
+      .populate("lists")
+      .populate("users.userId", "username email")
+      .exec();
 
     if (!board) {
       return res.status(404).json({ message: "Доска не найдена" });
@@ -279,7 +374,7 @@ router.put("/:boardId/kick-user", isAuth, async (req, res) => {
         .json({ message: "Вы не можете удалить админа с доски" });
     }
 
-    board.users = board.users.filter((u) => u.userId.toString() !== userId);
+    board.users = board.users.filter((u) => u.userId._id.toString() !== userId);
 
     for (const list of board.lists) {
       for (const cardId of list.cards) {
@@ -293,7 +388,17 @@ router.put("/:boardId/kick-user", isAuth, async (req, res) => {
 
     await board.save();
 
-    res.json({ message: `Пользователь успешно удалён` });
+    const formattedUsers = board.users.map((user) => ({
+      _id: user.userId._id,
+      role: user.role,
+      username: user.userId.username,
+      email: user.userId.email,
+    }));
+
+    res.json(formattedUsers);
+
+    sse.send({ userId, boardId, boardTitle: board.title }, "kickUser");
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -340,7 +445,15 @@ router.put("/:boardId/change-user-role", isAuth, async (req, res) => {
 
     await board.save();
 
-    res.json(board.users);
+    const formattedUsers = board.users.map((user) => ({
+      _id: user.userId._id,
+      role: user.role,
+      username: user.userId.username,
+      email: user.userId.email,
+    }));
+
+    res.json(formattedUsers);
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -378,6 +491,7 @@ router.put("/:boardId/add-label", isAuth, async (req, res) => {
     await board.save();
 
     res.json(board.labels.pop());
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -428,6 +542,7 @@ router.put("/:boardId/update-label", isAuth, async (req, res) => {
 
     await board.save();
     res.json(board.labels);
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -474,6 +589,121 @@ router.put("/:boardId/delete-label", isAuth, async (req, res) => {
     await board.save();
 
     res.json(board);
+    await sendBoardUpdate(boardId, req.user._id);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+// Загрузка пользовательского фона
+router.post(
+  "/:boardId/upload-background",
+  isAuth,
+  uploadBoardBackground.single("background"),
+  async (req, res) => {
+    try {
+      const { boardId } = req.params;
+      const file = req.file;
+
+      const board = await Board.findById(boardId);
+
+      if (!board) {
+        return res.status(404).json({ message: "Доска не найдена" });
+      }
+
+      if (!isUserAdmin(board, req.user._id)) {
+        return res.status(403).json({
+          message:
+            "У вас нет доступа к изменению данных карточек в этом списке",
+        });
+      }
+
+      const relativePath = path.join("backgrounds", boardId, file.filename);
+
+      const background = {
+        path: relativePath.replace(/\\/g, "/"),
+        name: decodeString(file.originalname),
+      };
+
+      board.backgrounds.push(background);
+      await board.save();
+
+      res.send(board.backgrounds);
+      await sendBoardUpdate(boardId, req.user._id);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Ошибка сервера" });
+    }
+  }
+);
+
+// Изменение фона доски
+router.put("/:boardId/change-background", isAuth, async (req, res) => {
+  try {
+    const { boardId } = req.params;
+    const { backgroundPath } = req.body;
+
+    const board = await Board.findById(boardId);
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    if (!isUserOnBoard(board, req.user._id)) {
+      return res
+        .status(403)
+        .json({ message: "У вас нет доступа к изменению этой доски" });
+    }
+
+    board.currentBackground = backgroundPath;
+
+    await board.save();
+
+    res.json({ message: "Фон изменён" });
+    await sendBoardUpdate(boardId, req.user._id);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+// Удаление фона
+router.put("/:boardId/delete-background", isAuth, async (req, res) => {
+  try {
+    const { boardId } = req.params;
+    const { background } = req.body;
+
+    const board = await Board.findById(boardId);
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    if (!isUserOnBoard(board, req.user._id)) {
+      return res
+        .status(403)
+        .json({ message: "У вас нет доступа к изменению этой доски" });
+    }
+
+    board.backgrounds = board.backgrounds.filter(
+      (b) => b._id.toString() !== background._id
+    );
+
+    const filePath = path.join(__dirname, background.path);
+    await deleteFile(filePath);
+
+    if (board.currentBackground === background.path) {
+      board.currentBackground = "backgrounds/common/snow.svg";
+    }
+
+    await board.save();
+
+    res.json({
+      backgrounds: board.backgrounds,
+      newbg: board.currentBackground,
+    });
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });

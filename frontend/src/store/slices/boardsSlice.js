@@ -18,8 +18,11 @@ export const boardsSlice = createSlice({
     pickBoard: (state, action) => {
       state.currentBoard = action.payload;
     },
-    quitBoard: (state, action) => {
+    quitBoard: (state) => {
       state.currentBoard = {};
+    },
+    getKickedFromBoard: (state, action) => {
+      state.boards = state.boards.filter((b) => b._id !== action.payload);
     },
     updateListOrder: (state, action) => {
       state.currentBoard.lists = action.payload;
@@ -109,10 +112,19 @@ export const boardsSlice = createSlice({
     updateBoardTitle: (state, action) => {
       state.currentBoard.title = action.payload;
     },
+    updateBoardBackgrounds: (state, action) => {
+      state.currentBoard.backgrounds = action.payload;
+    },
+    setBoardBackground: (state, action) => {
+      state.currentBoard.currentBackground = action.payload;
+    },
   },
 });
 
 export const {
+  setBoardBackground,
+  updateBoardBackgrounds,
+  getKickedFromBoard,
   updateBoardTitle,
   updateUsers,
   updateBoardDescription,

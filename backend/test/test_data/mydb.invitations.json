@@ -1,0 +1,247 @@
+[{
+  "_id": {
+    "$oid": "65e408f0667e131de4e31119"
+  },
+  "board": {
+    "$oid": "65ba1a49e2aef2a321f69cf6"
+  },
+  "invitedUser": {
+    "$oid": "65bc81933d07858fcab31e06"
+  },
+  "inviter": {
+    "$oid": "65bc81683d07858fcab31e01"
+  },
+  "status": "accepted",
+  "createdAt": {
+    "$date": "2024-03-03T05:21:52.152Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65e414f48edaa38b92f3f3bd"
+  },
+  "board": {
+    "$oid": "65ba1a49e2aef2a321f69cf6"
+  },
+  "invitedUser": {
+    "$oid": "65e413eae5bb00ebc9b877b8"
+  },
+  "inviter": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "status": "accepted",
+  "createdAt": {
+    "$date": "2024-03-03T06:13:08.718Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65e4530ca3d8093efd44383f"
+  },
+  "board": {
+    "$oid": "65ba1a49e2aef2a321f69cf6"
+  },
+  "invitedUser": {
+    "$oid": "65e413eae5bb00ebc9b877b8"
+  },
+  "inviter": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "status": "accepted",
+  "createdAt": {
+    "$date": "2024-03-03T10:38:04.706Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66322b343f7f983479affb18"
+  },
+  "board": {
+    "$oid": "65ba1a49e2aef2a321f69cf6"
+  },
+  "invitedUser": {
+    "$oid": "65e413eae5bb00ebc9b877b8"
+  },
+  "inviter": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "status": "accepted",
+  "createdAt": {
+    "$date": "2024-05-01T11:44:52.452Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66322b353f7f983479affb26"
+  },
+  "board": {
+    "$oid": "65ba1a49e2aef2a321f69cf6"
+  },
+  "invitedUser": {
+    "$oid": "662cf4b18e715fcbc8577c62"
+  },
+  "inviter": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "status": "pending",
+  "createdAt": {
+    "$date": "2024-05-01T11:44:53.186Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "663338c3f0c7047734634cbb"
+  },
+  "board": {
+    "$oid": "65e5b8a1f6061fcea6f38046"
+  },
+  "invitedUser": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "inviter": {
+    "$oid": "65bc81683d07858fcab31e01"
+  },
+  "status": "accepted",
+  "createdAt": {
+    "$date": "2024-05-02T06:54:59.006Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66334693e38a99d3daf63364"
+  },
+  "board": {
+    "$oid": "65ba1a49e2aef2a321f69cf6"
+  },
+  "invitedUser": {
+    "$oid": "65bc81683d07858fcab31e01"
+  },
+  "inviter": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "status": "accepted",
+  "createdAt": {
+    "$date": "2024-05-02T07:53:55.932Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66336529b9a220184842773e"
+  },
+  "board": {
+    "$oid": "65e5b8a1f6061fcea6f38046"
+  },
+  "invitedUser": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "inviter": {
+    "$oid": "65bc81683d07858fcab31e01"
+  },
+  "status": "declined",
+  "createdAt": {
+    "$date": "2024-05-02T10:04:25.684Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66336556b9a2201848427760"
+  },
+  "board": {
+    "$oid": "65e5b8a1f6061fcea6f38046"
+  },
+  "invitedUser": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "inviter": {
+    "$oid": "65bc81683d07858fcab31e01"
+  },
+  "status": "declined",
+  "createdAt": {
+    "$date": "2024-05-02T10:05:10.872Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66336575b9a2201848427782"
+  },
+  "board": {
+    "$oid": "65e5b8a1f6061fcea6f38046"
+  },
+  "invitedUser": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "inviter": {
+    "$oid": "65bc81683d07858fcab31e01"
+  },
+  "status": "accepted",
+  "createdAt": {
+    "$date": "2024-05-02T10:05:41.960Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "663366088b1633ffe8320126"
+  },
+  "board": {
+    "$oid": "65e5b8a1f6061fcea6f38046"
+  },
+  "invitedUser": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "inviter": {
+    "$oid": "65bc81683d07858fcab31e01"
+  },
+  "status": "declined",
+  "createdAt": {
+    "$date": "2024-05-02T10:08:08.152Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6633670491f2a7432b05f4cd"
+  },
+  "board": {
+    "$oid": "65e5b8a1f6061fcea6f38046"
+  },
+  "invitedUser": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "inviter": {
+    "$oid": "65bc81683d07858fcab31e01"
+  },
+  "status": "declined",
+  "createdAt": {
+    "$date": "2024-05-02T10:12:20.158Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6633676291f2a7432b05f523"
+  },
+  "board": {
+    "$oid": "65e5b8a1f6061fcea6f38046"
+  },
+  "invitedUser": {
+    "$oid": "65b9ddcee2aef2a321f69cb9"
+  },
+  "inviter": {
+    "$oid": "65bc81683d07858fcab31e01"
+  },
+  "status": "accepted",
+  "createdAt": {
+    "$date": "2024-05-02T10:13:54.922Z"
+  },
+  "__v": 0
+}]

@@ -1,5 +1,5 @@
 import express from "express";
-import { deepCopy, isAuth, isUserOnBoard } from "../utils.js"; // Middleware для авторизации
+import { deepCopy, isAuth, isUserOnBoard, sendBoardUpdate } from "../utils.js"; // Middleware для авторизации
 import Board from "../models/board.js";
 import List from "../models/list.js";
 import Card from "../models/card.js";
@@ -7,45 +7,45 @@ import Card from "../models/card.js";
 const router = express.Router();
 
 // Получение всех списков на доске
-router.get("/:boardId", isAuth, async (req, res) => {
-  try {
-    const { boardId } = req.params;
+// router.get("/:boardId", isAuth, async (req, res) => {
+//   try {
+//     const { boardId } = req.params;
 
-    const board = await Board.findById(boardId)
-      .populate({
-        path: "lists",
-        populate: {
-          path: "cards",
-          populate: {
-            path: "assignedUsers",
-          },
-        },
-      })
-      .exec();
+//     const board = await Board.findById(boardId)
+//       .populate({
+//         path: "lists",
+//         populate: {
+//           path: "cards",
+//           populate: {
+//             path: "assignedUsers",
+//           },
+//         },
+//       })
+//       .exec();
 
-    if (!board) {
-      return res.status(404).json({ message: "Доска не найдена" });
-    }
+//     if (!board) {
+//       return res.status(404).json({ message: "Доска не найдена" });
+//     }
 
-    // Проверяем доступ пользователя к этой доске перед получением списков
-    if (!isUserOnBoard(board, req.user._id)) {
-      return res.status(403).json({
-        message: "У вас нет доступа к просмотру списков на этой доске",
-      });
-    }
+//     // Проверяем доступ пользователя к этой доске перед получением списков
+//     if (!isUserOnBoard(board, req.user._id)) {
+//       return res.status(403).json({
+//         message: "У вас нет доступа к просмотру списков на этой доске",
+//       });
+//     }
 
-    board.lists.sort((a, b) => a.order - b.order);
+//     board.lists.sort((a, b) => a.order - b.order);
 
-    board.lists.forEach((list) => {
-      list.cards.sort((a, b) => a.order - b.order);
-    });
+//     board.lists.forEach((list) => {
+//       list.cards.sort((a, b) => a.order - b.order);
+//     });
 
-    res.json(board.lists);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Ошибка сервера" });
-  }
-});
+//     res.json(board.lists);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Ошибка сервера" });
+//   }
+// });
 
 // Создание нового списка на доске
 router.post("/:boardId", isAuth, async (req, res) => {
@@ -78,6 +78,8 @@ router.post("/:boardId", isAuth, async (req, res) => {
     await board.save();
 
     res.status(201).json(newList);
+
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -110,7 +112,7 @@ router.delete("/:boardId/:listId", isAuth, async (req, res) => {
 
     const orderToDelete = list.order;
 
-    const deletedCards = await Card.deleteMany({ _id: { $in: list.cards } });
+    await Card.deleteMany({ _id: { $in: list.cards } });
 
     // Удаление листа из базы данных
     await List.findByIdAndDelete(listId);
@@ -127,10 +129,8 @@ router.delete("/:boardId/:listId", isAuth, async (req, res) => {
       $pull: { lists: listId },
     });
 
-    // board.lists = board.lists.filter((id) => id.toString() !== listId);
-    // await board.save();
-
     res.json({ message: "Список успешно удален" });
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -163,6 +163,7 @@ router.put("/:boardId/rename/:listId", isAuth, async (req, res) => {
     await updatedList.save();
 
     res.json(updatedList);
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -263,6 +264,7 @@ router.put("/:boardId/move/:listId", isAuth, async (req, res) => {
     await list.save();
 
     res.json({ message: "Список перемещён успешно" });
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -340,6 +342,7 @@ router.put("/:boardId/copy/:listId", isAuth, async (req, res) => {
       .exec();
 
     res.json(responseList);
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -400,6 +403,7 @@ router.put("/:boardId/move-cards", isAuth, async (req, res) => {
       .exec();
 
     res.json(resultBoard.lists.sort((a, b) => a.order - b.order));
+    await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });

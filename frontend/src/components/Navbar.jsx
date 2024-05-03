@@ -59,7 +59,8 @@ const Navbar = () => {
       component={Stack}
       spacing={1}
       sx={{
-        borderBottom: "1px solid #b7b7b7",
+        borderBottom: "1px solid",
+        borderColor: theme.palette.text.disabled,
         bgcolor: theme.palette.background.paper,
         p: 2,
         alignItems: "center",
@@ -98,7 +99,7 @@ const Navbar = () => {
           sx={{
             cursor: "pointer",
             bgcolor: getUserColor(userInfo._id),
-            border: "1px solid #757575",
+            border: `1px solid ${theme.palette.text.disabled}`,
             color: getContrastColor(getUserColor(userInfo._id)),
           }}
           onClick={(e) => setProfileAnchorEl(e.currentTarget)}

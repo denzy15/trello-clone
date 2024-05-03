@@ -28,10 +28,10 @@ import DateIcon from "@mui/icons-material/CalendarMonth";
 import { useDispatch, useSelector } from "react-redux";
 import DynamicModal from "./DynamicModal";
 import {
-  colorIsDark,
   convertUsernameForAvatar,
   getUserColor,
   formatDateWithourYear,
+  getContrastColor,
 } from "../utils";
 import {
   renameCard,
@@ -51,6 +51,7 @@ import CommentIcon from "@mui/icons-material/Comment";
 import Comment from "./Comment";
 import { stopCardEdit, updateComments } from "../store/slices/metadataSlice";
 import { Close, DeleteOutline } from "@mui/icons-material";
+import { getTheme } from "../theme";
 
 const renderDateChip = (date) => {
   const dueDate = dayjs(date);
@@ -100,6 +101,8 @@ const listItems = [
 const CardEditModal = ({ close }) => {
   const { cardEditing } = useSelector((state) => state.metadata);
   const currentUserInfo = useSelector((state) => state.auth);
+  const { mode } = useSelector((state) => state.theme);
+  const theme = getTheme(mode);
 
   const [currentCard, setCurrentCard] = useState(cardEditing.card);
 
@@ -129,8 +132,6 @@ const CardEditModal = ({ close }) => {
       toast.error("Что то пошло не так");
       return;
     }
-
-    debugger;
 
     const copy = { ...targetComment };
 
@@ -310,7 +311,7 @@ const CardEditModal = ({ close }) => {
         left: "50%",
         transform: "translate(-50%)",
         width: "60%",
-        bgcolor: "white",
+        bgcolor: theme.palette.background.default,
         p: 4,
         zIndex: 10,
       }}
@@ -393,12 +394,22 @@ const CardEditModal = ({ close }) => {
               </Typography>
               <AvatarGroup
                 max={4}
-                sx={{ justifyContent: "start", cursor: "pointer" }}
+                sx={{
+                  justifyContent: "start",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                }}
                 onClick={() => handleOpenModal("Участники", 0)}
               >
                 {cardEditing.card.assignedUsers.map((user, idx) => (
                   <Tooltip key={idx} title={user.username + ` (${user.email})`}>
-                    <Avatar key={idx} sx={{ bgcolor: getUserColor(user._id) }}>
+                    <Avatar
+                      key={idx}
+                      sx={{
+                        bgcolor: getUserColor(user._id),
+                        color: getContrastColor(getUserColor(user._id)),
+                      }}
+                    >
                       {convertUsernameForAvatar(user.username)}
                     </Avatar>
                   </Tooltip>
@@ -428,7 +439,7 @@ const CardEditModal = ({ close }) => {
                       bgcolor: lbl.color,
                       minWidth: 48,
                       height: 30,
-                      color: colorIsDark(lbl.color) ? "white" : "black",
+                      color: getContrastColor(lbl.color),
                     }}
                   >
                     {lbl.title}
@@ -439,7 +450,8 @@ const CardEditModal = ({ close }) => {
                     cursor: "pointer",
                     p: 1,
                     borderRadius: 1,
-                    bgcolor: "#eeeeee",
+                    bgcolor: theme.palette.text.disabled,
+                    color: theme.palette.background.default,
                     minWidth: 48,
                     height: 30,
                     fontSize: 25,
@@ -456,16 +468,25 @@ const CardEditModal = ({ close }) => {
           )}
 
           {/* Даты*/}
-          <Box sx={{ mt: 2 }}>
+          <Box
+            sx={{
+              mt: 2,
+              "& p": {
+                color: theme.palette.background.paper,
+              },
+            }}
+          >
             {cardEditing.card.startDate && cardEditing.card.dueDate && (
               <>
-                <Typography variant="h6">Даты</Typography>
-                <Box
+                <Typography variant="h6" color={theme.palette.text.primary}>
+                  Даты
+                </Typography>
+                <Typography
                   onClick={() => handleOpenModal("Дата", 2)}
                   sx={{
                     cursor: "pointer",
                     mt: 1,
-                    bgcolor: "#eeeeee",
+                    bgcolor: theme.palette.action.active,
                     display: "inline-block",
                     p: 1,
                     borderRadius: 2,
@@ -474,18 +495,20 @@ const CardEditModal = ({ close }) => {
                   {dayjs(cardEditing.card.startDate).format("DD MMM")} —{" "}
                   {formatDateWithourYear(cardEditing.card.dueDate)}
                   {renderDateChip(cardEditing.card.dueDate)}
-                </Box>
+                </Typography>
               </>
             )}
             {cardEditing.card.startDate && !cardEditing.card.dueDate && (
               <>
-                <Typography variant="h6">Начало</Typography>
+                <Typography variant="h6" color={theme.palette.text.primary}>
+                  Начало
+                </Typography>
                 <Typography
                   onClick={() => handleOpenModal("Дата", 2)}
                   sx={{
                     cursor: "pointer",
                     mt: 1,
-                    bgcolor: "#eeeeee",
+                    bgcolor: theme.palette.action.active,
                     display: "inline-block",
                     p: 1,
                     borderRadius: 2,
@@ -497,13 +520,15 @@ const CardEditModal = ({ close }) => {
             )}
             {!cardEditing.card.startDate && cardEditing.card.dueDate && (
               <>
-                <Typography variant="h6">Срок</Typography>
-                <Box
+                <Typography variant="h6" color={theme.palette.text.primary}>
+                  Срок
+                </Typography>
+                <Typography
                   onClick={() => handleOpenModal("Дата", 2)}
                   sx={{
                     mt: 1,
                     cursor: "pointer",
-                    bgcolor: "#eeeeee",
+                    bgcolor: theme.palette.action.active,
                     display: "inline-block",
                     p: 1,
                     borderRadius: 2,
@@ -511,7 +536,7 @@ const CardEditModal = ({ close }) => {
                 >
                   {dayjs(cardEditing.card.dueDate).format("DD MMM YYYY, HH:mm")}
                   {renderDateChip(cardEditing.card.dueDate)}
-                </Box>
+                </Typography>
               </>
             )}
           </Box>
@@ -527,7 +552,7 @@ const CardEditModal = ({ close }) => {
           </Box>
           {/* Вложения */}
           {cardEditing.card.attachments.length > 0 && (
-            <Box sx={{ position: "relative" }}>
+            <Box sx={{ position: "relative", mt: 2 }}>
               <AttachFileIcon
                 sx={{
                   position: "absolute",
@@ -590,7 +615,12 @@ const CardEditModal = ({ close }) => {
             <Tooltip
               title={currentUserInfo.username + ` (${currentUserInfo.email})`}
             >
-              <Avatar sx={{ bgcolor: getUserColor(currentUserInfo._id) }}>
+              <Avatar
+                sx={{
+                  bgcolor: getUserColor(currentUserInfo._id),
+                  color: getContrastColor(getUserColor(currentUserInfo._id)),
+                }}
+              >
                 {convertUsernameForAvatar(currentUserInfo.username)}
               </Avatar>
             </Tooltip>
@@ -629,7 +659,15 @@ const CardEditModal = ({ close }) => {
           <List
             disablePadding
             subheader={
-              <ListSubheader sx={{ lineHeight: 1, position: "static" }}>
+              <ListSubheader
+                sx={{
+                  lineHeight: 1,
+                  position: "static",
+                  bgcolor: "inherit",
+                  borderBottom: `1px solid ${theme.palette.text.secondary}`,
+                  pb: 1,
+                }}
+              >
                 Добавить на карточку
               </ListSubheader>
             }

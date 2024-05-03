@@ -54,7 +54,7 @@ const List = (props) => {
             position: "relative",
             p: 1,
             // minWidth: 250,
-            bgcolor: "#ededed",
+            // bgcolor: "#ededed",
             minWidth: 300,  
             maxWidth: 350
           }}
@@ -65,7 +65,6 @@ const List = (props) => {
             onClick={(e) => setAnchorEl(e.currentTarget)}
             size="small"
             sx={{
-              color: "black",
               position: "absolute",
               right: 0,
               top: 0,
