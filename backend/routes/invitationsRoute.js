@@ -19,6 +19,10 @@ router.post("/", isAuth, async (req, res) => {
 
     const user = await User.findById(invitedUser);
 
+    if (!user) {
+      return res.status(404).json({ message: "Пользователь не найден" });
+    }
+
     if (isUserOnBoard(board, user._id.toString())) {
       return res
         .status(400)
@@ -35,10 +39,6 @@ router.post("/", isAuth, async (req, res) => {
       return res
         .status(400)
         .json({ message: "Приглашение данному пользователю уже отправлено" });
-    }
-
-    if (!user) {
-      return res.status(404).json({ message: "Пользователь не найден" });
     }
 
     const invitation = await Invitation.create({
@@ -71,6 +71,10 @@ router.put("/accept", isAuth, async (req, res) => {
     }
 
     const invitation = await Invitation.findById(invitationId);
+
+    if (!invitation) {
+      return res.status(404).json({ message: "Приглашение не найдено" });
+    }
 
     if (invitation.invitedUser.toString() !== req.user._id) {
       return res
@@ -110,6 +114,10 @@ router.put("/decline", isAuth, async (req, res) => {
 
     const invitation = await Invitation.findById(invitationId);
 
+    if (!invitation) {
+      return res.status(404).json({ message: "Приглашение не найдено" });
+    }
+
     if (invitation.invitedUser.toString() !== req.user._id) {
       return res
         .status(403)
@@ -132,6 +140,10 @@ router.delete("/:invitationId", isAuth, async (req, res) => {
     const { invitationId } = req.params;
 
     const invitation = await Invitation.findById(invitationId);
+
+    if (!invitation) {
+      return res.status(404).json({ message: "Приглашение не найдено" });
+    }
 
     if (invitation.invitedUser.toString() !== req.user._id) {
       return res

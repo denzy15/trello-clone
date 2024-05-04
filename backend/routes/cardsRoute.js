@@ -4,7 +4,6 @@ import {
   decodeString,
   deleteFile,
   isAuth,
-  isUserAdmin,
   isUserOnBoard,
   sendBoardUpdate,
 } from "../utils.js";
@@ -14,10 +13,7 @@ import Card from "../models/card.js";
 import User from "../models/user.js";
 import multer from "multer";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename).slice(0, -7);
+import { __dirname } from "../common.js";
 
 const router = express.Router();
 
@@ -43,35 +39,36 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// Не нужно maybe
 // Поиск всех карточек доски
-router.get("/:boardId", isAuth, async (req, res) => {
-  try {
-    const { boardId } = req.params;
+// router.get("/:boardId", isAuth, async (req, res) => {
+//   try {
+//     const { boardId } = req.params;
 
-    const board = await Board.findById(boardId);
+//     const board = await Board.findById(boardId);
 
-    if (!board) {
-      return res.status(404).json({ message: "Доска не найдена" });
-    }
+//     if (!board) {
+//       return res.status(404).json({ message: "Доска не найдена" });
+//     }
 
-    if (!isUserOnBoard(board, req.user._id)) {
-      return res.status(403).json({
-        message: "У вас нет доступа к просмотру карточек на этой доске",
-      });
-    }
+//     if (!isUserOnBoard(board, req.user._id)) {
+//       return res.status(403).json({
+//         message: "У вас нет доступа к просмотру карточек на этой доске",
+//       });
+//     }
 
-    const listIds = board.lists; // Получаем массив ID листов
-    const lists = await List.find({ _id: { $in: listIds } }); // Находим все листы в одном запросе
+//     const listIds = board.lists; // Получаем массив ID листов
+//     const lists = await List.find({ _id: { $in: listIds } }); // Находим все листы в одном запросе
 
-    const cardIds = lists.flatMap((list) => list.cards); // Получаем массив ID карточек
-    const cards = await Card.find({ _id: { $in: cardIds } });
+//     const cardIds = lists.flatMap((list) => list.cards); // Получаем массив ID карточек
+//     const cards = await Card.find({ _id: { $in: cardIds } });
 
-    res.json(cards);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Ошибка сервера" });
-  }
-});
+//     res.json(cards);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Ошибка сервера" });
+//   }
+// });
 
 //Получение информации о карточке
 router.get("/:boardId/:cardId", isAuth, async (req, res) => {
@@ -84,7 +81,6 @@ router.get("/:boardId/:cardId", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    // Проверяем доступ пользователя к этой доске перед получением карточек
     if (!isUserOnBoard(board, req.user._id)) {
       return res.status(403).json({
         message: "У вас нет доступа к просмотру карточек на этой доске",
@@ -119,6 +115,14 @@ router.post("/:boardId/:listId/", isAuth, async (req, res) => {
     if (!list) {
       return res.status(404).json({ message: "Список не найден" });
     }
+
+    if (!board.lists.includes(list._id)) {
+      return res
+        .status(403)
+        .json({ message: "Список не находится в данной доске" });
+    }
+
+    // console.log("suka");
 
     // Проверяем доступ пользователя к этой доске и списку перед добавлением карточки
     if (!isUserOnBoard(board, req.user._id)) {
@@ -228,6 +232,19 @@ router.put("/:boardId/:cardId/move", isAuth, async (req, res) => {
 
     if (!board) {
       return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    if (!sourceList || !assignedList) {
+      return res.status(404).json({ message: "Неверные списки" });
+    }
+
+    if (
+      !board.lists.includes(sourceList._id) ||
+      !board.lists.includes(assignedList._id)
+    ) {
+      return res
+        .status(404)
+        .json({ message: "Один из списков не находится на данной доске" });
     }
 
     if (!isUserOnBoard(board, req.user._id)) {

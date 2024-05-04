@@ -13,6 +13,24 @@ router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
+    if (!username || username.length < 3) {
+      return res
+        .status(400)
+        .json({
+          message: "Имя пользователя должно содержать минимум 3 символа",
+        });
+    }
+
+    if (!email || !email.includes("@")) {
+      return res.status(400).json({ message: "Введите валидный email" });
+    }
+
+    if (!password || password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Пароль должен содержать минимум 6 символов" });
+    }
+
     // Проверка, что пользователь с таким email еще не зарегистрирован
     const existingUser = await User.findOne({ email });
     if (existingUser) {

@@ -10,14 +10,11 @@ import usersRouter from "./routes/usersRoute.js";
 import invitationsRouter from "./routes/invitationsRoute.js";
 import path from "path";
 import sse from "./sse.js";
-import { fileURLToPath } from "url";
+import { __dirname } from "./common.js";
 
 const PORT = 5000;
 
 dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const dbConnection =
   process.env.NODE_ENV === "test"

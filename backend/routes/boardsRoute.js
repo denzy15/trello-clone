@@ -13,13 +13,10 @@ import {
 } from "../utils.js";
 import sse from "../sse.js";
 import multer from "multer";
-import { fileURLToPath } from "url";
 import path from "path";
+import { __dirname } from "../common.js";
 
 const router = express.Router();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename).slice(0, -7);
 
 const boardBackgroundStorage = multer.diskStorage({
   destination: async function (req, file, cb) {
@@ -32,15 +29,6 @@ const boardBackgroundStorage = multer.diskStorage({
     } catch (error) {
       cb(error);
     }
-
-    // fs.access(dirPath, (error) => {
-    //   if (error) {
-    //     return fs.mkdir(dirPath, { recursive: true }, (error) =>
-    //       cb(error, dirPath)
-    //     );
-    //   }
-    //   return cb(null, dirPath);
-    // });
   },
   filename: function (req, file, cb) {
     const timestamp = new Date().getTime();
@@ -255,7 +243,7 @@ router.get("/:boardId", isAuth, async (req, res) => {
 router.put("/:boardId", isAuth, async (req, res) => {
   try {
     const { boardId } = req.params;
-    const { title, description, labels } = req.body;
+    const { title, description } = req.body;
 
     let board = await Board.findById(boardId)
       .populate("users.userId", "username email")
@@ -275,7 +263,6 @@ router.put("/:boardId", isAuth, async (req, res) => {
     // Обновление данных доски
     board.title = title || board.title;
     board.description = description || board.description;
-    board.labels = labels || board.labels;
 
     await board.save();
 
@@ -339,7 +326,7 @@ router.put("/:boardId/leave", isAuth, async (req, res) => {
 
     await board.save();
 
-    res.json({ message: `Вы успешно покинули доску ` });
+    res.json({ message: `Вы успешно покинули доску` });
     await sendBoardUpdate(boardId, req.user._id);
   } catch (err) {
     console.error(err);

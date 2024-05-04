@@ -1,5 +1,5 @@
 import express from "express";
-import { deepCopy, isAuth, isUserOnBoard, sendBoardUpdate } from "../utils.js"; // Middleware для авторизации
+import { isAuth, isUserOnBoard, sendBoardUpdate } from "../utils.js";
 import Board from "../models/board.js";
 import List from "../models/list.js";
 import Card from "../models/card.js";
