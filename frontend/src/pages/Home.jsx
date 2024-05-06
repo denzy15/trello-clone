@@ -19,10 +19,13 @@ import { setInvitations } from "../store/slices/invitationsSlice";
 import { setMyRoleOnCurrentBoard } from "../store/slices/metadataSlice";
 import { ViewKanbanOutlined } from "@mui/icons-material";
 import { getTheme } from "../theme";
+import HomePageSkeleton from "../components/skeletons/HomePageSkeleton";
 
 const Home = () => {
   const { boards } = useSelector((state) => state.boards);
   const { mode } = useSelector((state) => state.theme);
+
+  const [loading, setLoading] = useState(false);
 
   const theme = getTheme(mode);
 
@@ -44,12 +47,16 @@ const Home = () => {
     }
 
     async function fetchBoards() {
+      setLoading(true);
       await axiosInstance
         .get(`${SERVER_URL}/api/boards`)
         .then(({ data }) => {
           dispatch(setBoards(data));
         })
-        .catch(() => setFetchError("Не удалось загрузить доски"));
+        .catch(() => setFetchError("Не удалось загрузить доски"))
+        .finally(() => {
+          setLoading(false);
+        });
     }
 
     fetchBoards();
@@ -66,7 +73,6 @@ const Home = () => {
       <Navbar />
       <Container>
         {!!fetchError && <Alert severity="error">{fetchError}</Alert>}
-
         <Box>
           <Stack
             direction={"row"}
@@ -77,67 +83,72 @@ const Home = () => {
             <ViewKanbanOutlined />
             <Typography variant="h6">Ваши рабочие пространства:</Typography>
           </Stack>
-          <Grid container spacing={2}>
-            {boards.map((board, idx) => (
-              <Grid
-                key={idx}
-                item
-                xs={2}
-                onClick={() => navigate(`boards/${board._id}`)}
-              >
+          {loading ? (
+            <HomePageSkeleton />
+          ) : (
+            <Grid container spacing={2}>
+              {boards.map((board, idx) => (
+                <Grid
+                  key={idx}
+                  item
+                  xs={6}
+                  md={2}
+                  onClick={() => navigate(`boards/${board._id}`)}
+                >
+                  <Paper
+                    elevation={4}
+                    sx={{
+                      cursor: "pointer",
+                      p: 2,
+                      pb: 6,
+                      color: "white",
+                      background: `linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5)), url(${SERVER_URL}/${board.currentBackground})`,
+                      backgroundRepeat: "no-repeat",
+                      backgroundSize: "cover",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {board.title}
+                  </Paper>
+                </Grid>
+              ))}
+              <Grid item xs={6} md={2} sx={{ position: "relative" }}>
                 <Paper
-                  elevation={4}
+                  elevation={1}
                   sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                     cursor: "pointer",
-                    p: 2,
-                    pb: 6,
-                    color: "white",
-                    background: `linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5)), url(${SERVER_URL}/${board.currentBackground})`,
-                    backgroundRepeat: "no-repeat",
-                    backgroundSize: "cover",
+                    p: 1,
+                    minHeight: 80,
+                    bgcolor: theme.palette.action.disabled,
                     fontFamily: "Montserrat, sans-serif",
                     fontWeight: 600,
                     lineHeight: 1.2,
+                    transition: "0.3s",
+                    position: "relative",
+                    "&:hover": {
+                      opacity: 0.8,
+                    },
                   }}
+                  onClick={() => setIsNewBoardCreating((v) => !v)}
                 >
-                  {board.title}
+                  <Typography sx={{ fontWeight: 500, fontSize: 16 }}>
+                    Создать доску
+                  </Typography>
                 </Paper>
+                {isNewBoardCreating && (
+                  <NewBoardModal
+                    key={boards.length}
+                    close={() => setIsNewBoardCreating(false)}
+                  />
+                )}
               </Grid>
-            ))}
-            <Grid item xs={2} sx={{ position: "relative" }}>
-              <Paper
-                elevation={1}
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  p: 1,
-                  minHeight: 80,
-                  bgcolor: theme.palette.action.disabled,
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 600,
-                  lineHeight: 1.2,
-                  transition: "0.3s",
-                  position: "relative",
-                  "&:hover": {
-                    opacity: 0.8,
-                  },
-                }}
-                onClick={() => setIsNewBoardCreating((v) => !v)}
-              >
-                <Typography sx={{ fontWeight: 500, fontSize: 16 }}>
-                  Создать доску
-                </Typography>
-              </Paper>
-              {isNewBoardCreating && (
-                <NewBoardModal
-                  key={boards.length}
-                  close={() => setIsNewBoardCreating(false)}
-                />
-              )}
             </Grid>
-          </Grid>
+          )}
         </Box>
       </Container>
     </Box>

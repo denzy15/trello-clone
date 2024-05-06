@@ -103,7 +103,7 @@ describe("Board routes", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.title).toBe("DIPLOMA");
     expect(response.body.users).toHaveLength(1);
-    expect(response.body.users[0]._id).toBe("65bc81683d07858fcab31e01");
+    expect(response.body.users[0]._id).toBe("662cf4b18e715fcbc8577c62");
     expect(response.body.lists).toHaveLength(4);
     expect(response.body.lists.map((list) => list._id)).toEqual([
       "65bcab12e1089d54efd90a58",
@@ -265,8 +265,6 @@ describe("Board routes", () => {
     );
     expect(deletedLabel).toBeUndefined();
   });
-
-  
 
   afterAll(async () => {
     await Board.findByIdAndDelete(createdBoardId);

@@ -4,7 +4,6 @@ import Navbar from "../components/Navbar";
 import { useParams } from "react-router-dom";
 import { SERVER_URL } from "../constants";
 import axiosInstance from "../axiosInterceptor";
-import GridLoader from "react-spinners/GridLoader";
 import List from "../components/List";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import BoardInfoBar from "../components/BoardInfoBar";
@@ -24,10 +23,11 @@ import {
 import { LocalizationProvider, ruRU } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import AddElement from "../components/AddElement";
+import BoardPageSkeleton from "../components/skeletons/BoardPageSkeleton";
 
 const BoardPage = () => {
   const { boardId } = useParams();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { _id: currentUserId } = useSelector((state) => state.auth);
 
@@ -259,9 +259,10 @@ const BoardPage = () => {
     >
       <Box
         sx={{
-          background: `url(${SERVER_URL}/${currentBoard.currentBackground})`,
+          background: `url('${SERVER_URL}/${currentBoard.currentBackground}')`,
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
+          minHeight: '100%'
         }}
       >
         <Navbar />
@@ -279,7 +280,7 @@ const BoardPage = () => {
           )}
           {loading ? (
             <Box sx={{ textAlign: "center", mt: 4 }}>
-              <GridLoader color="#875ceb" size={30} />
+              <BoardPageSkeleton />
             </Box>
           ) : (
             <Box>

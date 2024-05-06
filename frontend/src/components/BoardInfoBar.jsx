@@ -1,5 +1,6 @@
 import {
   ArrowBack,
+  Close,
   Delete,
   Info,
   MoreHoriz,
@@ -63,7 +64,7 @@ const BoardInfoBar = (props) => {
   };
 
   const dispatch = useDispatch();
-  const { editableDraft } = useSelector((state) => state.metadata);
+  const { editableDraft, role } = useSelector((state) => state.metadata);
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [newTitle, setNewTitle] = useState(props.title);
@@ -119,6 +120,7 @@ const BoardInfoBar = (props) => {
           <TextField
             value={newTitle}
             autoFocus
+            sx={{ bgcolor: "white" }}
             onBlur={handleEditTitle}
             onKeyDown={handleEditTitle}
             onChange={(e) => setNewTitle(e.target.value)}
@@ -130,7 +132,7 @@ const BoardInfoBar = (props) => {
               cursor: "pointer",
               display: "inline-block",
             }}
-            onClick={() => setIsEditingTitle(true)}
+            onClick={() => role === "ADMIN" && setIsEditingTitle(true)}
           >
             {newTitle || props.title}
           </Typography>
@@ -144,6 +146,7 @@ const BoardInfoBar = (props) => {
           <Stack
             direction={"row"}
             alignItems={"start"}
+            justifyContent={'space-between'}
             spacing={6}
             sx={{ mb: 1 }}
           >
@@ -157,6 +160,11 @@ const BoardInfoBar = (props) => {
             <Typography sx={{ mb: 2, py: 1, fontWeight: 500, fontSize: 16 }}>
               {modalState.title}
             </Typography>
+            <Box sx={{ width: 30 }}>
+              <IconButton onClick={handleCloseDrawer}>
+                <Close />
+              </IconButton>
+            </Box>
           </Stack>
           <Divider />
           {<modalState.component handleClick={handleClick} {...props} />}

@@ -77,7 +77,7 @@ describe("Invitation routes", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({ boardId, invitedUser: invitedUserId });
 
-    console.log(invitationResponse.body);
+   
 
     const invitationId = invitationResponse.body._id;
 

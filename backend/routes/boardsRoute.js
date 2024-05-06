@@ -49,7 +49,6 @@ router.get("/", isAuth, async (req, res) => {
       $or: [{ creator: userId }, { users: { $elemMatch: { userId: userId } } }],
     })
       .populate("creator", "username email")
-      .populate("users.userId", "username email")
       .populate({
         path: "lists",
         populate: {
@@ -69,26 +68,10 @@ router.get("/", isAuth, async (req, res) => {
           ],
         },
       })
-      .lean()
+      .select("-users -description -labels -backgrounds")
       .exec();
 
-    // Преобразование данных пользователей для каждой доски
-    const formattedBoards = boards.map((board) => {
-      const formattedUsers = board.users.map((user) => ({
-        _id: user.userId._id,
-        role: user.role,
-        username: user.userId.username,
-        email: user.userId.email,
-      }));
-
-      return {
-        ...board,
-        users: formattedUsers,
-      };
-    });
-
-    // Отправка преобразованных данных
-    res.json(formattedBoards);
+    res.json(boards);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Ошибка сервера" });

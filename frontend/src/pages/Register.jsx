@@ -139,14 +139,18 @@ const Register = () => {
           sm: "95vw",
           md: "70vw",
         },
-        pt: "10%",
+        pt: { md: "10%" },
         mx: "auto",
+        height: { xs: "100vh", md: "auto" },
       }}
     >
-      <Paper elevation={3} sx={{ px: 5, py: 7 }}>
+      <Paper
+        elevation={3}
+        sx={{ px: 5, py: 7, height: { xs: "100%", md: "auto" } }}
+      >
         <Box
           component={Stack}
-          direction={"row"}
+          direction={{ md: "row" }}
           justifyContent={"space-between"}
         >
           <Typography sx={{ fontWeight: 600, fontSize: 18 }}>
@@ -172,11 +176,15 @@ const Register = () => {
               "& img": {
                 maxWidth: "100%",
               },
+              display: {
+                xs: "none",
+                md: "block",
+              },
             }}
           >
             <img alt="hey!" src={lightThemeImage} />
           </Box>
-          <Box sx={{ flexBasis: "50%" }}>
+          <Box sx={{ flexBasis: { md: "50%", xs: "100%" } }}>
             <Typography variant="h4">Добро пожаловать!</Typography>
             <Typography
               variant="subtitle1"

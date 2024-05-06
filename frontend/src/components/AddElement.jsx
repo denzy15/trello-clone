@@ -88,7 +88,13 @@ const AddElement = ({
   };
 
   return (
-    <Box sx={{ mt: 2, minWidth: 200 }}>
+    <Box
+      sx={{
+        mt: 2,
+        minWidth: 200,
+        bgcolor: type === "LIST" && "rgba(0, 0, 0, 0.2)",
+      }}
+    >
       {!isCreating ? (
         <Button
           variant="text"
@@ -111,10 +117,7 @@ const AddElement = ({
             } `}
           />
           <Stack sx={{ mt: 1 }} spacing={1} direction={"row"}>
-            <Button
-              variant="contained"
-              onClick={createNewElementHandler}
-            >
+            <Button variant="contained" onClick={createNewElementHandler}>
               Добавить {type === "CARD" ? "карточку" : "новый список"}
             </Button>
             <IconButton

@@ -3,21 +3,18 @@ import app from "../../server.js";
 import request from "supertest";
 
 describe("Auth routes", () => {
-  test("Регистрация", (done) => {
-    request(app)
-      .post("/api/auth/register")
-      .send({
-        username: "testuser",
-        email: "test@example.com",
-        password: "testpassword",
-      })
-      .end((err, res) => {
-        if (err) return done(err);
+  test("Регистрация", async () => {
+    const response = await request(app).post("/api/auth/register").send({
+      username: "testuser",
+      email: "test@example.com",
+      password: "testpassword",
+    });
 
-        console.log(res.body.message);
-
-        done();
-      });
+    expect(response.statusCode).toBe(201);
+    expect(response.body).toHaveProperty(
+      "message",
+      "Пользователь успешно зарегистрирован"
+    );
   });
 
   test("Вход в аккаунт", async () => {
@@ -46,7 +43,7 @@ describe("Auth routes", () => {
       password: "wrongpassword",
     });
 
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(404);
   });
 
   afterAll(async () => {

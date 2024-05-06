@@ -68,7 +68,7 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({ message: "Неверный email или пароль" });
+      return res.status(404).json({ message: "Неверный email или пароль" });
     }
 
     // Проверка пароля

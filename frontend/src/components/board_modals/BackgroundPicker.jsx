@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Grid,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Divider, Grid, Paper, Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getTheme } from "../../theme";
@@ -149,8 +142,9 @@ const BackgroundPicker = () => {
             cursor: "pointer",
           }}
         >
-          <Paper
+          <Box
             sx={{
+              bgcolor: theme.palette.background.paper,
               height: 80,
               overflow: "hidden",
               display: "flex",
@@ -159,31 +153,23 @@ const BackgroundPicker = () => {
             }}
           >
             <Button
-              aria-label="upload-bg"
               component="label"
               sx={{ width: "100%", height: "100%", borderRadius: 0 }}
               color="inherit"
             >
-              <Add sx={{ fontSize: 40 }} />
               <input
+                id="upload-bg"
                 name="background"
                 onChange={handleFileChange}
                 style={{
-                  clip: "rect(0 0 0 0)",
-                  clipPath: "inset(50%)",
-                  height: 1,
-                  overflow: "hidden",
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  whiteSpace: "nowrap",
-                  width: 1,
+                  display: "none",
                 }}
-                type="image"
-                alt="bg picker"
+                type="file"
+                accept="image/*"
               />
+              <Add sx={{ fontSize: 40 }} />
             </Button>
-          </Paper>
+          </Box>
         </Grid>
 
         {currentBoard.backgrounds &&

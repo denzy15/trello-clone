@@ -79,7 +79,17 @@ const Navbar = () => {
           to="/"
         >
           <AccountTreeIcon />
-          <span>Trello Clone</span>
+          <Box
+            component={"span"}
+            sx={{
+              display: {
+                xs: "none",
+                md: "inline",
+              },
+            }}
+          >
+            Trello Clone
+          </Box>
         </Link>
       </Typography>
       <SearchBar />

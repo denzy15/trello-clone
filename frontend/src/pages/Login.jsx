@@ -36,7 +36,7 @@ const initialErrorsData = {
 };
 
 const Login = () => {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -93,16 +93,21 @@ const Login = () => {
           sm: "95vw",
           md: "70vw",
         },
-        pt: "10%",
+        pt: { md: "10%" },
         mx: "auto",
+        height: { xs: "100vh", md: "auto" },
       }}
     >
-      <Paper elevation={3} sx={{ px: 5, py: 7 }}>
+      <Paper
+        elevation={3}
+        sx={{ px: 5, py: 7, height: { xs: "100%", md: "auto" } }}
+      >
         <Box
           component={Stack}
-          direction={"row"}
+          direction={{ md: "row" }}
           justifyContent={"space-between"}
           sx={{ mb: 2 }}
+          spacing={1}
         >
           <Typography sx={{ fontWeight: 600, fontSize: 18 }}>
             Trello Clone
@@ -126,11 +131,15 @@ const Login = () => {
               "& img": {
                 maxWidth: "100%",
               },
+              display: {
+                xs: "none",
+                md: "block",
+              },
             }}
           >
             <img src={lightThemeImage} alt="hey!" />
           </Box>
-          <Box sx={{ flexBasis: "50%" }}>
+          <Box sx={{ flexBasis: { md: "50%", xs: '100%' } }}>
             <Typography variant="h4">С возвращением!</Typography>
             <Typography
               variant="subtitle1"

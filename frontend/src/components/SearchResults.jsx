@@ -15,14 +15,15 @@ const SearchResults = ({ results, handleClickAway }) => {
           zIndex: 1000,
           overflow: "auto",
           textOverflow: "ellipsis",
-          right: 0,
+          right: "50%",
+          transform: "translate(50%, 0)",
           top: 50,
-          minWidth: "30vw",
-          maxWidth: { sm: "90vw", md: "50vw" },
+          // minWidth: "30vw",
+          // maxWidth: { sm: "50vw", md: "50vw" },
           maxHeight: "70vh",
         }}
       >
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" sx={{ textAlign: "center" }} gutterBottom>
           Результаты поиска
         </Typography>
         {!results ? (

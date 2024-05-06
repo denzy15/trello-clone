@@ -76,13 +76,17 @@ const ResetPassword = () => {
       sx={{
         maxWidth: {
           sm: "95vw",
-          md: "50vw",
+          md: "70vw",
         },
-        pt: "10%",
+        pt: { md: "10%" },
         mx: "auto",
+        height: { xs: "100vh", md: "auto" },
       }}
     >
-      <Paper elevation={3} sx={{ px: 5, py: 7 }}>
+      <Paper
+        elevation={3}
+        sx={{ px: 5, py: 7, height: { xs: "100%", md: "auto" } }}
+      >
         <Typography component="h1" variant="h5">
           Новый пароль
         </Typography>
