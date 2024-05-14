@@ -87,6 +87,7 @@ const SearchBar = () => {
 
   const handleClickAway = () => {
     setSearchResults(null);
+    setSearchQuery('')
   };
 
   return (

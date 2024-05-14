@@ -27,6 +27,7 @@ import Invitation from "./Invitation";
 import SearchBar from "./SearchBar";
 import { toggleTheme } from "../store/slices/themeSlice";
 import { getTheme } from "../theme";
+import { APP_TITLE } from "../constants";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -88,7 +89,7 @@ const Navbar = () => {
               },
             }}
           >
-            Trello Clone
+            {APP_TITLE}
           </Box>
         </Link>
       </Typography>

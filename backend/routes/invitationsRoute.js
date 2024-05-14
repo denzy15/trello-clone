@@ -1,5 +1,10 @@
 import express from "express";
-import { isAuth, isUserOnBoard, sendBoardUpdate } from "../utils.js";
+import {
+  isAuth,
+  isUserAdmin,
+  isUserOnBoard,
+  sendBoardUpdate,
+} from "../utils.js";
 import Board from "../models/board.js";
 import User from "../models/user.js";
 import Invitation from "../models/invitation.js";
@@ -7,11 +12,29 @@ import sse from "../sse.js";
 
 const router = express.Router();
 
+router.get("/", isAuth, async (req, res) => {
+  try {
+    const invitations = await Invitation.find({ invitedUser: req.user._id })
+      .populate("inviter", "username email")
+      .populate("board", "title");
+    res.json(invitations.sort((a, b) => b.createdAt - a.createdAt));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
 router.post("/", isAuth, async (req, res) => {
   try {
     const { boardId, invitedUser } = req.body;
 
     const board = await Board.findById(boardId);
+
+    if (!isUserAdmin(board, req.user._id)) {
+      return res
+        .status(403)
+        .json({ message: "У вас нет прав приглашать пользователейы" });
+    }
 
     if (!board) {
       return res.status(404).json({ message: "Доска не найдена" });

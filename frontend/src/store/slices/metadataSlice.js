@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  // recent: [],
   cardEditing: {
     isEditing: false,
     card: null,
@@ -18,21 +17,6 @@ export const metadataSlice = createSlice({
     setMyRoleOnCurrentBoard: (state, action) => {
       state.role = action.payload;
     },
-    // visitBoard: (state, action) => {
-    //   if (!state.recent.includes(action.payload)) {
-    //     state.recent = [...state.recent, action.payload];
-    //     return;
-    //   }
-
-    //   const index = state.recent.indexOf(action.payload);
-
-    //   if (index > 0) {
-    //     state.recent.splice(index, 1).push(action.payload);
-    //   }
-    // },
-    // clearRecent: (state, action) => {
-    //   state.recent = [];
-    // },
     startCardEdit: (state, action) => {
       state.cardEditing = {
         card: action.payload,
@@ -46,7 +30,8 @@ export const metadataSlice = createSlice({
       };
       state.editableDraft = false;
     },
-
+    
+    // Изменение текущей карточки
     addUserToCard: (state, action) => {
       state.cardEditing.card.assignedUsers.push(action.payload);
     },
@@ -108,7 +93,6 @@ export const metadataSlice = createSlice({
 export const {
   setMyRoleOnCurrentBoard,
   updateComments,
-
   deleteAttach,
   updateCardAttachName,
   updateCardAttachments,
@@ -121,7 +105,6 @@ export const {
   removeLabelFromCard,
   addUserToCard,
   removeUserFromCard,
-
   startCardEdit,
   stopCardEdit,
   updateCardEditingInfo,

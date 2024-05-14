@@ -17,6 +17,7 @@ const AddUser = () => {
   const [searchResults, setSearchResults] = useState([]);
 
   const { currentBoard } = useSelector((state) => state.boards);
+  const { role } = useSelector((state) => state.metadata);
 
   const modalRef = useRef();
 
@@ -60,38 +61,40 @@ const AddUser = () => {
 
   return (
     <Box sx={{ p: 1 }}>
-      <Typography>Пригласить пользователей:</Typography>
-      <TextField
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Поиск..."
-        type="search"
-        sx={{ my: 1 }}
-        fullWidth
-        autoComplete="off"
-      />
-      <Paper
-        ref={modalRef}
-        sx={{ position: "absolute", width: "90%", zIndex: 10 }}
-        hidden={!searchModal}
-        onClick={() => setSearchModal(false)}
-      >
-        {loading ? (
-          <Box sx={{ textAlign: "center", my: 2 }}>
-            <GridLoader color="#875ceb" size={10} />
-          </Box>
-        ) : searchResults.length > 0 ? (
-          <List onClick={(e) => e.stopPropagation()}>
-            {searchResults.map((u) => (
-              <UserSearchResultItem key={u._id} {...u} />
-            ))}
-          </List>
-        ) : (
-          <Box sx={{ p: 2 }}>
-            <Typography>Ничего не найдено</Typography>
-          </Box>
-        )}
-      </Paper>
+      <Box hidden={role !== "ADMIN"}>
+        <Typography>Пригласить пользователей:</Typography>
+        <TextField
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Поиск..."
+          type="search"
+          sx={{ my: 1 }}
+          fullWidth
+          autoComplete="off"
+        />
+        <Paper
+          ref={modalRef}
+          sx={{ position: "absolute", width: "90%", zIndex: 10 }}
+          hidden={!searchModal}
+          onClick={() => setSearchModal(false)}
+        >
+          {loading ? (
+            <Box sx={{ textAlign: "center", my: 2 }}>
+              <GridLoader color="#875ceb" size={10} />
+            </Box>
+          ) : searchResults.length > 0 ? (
+            <List onClick={(e) => e.stopPropagation()}>
+              {searchResults.map((u) => (
+                <UserSearchResultItem key={u._id} {...u} />
+              ))}
+            </List>
+          ) : (
+            <Box sx={{ p: 2 }}>
+              <Typography>Ничего не найдено</Typography>
+            </Box>
+          )}
+        </Paper>
+      </Box>
       <Typography sx={{ mt: 3 }}>Пользователи доски:</Typography>
       <Box>
         <Box>

@@ -2,7 +2,6 @@ import request from "supertest";
 import app from "../../server.js";
 import Board from "../../models/board.js";
 import Invitation from "../../models/invitation.js";
-import User from "../../models/user.js";
 
 const setAuthToken = async (data) => {
   const response = await request(app).post("/api/auth/login").send(data);

@@ -134,10 +134,9 @@ function App() {
           newestOnTop={false}
           closeOnClick
           rtl={false}
-          pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="light"
+          theme={mode === "light" ? "light" : "dark"}
         />
       </Box>
     </ThemeProvider>

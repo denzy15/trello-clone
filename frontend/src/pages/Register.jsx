@@ -23,6 +23,8 @@ import { login } from "../store/slices/authSlice";
 
 import lightThemeImage from "../assets/auth-image-2.jpg";
 import { getTheme } from "../theme";
+import { APP_TITLE } from "../constants";
+import { AccountTree } from "@mui/icons-material";
 
 const initialFormData = {
   username: "",
@@ -153,8 +155,28 @@ const Register = () => {
           direction={{ md: "row" }}
           justifyContent={"space-between"}
         >
-          <Typography sx={{ fontWeight: 600, fontSize: 18 }}>
-            Trello Clone
+          <Typography
+            sx={{
+              flexGrow: 1,
+              fontWeight: 600,
+              fontSize: 18,
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <AccountTree />
+            <Box
+              component={"span"}
+              sx={{
+                display: {
+                  xs: "none",
+                  md: "inline",
+                },
+              }}
+            >
+              {APP_TITLE}
+            </Box>
           </Typography>
           <Typography
             sx={{

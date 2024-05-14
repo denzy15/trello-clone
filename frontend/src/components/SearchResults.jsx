@@ -18,7 +18,7 @@ const SearchResults = ({ results, handleClickAway }) => {
           right: "50%",
           transform: "translate(50%, 0)",
           top: 50,
-          // minWidth: "30vw",
+          minWidth: "30vw",
           // maxWidth: { sm: "50vw", md: "50vw" },
           maxHeight: "70vh",
         }}

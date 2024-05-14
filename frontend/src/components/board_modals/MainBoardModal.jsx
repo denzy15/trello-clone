@@ -17,7 +17,12 @@ const MainBoardModal = ({ handleClick }) => {
   const items = [
     { id: 1, text: "О доске", icon: <Info /> },
     { id: 2, text: "Участники", icon: <Group /> },
-    { id: 3, text: "Сменить фон", icon: <Wallpaper /> },
+    {
+      id: 3,
+      text: "Сменить фон",
+      icon: <Wallpaper />,
+      disabled: role !== "ADMIN",
+    },
     {
       id: 4,
       text: "Покинуть доску",

@@ -39,36 +39,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Не нужно maybe
-// Поиск всех карточек доски
-// router.get("/:boardId", isAuth, async (req, res) => {
-//   try {
-//     const { boardId } = req.params;
-
-//     const board = await Board.findById(boardId);
-
-//     if (!board) {
-//       return res.status(404).json({ message: "Доска не найдена" });
-//     }
-
-//     if (!isUserOnBoard(board, req.user._id)) {
-//       return res.status(403).json({
-//         message: "У вас нет доступа к просмотру карточек на этой доске",
-//       });
-//     }
-
-//     const listIds = board.lists; // Получаем массив ID листов
-//     const lists = await List.find({ _id: { $in: listIds } }); // Находим все листы в одном запросе
-
-//     const cardIds = lists.flatMap((list) => list.cards); // Получаем массив ID карточек
-//     const cards = await Card.find({ _id: { $in: cardIds } });
-
-//     res.json(cards);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Ошибка сервера" });
-//   }
-// });
 
 //Получение информации о карточке
 router.get("/:boardId/:cardId", isAuth, async (req, res) => {

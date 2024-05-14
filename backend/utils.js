@@ -81,8 +81,6 @@ export const deleteFile = async (filePath) => {
   }
 };
 
-export const deepCopy = (obj) => JSON.parse(JSON.stringify(obj));
-
 export const isUserAdmin = (board, reqUserId) => {
   if (board.creator._id.toString() === reqUserId) return true;
 

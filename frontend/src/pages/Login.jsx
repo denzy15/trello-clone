@@ -19,10 +19,11 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../store/slices/authSlice";
-import { SERVER_URL } from "../constants";
+import { APP_TITLE, SERVER_URL } from "../constants";
 import { getTheme } from "../theme";
 
 import lightThemeImage from "../assets/auth-image-2.jpg";
+import { AccountTree } from "@mui/icons-material";
 
 const initialFormData = {
   email: "",
@@ -109,8 +110,28 @@ const Login = () => {
           sx={{ mb: 2 }}
           spacing={1}
         >
-          <Typography sx={{ fontWeight: 600, fontSize: 18 }}>
-            Trello Clone
+          <Typography
+            sx={{
+              flexGrow: 1,
+              fontWeight: 600,
+              fontSize: 18,
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <AccountTree />
+            <Box
+              component={"span"}
+              sx={{
+                display: {
+                  xs: "none",
+                  md: "inline",
+                },
+              }}
+            >
+              {APP_TITLE}
+            </Box>
           </Typography>
           <Typography
             sx={{
@@ -139,7 +160,7 @@ const Login = () => {
           >
             <img src={lightThemeImage} alt="hey!" />
           </Box>
-          <Box sx={{ flexBasis: { md: "50%", xs: '100%' } }}>
+          <Box sx={{ flexBasis: { md: "50%", xs: "100%" } }}>
             <Typography variant="h4">С возвращением!</Typography>
             <Typography
               variant="subtitle1"

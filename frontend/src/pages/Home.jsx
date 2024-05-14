@@ -39,7 +39,7 @@ const Home = () => {
   useEffect(() => {
     async function fetchNotifications() {
       await axiosInstance
-        .get(`${SERVER_URL}/api/users/notifications`)
+        .get(`${SERVER_URL}/api/invite`)
         .then(({ data }) => {
           dispatch(setInvitations(data));
         })

@@ -584,8 +584,7 @@ router.post(
 
       if (!isUserAdmin(board, req.user._id)) {
         return res.status(403).json({
-          message:
-            "У вас нет доступа к изменению данных карточек в этом списке",
+          message: "У вас нет доступа к изменению фона в этой доске",
         });
       }
 
@@ -620,7 +619,7 @@ router.put("/:boardId/change-background", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Доска не найдена" });
     }
 
-    if (!isUserOnBoard(board, req.user._id)) {
+    if (!isUserAdmin(board, req.user._id)) {
       return res
         .status(403)
         .json({ message: "У вас нет доступа к изменению этой доски" });
