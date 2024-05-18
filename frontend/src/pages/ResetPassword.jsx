@@ -20,19 +20,21 @@ const ResetPassword = () => {
     confirmPassword: "",
     showPassword: false,
     showConfirmPassword: false,
-  });
+  }); // Состояние значений пароля и подтверждения пароля, а также состояние отображения символов пароля и подтверждения пароля
 
-  const { token } = useParams();
+  const { token } = useParams(); // Получает параметр токена из URL
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Получает функцию navigate для навигации по маршрутам
 
-  const [disabledButton, setDisabledButton] = useState(false);
+  const [disabledButton, setDisabledButton] = useState(false); // Состояние кнопки "Сбросить пароль"
 
   const handleChange = (prop) => (event) => {
+    // Обработчик изменений в полях ввода
     setValues({ ...values, [prop]: event.target.value });
   };
 
   const handleClickShowPassword = (prop) => () => {
+    // Обработчик клика для отображения/скрытия символов пароля и подтверждения пароля
     setValues({
       ...values,
       [prop]: !values[prop],
@@ -40,28 +42,29 @@ const ResetPassword = () => {
   };
 
   const handleResetPassword = async () => {
+    // Функция для сброса пароля
     if (!values.password || !values.confirmPassword) {
       toast.error("Заполните все поля");
     } else if (values.password !== values.confirmPassword) {
       toast.error("Пароли не совпадают!");
     } else {
-      setDisabledButton(true);
+      setDisabledButton(true); // Деактивирует кнопку "Сбросить пароль"
       await axiosInstance
         .post(`${SERVER_URL}/api/auth/reset/${token}`, {
           password: values.password,
-        })
+        }) // Отправляет запрос на сброс пароля на сервер
         .then(() => {
           toast.success("Пароль успешно изменён");
-          navigate("/login");
+          navigate("/login"); // Перенаправляет пользователя на страницу входа
         })
         .catch((e) => {
-          setDisabledButton(false);
+          setDisabledButton(false); // Активирует кнопку "Сбросить пароль"
           if (
             e.response.data.message ===
             "Токен сброса пароля недействителен или истек"
           ) {
             toast.warn("Токен сброса пароля недействителен или истек");
-            navigate("/forgotPassword");
+            navigate("/forgotPassword"); // Перенаправляет пользователя на страницу восстановления пароля
           } else {
             toast.error(
               e.response.data.message || "Произошла ошибка при изменении пароля"

@@ -2,7 +2,6 @@ import React from "react";
 import UserEdit from "./card_modals/UserEdit";
 import LabelsEdit from "./card_modals/LabelsEdit";
 import DateEdit from "./card_modals/DateEdit";
-import { ClickAwayListener } from "@mui/base/ClickAwayListener";
 import { IconButton, Paper, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AttachmentsModal from "./card_modals/AttachmentsModal";

@@ -18,6 +18,7 @@ import { __dirname } from "../common.js";
 
 const router = express.Router();
 
+// Создание хранилища для фонов 
 const boardBackgroundStorage = multer.diskStorage({
   destination: async function (req, file, cb) {
     const boardId = req.params.boardId;
@@ -430,6 +431,7 @@ router.put("/:boardId/change-user-role", isAuth, async (req, res) => {
   }
 });
 
+// Добавление новой метки на доску
 router.put("/:boardId/add-label", isAuth, async (req, res) => {
   try {
     const { boardId } = req.params;
@@ -468,6 +470,7 @@ router.put("/:boardId/add-label", isAuth, async (req, res) => {
   }
 });
 
+// Изменение существующей метки
 router.put("/:boardId/update-label", isAuth, async (req, res) => {
   try {
     debugger;
@@ -519,6 +522,7 @@ router.put("/:boardId/update-label", isAuth, async (req, res) => {
   }
 });
 
+// Удаление метки
 router.put("/:boardId/delete-label", isAuth, async (req, res) => {
   try {
     const { boardId } = req.params;

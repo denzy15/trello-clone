@@ -26,36 +26,45 @@ import AddElement from "../components/AddElement";
 import BoardPageSkeleton from "../components/skeletons/BoardPageSkeleton";
 
 const BoardPage = () => {
+  // Получение параметра из URL
   const { boardId } = useParams();
+
+  // Хуки для управления состоянием компонента
   const [loading, setLoading] = useState(true);
-
-  const { _id: currentUserId } = useSelector((state) => state.auth);
-
   const [error, setError] = useState("");
-
   const [isCreatingNewList, setIsCreatingNewList] = useState(false);
 
+  // Получение данных о пользователе и доске из Redux store
+  const { _id: currentUserId } = useSelector((state) => state.auth);
   const { cardEditing } = useSelector((state) => state.metadata);
   const { currentBoard } = useSelector((state) => state.boards);
 
+  // Инициализация диспатча для обновления Redux store
   const dispatch = useDispatch();
 
+  // Загрузка данных о доске при монтировании компонента
   useEffect(() => {
     async function fetchBoardInfo() {
       setLoading(true);
-      await axiosInstance
-        .get(`${SERVER_URL}/api/boards/${boardId}`)
-        .then(({ data }) => {
-          dispatch(pickBoard(data));
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      try {
+        const { data } = await axiosInstance.get(
+          `${SERVER_URL}/api/boards/${boardId}`
+        );
+        dispatch(pickBoard(data));
+      } catch (error) {
+        setError(
+          error.response?.data?.message ||
+            "Ошибка загрузки доски. Попробуйте снова позже."
+        );
+      } finally {
+        setLoading(false);
+      }
     }
 
     fetchBoardInfo();
   }, [boardId, dispatch]);
 
+  // Определение роли пользователя на доске при изменении данных о доске
   useEffect(() => {
     const calculateRole = () => {
       if (currentUserId === currentBoard.creator._id) {
@@ -72,37 +81,39 @@ const BoardPage = () => {
     if (!!currentBoard.creator) {
       dispatch(setMyRoleOnCurrentBoard(calculateRole()));
     }
-  }, [
-    boardId,
-    currentBoard,
-    currentBoard.users,
-    currentUserId,
-    dispatch,
-    currentBoard.currentBackground,
-  ]);
+  }, [currentBoard, currentUserId, dispatch]);
 
+  // Обработчик изменения названия списка
   const handleEditListTitle = async (listId, listIndex, newListTitle) => {
     const oldListTitle = currentBoard.lists[listIndex].title;
     dispatch(renameList({ listIndex, title: newListTitle }));
 
-    await axiosInstance
-      .put(`${SERVER_URL}/api/lists/${boardId}/rename/${listId}`, {
-        title: newListTitle,
-      })
-      .catch((e) => {
-        toast.error(
-          e.response.data.message ||
-            "Не удалось переименовать список, попробуйте позже"
-        );
-        dispatch(renameList({ listIndex, title: oldListTitle }));
-      });
+    try {
+      await axiosInstance.put(
+        `${SERVER_URL}/api/lists/${boardId}/rename/${listId}`,
+        {
+          title: newListTitle,
+        }
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Не удалось переименовать список. Попробуйте снова позже."
+      );
+      dispatch(renameList({ listIndex, title: oldListTitle }));
+    }
   };
+
+  // Обработчик завершения перетаскивания элемента
 
   const onDragEnd = async (result) => {
     const { destination, source, draggableId, type } = result;
+    // Если нет пункта назначения, выходим
     if (!destination) {
       return;
     }
+
+    // Если элемент бросили в ту же позицию, выходим
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
@@ -110,28 +121,39 @@ const BoardPage = () => {
       return;
     }
 
+    // Если перетаскиваемый элемент - колонка
     if (type === "COLUMN") {
+      // Клонируем списки текущей доски
       const oldOrderedLists = Array.from(currentBoard.lists);
       const newOrderedLists = Array.from(currentBoard.lists);
 
+      // Удаляем перетаскиваемую колонку из исходного местоположения
       const [targetList] = newOrderedLists.splice(source.index, 1);
+
+      // Вставляем перетаскиваемую колонку в позицию назначения
       newOrderedLists.splice(destination.index, 0, targetList);
+
+      // Обновляем хранилище новым порядком колонок
       dispatch(updateListOrder(newOrderedLists));
-      await axiosInstance
-        .put(
+
+      try {
+        // Пытаемся обновить порядок колонок на сервере
+        await axiosInstance.put(
           `${SERVER_URL}/api/lists/${currentBoard._id}/move/${draggableId}?newOrder=${destination.index}`
-        )
-        .catch(() => {
-          setError("Ошибка. Не удалось поменять местами списки");
-          dispatch(updateListOrder(oldOrderedLists));
-          setTimeout(() => {
-            setError("");
-          }, 3000);
-        });
+        );
+      } catch (error) {
+        // Обрабатываем ошибки и возвращаем старый порядок колонок
+        setError("Произошла ошибка. Не удалось изменить порядок колонок");
+        dispatch(updateListOrder(oldOrderedLists));
+        setTimeout(() => {
+          setError("");
+        }, 3000);
+      }
 
       return;
     }
 
+    // Находим индексы исходного и целевого списка
     const sourceListIndex = currentBoard.lists.findIndex(
       (list) => list._id === source.droppableId
     );
@@ -139,12 +161,15 @@ const BoardPage = () => {
       (list) => list._id === destination.droppableId
     );
 
+    // Если индексы исходного или целевого списка не найдены
     if (sourceListIndex === -1 || resultListIndex === -1) {
-      setError("Ошибка перетаскивания. Повторите еще раз");
+      setError("Ошибка перетаскивания. Пожалуйста, попробуйте еще раз.");
       return;
     }
 
+    // Если исходный и целевой списки совпадают
     if (sourceListIndex !== -1 && sourceListIndex === resultListIndex) {
+      // Клонируем текущие карточки исходного списка
       const oldOrderedCards = Array.from(
         currentBoard.lists[sourceListIndex].cards
       );
@@ -152,51 +177,49 @@ const BoardPage = () => {
         currentBoard.lists[sourceListIndex].cards
       );
 
+      // Удаляем перетаскиваемую карточку из исходной позиции
       const [targetCard] = newOrderedCards.splice(source.index, 1);
+
+      // Вставляем перетаскиваемую карточку на позицию назначения
       newOrderedCards.splice(destination.index, 0, targetCard);
+
+      // Обновляем хранилище новым порядком карточек
       dispatch(
         updateCardOrder({ listIndex: sourceListIndex, cards: newOrderedCards })
       );
 
-      await axiosInstance
-        .put(
+      try {
+        // Пытаемся обновить порядок карточек на сервере
+        await axiosInstance.put(
           `${SERVER_URL}/api/cards/${boardId}/${draggableId}/change-order?listId=${source.droppableId}`,
           { newOrder: destination.index }
-        )
-        .catch(() => {
-          dispatch(
-            updateCardOrder({
-              listIndex: sourceListIndex,
-              cards: oldOrderedCards,
-            })
-          );
-        });
+        );
+      } catch (error) {
+        // Обрабатываем ошибки и возвращаем старый порядок карточек
+        dispatch(
+          updateCardOrder({
+            listIndex: sourceListIndex,
+            cards: oldOrderedCards,
+          })
+        );
+      }
+
       return;
     }
 
+    // Клонируем текущие карточки исходного и целевого списков
     const newOrderedSourceCards = Array.from(
       currentBoard.lists[sourceListIndex].cards
     );
-
     const newOrderedDestinationCards = Array.from(
       currentBoard.lists[resultListIndex].cards
     );
 
+    // Удаляем перетаскиваемую карточку из исходного списка и вставляем в целевой список
+
     const [targetCard] = newOrderedSourceCards.splice(source.index, 1);
     newOrderedDestinationCards.splice(destination.index, 0, targetCard);
 
-    // setOrderedLists((prev) => {
-    //   const lists = [...prev];
-    //   lists[sourceListIndex] = {
-    //     ...lists[sourceListIndex],
-    //     cards: newOrderedSourceCards,
-    //   };
-    //   lists[resultListIndex] = {
-    //     ...lists[resultListIndex],
-    //     cards: newOrderedDestinationCards,
-    //   };
-    //   return lists;
-    // });
     dispatch(
       updateCardOrder({
         listIndex: sourceListIndex,
@@ -217,21 +240,6 @@ const BoardPage = () => {
         newOrder: destination.index,
       })
       .catch(() => {
-        // setOrderedLists((prev) => {
-        //   const lists = [...prev];
-        //   newOrderedSourceCards.splice(source.index, 0, targetCard);
-        //   lists[sourceListIndex] = {
-        //     ...lists[sourceListIndex],
-        //     cards: newOrderedSourceCards,
-        //   };
-        //   newOrderedDestinationCards.splice(destination.index, 1);
-        //   lists[resultListIndex] = {
-        //     ...lists[resultListIndex],
-        //     cards: newOrderedDestinationCards,
-        //   };
-        //   return lists;
-        // });
-
         newOrderedDestinationCards.splice(destination.index, 1);
         newOrderedSourceCards.splice(source.index, 0, targetCard);
         dispatch(
@@ -262,7 +270,7 @@ const BoardPage = () => {
           background: `url('${SERVER_URL}/${currentBoard.currentBackground}')`,
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
-          minHeight: '100%'
+          minHeight: "100%",
         }}
       >
         <Navbar />

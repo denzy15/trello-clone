@@ -22,51 +22,53 @@ import { getTheme } from "../theme";
 import HomePageSkeleton from "../components/skeletons/HomePageSkeleton";
 
 const Home = () => {
-  const { boards } = useSelector((state) => state.boards);
-  const { mode } = useSelector((state) => state.theme);
+  const { boards } = useSelector((state) => state.boards); // Получает список досок из глобального состояния
+  const { mode } = useSelector((state) => state.theme); // Получает текущий режим темы из глобального состояния
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Устанавливает состояние загрузки
 
-  const theme = getTheme(mode);
+  const theme = getTheme(mode); // Определяет тему для компонентов MUI на основе текущего режима
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // Получает функцию dispatch для отправки действий в хранилище
 
-  const [fetchError, setFetchError] = useState("");
-  const [isNewBoardCreating, setIsNewBoardCreating] = useState(false);
+  const [fetchError, setFetchError] = useState(""); // Устанавливает состояние ошибки при загрузке данных
+  const [isNewBoardCreating, setIsNewBoardCreating] = useState(false); // Устанавливает состояние создания новой доски
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Получает функцию для навигации между страницами
 
   useEffect(() => {
+    // Загрузка уведомлений и досок при монтировании компонента
     async function fetchNotifications() {
       await axiosInstance
         .get(`${SERVER_URL}/api/invite`)
         .then(({ data }) => {
-          dispatch(setInvitations(data));
+          dispatch(setInvitations(data)); // Обновляет список уведомлений в хранилище
         })
-        .catch(() => setFetchError("Не удалось загрузить новые уведомления"));
+        .catch(() => setFetchError("Не удалось загрузить новые уведомления")); // Устанавливает сообщение об ошибке
     }
 
     async function fetchBoards() {
-      setLoading(true);
+      setLoading(true); // Устанавливает состояние загрузки перед отправкой запроса
       await axiosInstance
         .get(`${SERVER_URL}/api/boards`)
         .then(({ data }) => {
-          dispatch(setBoards(data));
+          dispatch(setBoards(data)); // Обновляет список досок в хранилище
         })
-        .catch(() => setFetchError("Не удалось загрузить доски"))
+        .catch(() => setFetchError("Не удалось загрузить доски")) // Устанавливает сообщение об ошибке
         .finally(() => {
-          setLoading(false);
+          setLoading(false); // Сбрасывает состояние загрузки после завершения запроса
         });
     }
 
-    fetchBoards();
-    fetchNotifications();
-  }, [dispatch]);
+    fetchBoards(); // Вызывает функцию для загрузки досок
+    fetchNotifications(); // Вызывает функцию для загрузки уведомлений
+  }, [dispatch]); // Зависимость useEffect зависит от dispatch для обновления данных в хранилище
 
   useEffect(() => {
-    dispatch(setMyRoleOnCurrentBoard(null));
-    dispatch(quitBoard());
-  }, [dispatch]);
+    // Сброс текущей доски и роли пользователя при изменении компонента
+    dispatch(setMyRoleOnCurrentBoard(null)); // Сбрасывает роль пользователя на текущей доске
+    dispatch(quitBoard()); // Сбрасывает текущую доску
+  }, [dispatch]); // Зависимость useEffect зависит от dispatch для обновления данных в хранилище
 
   return (
     <Box>

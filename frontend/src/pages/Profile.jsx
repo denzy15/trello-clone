@@ -26,21 +26,22 @@ const passwordEditData = {
 };
 
 const Profile = () => {
-  const { username, email, _id } = useSelector((state) => state.auth);
+  const { username, email, _id } = useSelector((state) => state.auth); // Получает данные пользователя из глобального состояния
 
-  const [editingUsername, setEditingUsername] = useState(false);
+  const [editingUsername, setEditingUsername] = useState(false); // Состояние редактирования имени пользователя
 
-  const [newUsername, setNewUsername] = useState(username);
+  const [newUsername, setNewUsername] = useState(username); // Состояние нового имени пользователя
 
-  const [changingPassword, setChangingPassword] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false); // Состояние изменения пароля
 
-  const [passwordData, setPasswordData] = useState(passwordEditData);
+  const [passwordData, setPasswordData] = useState(passwordEditData); // Состояние данных пароля
 
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showNewPasswordConfirm, setShowNewPasswordConfirm] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false); // Состояние отображения старого пароля
+  const [showNewPassword, setShowNewPassword] = useState(false); // Состояние отображения нового пароля
+  const [showNewPasswordConfirm, setShowNewPasswordConfirm] = useState(false); // Состояние отображения подтверждения нового пароля
 
   const handleChangePassword = (event) => {
+    // Обработчик изменений в полях пароля
     setPasswordData((prev) => ({
       ...prev,
       [event.target.name]: event.target.value,
@@ -48,22 +49,23 @@ const Profile = () => {
   };
 
   const validatePasswordData = () => {
+    // Проверка введенных данных пароля
     if (
       !passwordData.newPass ||
       !passwordData.newPassConfirm ||
       !passwordData.oldPass
     ) {
-      toast.error("Необходимо заполнить все поля");
+      toast.error("Необходимо заполнить все поля"); // Выводит сообщение об ошибке, если не все поля заполнены
       return false;
     }
 
-    // if (passwordData.newPass.length < 8) {
-    //   toast.error("Новый пароль должен содержать не менее 8 символов");
-    //   return false;
-    // }
+    if (passwordData.newPass.length < 8) {
+      toast.error("Новый пароль должен содержать не менее 8 символов"); // Выводит сообщение об ошибке, если длина нового пароля меньше 8 символов
+      return false;
+    }
 
     if (passwordData.newPass !== passwordData.newPassConfirm) {
-      toast.error("Пароли не совпадают");
+      toast.error("Пароли не совпадают"); // Выводит сообщение об ошибке, если новый пароль и его подтверждение не совпадают
       return false;
     }
 
@@ -71,52 +73,53 @@ const Profile = () => {
   };
 
   const fetchNewPassword = async () => {
-    if (!validatePasswordData()) return;
+    // Функция для отправки запроса на изменение пароля
+    if (!validatePasswordData()) return; // Проверяет валидность данных пароля
 
     try {
       await axiosInstance.put(`${SERVER_URL}/api/users/${_id}`, {
         password: passwordData.oldPass,
         newPassword: passwordData.newPass,
-      });
+      }); // Отправляет запрос на сервер для изменения пароля
 
-      setChangingPassword(false);
-      setPasswordData(passwordEditData);
-      setShowNewPassword(false);
-      setShowNewPasswordConfirm(false);
-      setShowOldPassword(false);
-      toast.success("Пароль успешно изменён");
+      setChangingPassword(false); // Сбрасывает состояние изменения пароля
+      setPasswordData(passwordEditData); // Сбрасывает состояние данных пароля
+      setShowNewPassword(false); // Скрывает поле ввода нового пароля
+      setShowNewPasswordConfirm(false); // Скрывает поле ввода подтверждения нового пароля
+      setShowOldPassword(false); // Скрывает поле ввода старого пароля
+      toast.success("Пароль успешно изменён"); // Выводит сообщение об успешном изменении пароля
     } catch (e) {
-      toast.error(e.response.data.message || "Не удалось изменить пароль");
+      toast.error(e.response.data.message || "Не удалось изменить пароль"); // Выводит сообщение об ошибке изменения пароля
     }
   };
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // Получает функцию dispatch для отправки действий в хранилище
 
-  const {mode} = useSelector(state=>state.theme)
+  const { mode } = useSelector((state) => state.theme); // Получает текущий режим темы из глобального состояния
 
-  const theme = getTheme(mode)
-
+  const theme = getTheme(mode); // Определяет тему для компонентов MUI на основе текущего режима
 
   const handleSaveNewUsername = async (e) => {
-    if (e.type === "keydown" && e.key !== "Enter") return;
+    // Обработчик сохранения нового имени пользователя
+    if (e.type === "keydown" && e.key !== "Enter") return; // Если нажата клавиша не "Enter", завершает выполнение
 
     if (!newUsername || newUsername === username) {
-      setNewUsername(username);
-      setEditingUsername(false);
+      setNewUsername(username); // Возвращает предыдущее имя пользователя, если новое пустое или равно текущему
+      setEditingUsername(false); // Завершает редактирование имени пользователя
       return;
     }
 
     try {
       await axiosInstance.put(`${SERVER_URL}/api/users/${_id}`, {
         username: newUsername,
-      });
-      dispatch(changeUsername(newUsername));
+      }); // Отправляет запрос на сервер для изменения имени пользователя
+      dispatch(changeUsername(newUsername)); // Отправляет действие для изменения имени пользователя в хранилище
     } catch (e) {
-      setNewUsername(username);
-      toast.error(e.response.data.message || "Не удалось изменить имя");
+      setNewUsername(username); // Возвращает предыдущее имя пользователя в случае ошибки
+      toast.error(e.response.data.message || "Не удалось изменить имя"); // Выводит сообщение об ошибке изменения имени пользователя
     }
 
-    setEditingUsername(false);
+    setEditingUsername(false); // Завершает редактирование имени пользователя
   };
 
   return (
@@ -150,7 +153,7 @@ const Profile = () => {
                   borderRadius: 1,
                   transition: "0.3s",
                   "&:hover": {
-                    bgcolor: theme.palette.action.disabledBackground
+                    bgcolor: theme.palette.action.disabledBackground,
                   },
                 }}
                 onClick={() => setEditingUsername(true)}

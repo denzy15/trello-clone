@@ -12,6 +12,7 @@ import sse from "../sse.js";
 
 const router = express.Router();
 
+// Поиск приглашений пользователя
 router.get("/", isAuth, async (req, res) => {
   try {
     const invitations = await Invitation.find({ invitedUser: req.user._id })
@@ -24,6 +25,7 @@ router.get("/", isAuth, async (req, res) => {
   }
 });
 
+// Создание приглашения
 router.post("/", isAuth, async (req, res) => {
   try {
     const { boardId, invitedUser } = req.body;
@@ -33,7 +35,7 @@ router.post("/", isAuth, async (req, res) => {
     if (!isUserAdmin(board, req.user._id)) {
       return res
         .status(403)
-        .json({ message: "У вас нет прав приглашать пользователейы" });
+        .json({ message: "У вас нет прав приглашать пользователей" });
     }
 
     if (!board) {
@@ -83,6 +85,7 @@ router.post("/", isAuth, async (req, res) => {
   }
 });
 
+// Принятие приглашений
 router.put("/accept", isAuth, async (req, res) => {
   try {
     const { boardId, invitationId } = req.body;
@@ -131,6 +134,7 @@ router.put("/accept", isAuth, async (req, res) => {
   }
 });
 
+// Отклонение приглашения
 router.put("/decline", isAuth, async (req, res) => {
   try {
     const { invitationId } = req.body;
@@ -158,6 +162,7 @@ router.put("/decline", isAuth, async (req, res) => {
   }
 });
 
+// Удаление приглашения
 router.delete("/:invitationId", isAuth, async (req, res) => {
   try {
     const { invitationId } = req.params;

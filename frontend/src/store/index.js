@@ -16,12 +16,14 @@ import {
   persistStore,
 } from "redux-persist";
 
+// Конфигурация для хранения состояния с помощью redux-persist
 const persistConfig = {
-  key: "root",
-  storage,
-  whitelist: ["auth", "theme"],
+  key: "root", // Ключ корневого хранилища
+  storage, // Используемое хранилище (localStorage, AsyncStorage и т. д.)
+  whitelist: ["auth", "theme"], // Список срезов, которые будут сохранены при перезагрузке страницы
 };
 
+// Комбинирование всех редукторов в один корневой редуктор
 const rootReducer = combineReducers({
   theme: themeReducer,
   auth: authReducer,
@@ -30,10 +32,13 @@ const rootReducer = combineReducers({
   invitations: invitationsReducer,
 });
 
+// Создание персистентного редуктора
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
+// Создание хранилища Redux с использованием конфигурации
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: persistedReducer, // Использование персистентного редуктора
+  // Применение middleware и игнорирование сериализации для redux-persist actions
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
@@ -42,4 +47,5 @@ export const store = configureStore({
     }),
 });
 
+// Создание персистора для Redux store
 export const persistor = persistStore(store);

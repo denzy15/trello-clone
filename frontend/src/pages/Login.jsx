@@ -25,11 +25,13 @@ import { getTheme } from "../theme";
 import lightThemeImage from "../assets/auth-image-2.jpg";
 import { AccountTree } from "@mui/icons-material";
 
+// Инициализация значений в форме
 const initialFormData = {
   email: "",
   password: "",
 };
 
+// Определение типов ошибок
 const initialErrorsData = {
   email: "",
   password: "",
@@ -37,53 +39,55 @@ const initialErrorsData = {
 };
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Устанавливает состояние отображения пароля
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPassword = () => setShowPassword((show) => !show); // Обработчик щелчка для переключения отображения пароля
 
-  const { mode } = useSelector((state) => state.theme);
-  const theme = getTheme(mode);
+  const { mode } = useSelector((state) => state.theme); // Получает текущий режим темы из глобального состояния
+  const theme = getTheme(mode); // Определяет тему для компонентов MUI на основе текущего режима
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const dispatch = useDispatch(); // Получает функцию dispatch для отправки действий в хранилище
+  const navigate = useNavigate(); // Получает функцию для навигации между страницами
 
-  const [formData, setFormData] = useState(initialFormData);
-  const [errors, setErrors] = useState(initialErrorsData);
+  const [formData, setFormData] = useState(initialFormData); // Устанавливает состояние формы для входа
+  const [errors, setErrors] = useState(initialErrorsData); // Устанавливает состояние ошибок формы для входа
 
   const handleLogin = () => {
+    // Обработчик входа
     if (!formData.email) {
-      setErrors((prev) => ({ ...prev, email: "Заполните поле" }));
+      setErrors((prev) => ({ ...prev, email: "Заполните поле" })); // Устанавливает ошибку, если поле электронной почты не заполнено
       return;
     }
-    setErrors((prev) => ({ ...prev, email: "" }));
+    setErrors((prev) => ({ ...prev, email: "" })); // Сбрасывает ошибку при заполненном поле электронной почты
 
     if (!formData.password) {
-      setErrors((prev) => ({ ...prev, password: "Заполните поле" }));
+      setErrors((prev) => ({ ...prev, password: "Заполните поле" })); // Устанавливает ошибку, если поле пароля не заполнено
       return;
     }
-    setErrors((prev) => ({ ...prev, password: "" }));
+    setErrors((prev) => ({ ...prev, password: "" })); // Сбрасывает ошибку при заполненном поле пароля
 
     axios
-      .post(`${SERVER_URL}/api/auth/login`, formData)
+      .post(`${SERVER_URL}/api/auth/login`, formData) // Отправляет запрос на вход
       .then(({ data }) => {
-        dispatch(login(data));
-        navigate("/");
-        setFormData(initialFormData);
-        setErrors(initialErrorsData);
+        dispatch(login(data)); // Авторизует пользователя и обновляет данные пользователя в хранилище
+        navigate("/"); // Перенаправляет пользователя на главную страницу
+        setFormData(initialFormData); // Сбрасывает данные формы
+        setErrors(initialErrorsData); // Сбрасывает ошибки формы
       })
       .catch((e) => {
         console.log(e);
         setErrors((prev) => ({
           ...prev,
-          common: e.response.data.message || "Неверный логин или пароль",
+          common: e.response.data.message || "Неверный логин или пароль", // Устанавливает сообщение об ошибке входа
         }));
       });
   };
 
   const handleChange = (event) => {
+    // Обработчик изменения данных формы
     setFormData((prev) => ({
       ...prev,
-      [event.target.name]: event.target.value,
+      [event.target.name]: event.target.value, // Обновляет данные формы при изменении значений полей
     }));
   };
 

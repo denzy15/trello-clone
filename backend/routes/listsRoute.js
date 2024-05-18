@@ -129,6 +129,7 @@ router.put("/:boardId/rename/:listId", isAuth, async (req, res) => {
   }
 });
 
+// Изменение порядка отображения списка
 router.put("/:boardId/move/:listId", isAuth, async (req, res) => {
   try {
     const { boardId, listId } = req.params;
@@ -230,6 +231,7 @@ router.put("/:boardId/move/:listId", isAuth, async (req, res) => {
   }
 });
 
+// Копировние существующего списка
 router.put("/:boardId/copy/:listId", isAuth, async (req, res) => {
   const { boardId, listId } = req.params;
   const { title } = req.body;

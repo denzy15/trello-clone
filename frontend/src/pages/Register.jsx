@@ -23,7 +23,7 @@ import { login } from "../store/slices/authSlice";
 
 import lightThemeImage from "../assets/auth-image-2.jpg";
 import { getTheme } from "../theme";
-import { APP_TITLE } from "../constants";
+import { APP_TITLE, SERVER_URL } from "../constants";
 import { AccountTree } from "@mui/icons-material";
 
 const initialFormData = {
@@ -42,23 +42,24 @@ const initialErrorsData = {
 };
 
 const Register = () => {
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false); // Состояние отображения пароля
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false); // Состояние отображения подтверждения пароля
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPassword = () => setShowPassword((show) => !show); // Обработчик клика для отображения/скрытия пароля
   const handleClickShowConfirmPassword = () =>
-    setShowConfirmPassword((show) => !show);
+    setShowConfirmPassword((show) => !show); // Обработчик клика для отображения/скрытия подтверждения пароля
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const dispatch = useDispatch(); // Получает функцию dispatch для отправки действий в хранилище
+  const navigate = useNavigate(); // Получает функцию navigate для навигации по маршрутам
 
-  const [formData, setFormData] = useState(initialFormData);
-  const [errors, setErrors] = useState(initialErrorsData);
+  const [formData, setFormData] = useState(initialFormData); // Состояние данных формы регистрации
+  const [errors, setErrors] = useState(initialErrorsData); // Состояние ошибок валидации формы регистрации
 
-  const { mode } = useSelector((state) => state.theme);
-  const theme = getTheme(mode);
+  const { mode } = useSelector((state) => state.theme); // Получает текущий режим темы из глобального состояния
+  const theme = getTheme(mode); // Определяет тему для компонентов MUI на основе текущего режима
 
   const handleLogin = () => {
+    // Обработчик отправки формы регистрации
     if (!formData.username) {
       setErrors((prev) => ({ ...prev, username: "Заполните поле" }));
       return;
@@ -101,18 +102,18 @@ const Register = () => {
     const { passwordConfirm, ...rest } = formData;
 
     axios
-      .post("http://localhost:5000/api/auth/register", rest)
+      .post(`${SERVER_URL}/api/auth/register`, rest) // Отправляет запрос на сервер для регистрации пользователя
       .then(() => {
         axios
-          .post("http://localhost:5000/api/auth/login", {
+          .post(`${SERVER_URL}/api/auth/login`, {
             email: formData.email,
             password: formData.password,
-          })
+          }) // Отправляет запрос на сервер для входа после успешной регистрации
           .then(({ data }) => {
-            dispatch(login(data));
-            navigate("/");
-            setFormData(initialFormData);
-            setErrors(initialErrorsData);
+            dispatch(login(data)); // Отправляет действие для входа в хранилище
+            navigate("/"); // Перенаправляет пользователя на главную страницу
+            setFormData(initialFormData); // Сбрасывает данные формы
+            setErrors(initialErrorsData); // Сбрасывает ошибки валидации формы
           })
           .catch((e) => {
             setErrors((prev) => ({
@@ -128,6 +129,7 @@ const Register = () => {
   };
 
   const handleChange = (event) => {
+    // Обработчик изменений в полях формы
     setFormData((prev) => ({
       ...prev,
       [event.target.name]: event.target.value,

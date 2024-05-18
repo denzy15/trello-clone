@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
-// Получение всех пользователей
+// Поиск пользователей
 router.get("/", isAuth, async (req, res) => {
   const { search } = req.query;
   try {
@@ -28,7 +28,7 @@ router.get("/", isAuth, async (req, res) => {
   }
 });
 
-
+// Изменение личных данных
 router.put("/:userId", isAuth, async (req, res) => {
   try {
     const { userId } = req.params;

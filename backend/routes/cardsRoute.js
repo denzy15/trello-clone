@@ -17,6 +17,7 @@ import { __dirname } from "../common.js";
 
 const router = express.Router();
 
+// Создание хранилища для вложений карточек
 const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
     const boardId = req.params.boardId;
@@ -402,6 +403,7 @@ router.put("/:boardId/:cardId/users", isAuth, async (req, res) => {
   }
 });
 
+// Удаление метки с доски
 router.put(
   "/:boardId/:cardId/remove-deleted-label",
   isAuth,

@@ -26,34 +26,35 @@ import {
 } from "./store/slices/boardsSlice";
 
 function App() {
-  dayjs.locale("ru");
+  dayjs.locale("ru"); // Установка локали для библиотеки dayjs
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); 
+  const { _id } = useSelector((state) => state.auth); 
+  const { pathname } = useLocation(); // Получение текущего пути страницы
+  const navigate = useNavigate(); // Получение функции навигации
 
-  const { _id } = useSelector((state) => state.auth);
+  const mode = useSelector((state) => state.theme.mode); // Получение текущей темы из Redux
+  const { currentBoard } = useSelector((state) => state.boards); // Получение текущей доски из Redux
 
-  const { pathname } = useLocation();
-
-  const navigate = useNavigate();
-
-  const mode = useSelector((state) => state.theme.mode);
-  const { currentBoard } = useSelector((state) => state.boards);
-
-  const theme = getTheme(mode);
+  const theme = getTheme(mode); // Получение темы приложения
 
   useEffect(() => {
+    // Обработчик для сброса текущей доски при переходе на другие страницы
     if (!pathname.startsWith("/boards")) {
       dispatch(quitBoard());
     }
 
+    // Установка темы "light" при выходе из системы
     if (!_id) {
       dispatch(setTheme("light"));
     }
 
-    return () => {};
+    return () => {}; // Очистка эффекта при размонтировании компонента
   }, [_id, dispatch, pathname]);
 
+
   useEffect(() => {
+    // Подписка на события Server-Sent Events для обновления данных
     const eventSource = new EventSource(`${SERVER_URL}/sse`);
 
     if (!!_id) {

@@ -2,8 +2,8 @@ import fs from "fs";
 import jwt from "jsonwebtoken";
 import Board from "./models/board.js";
 import sse from "./sse.js";
-("jsonwebtoken");
 
+// Функция для генерации JWT токена
 export const generateToken = (user) => {
   return jwt.sign(
     {
@@ -18,10 +18,11 @@ export const generateToken = (user) => {
   );
 };
 
+// Middleware для проверки авторизации пользователя
 export const isAuth = (req, res, next) => {
   const authorization = req.headers.authorization;
   if (authorization) {
-    const token = authorization.slice(7, authorization.length);
+    const token = authorization.slice(7, authorization.length); // Берем токен без 'Bearer '
     jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
       if (err) {
         if (err.name === "TokenExpiredError") {
@@ -30,7 +31,7 @@ export const isAuth = (req, res, next) => {
           res.status(401).send({ message: "Неверный токен" });
         }
       } else {
-        req.user = decode;
+        req.user = decode; // Декодируем токен и сохраняем данные пользователя в req.user
         next();
       }
     });
@@ -39,6 +40,7 @@ export const isAuth = (req, res, next) => {
   }
 };
 
+// Функция для конвертации данных пользователя в нужный формат
 export const convertUsersResponse = (userData) => {
   if (Array.isArray(userData)) {
     return userData.map((user) => {
@@ -51,6 +53,7 @@ export const convertUsersResponse = (userData) => {
   return { _id, username, email };
 };
 
+// Функция для создания директорий
 export const createDirectories = (dirPath) => {
   return new Promise((resolve, reject) => {
     fs.mkdir(dirPath, { recursive: true }, (err) => {
@@ -63,6 +66,7 @@ export const createDirectories = (dirPath) => {
   });
 };
 
+// Функция для декодирования строки
 export const decodeString = (str) => {
   const byteArray = Array.from(str).map((char) => char.charCodeAt(0));
   const decodedString = new TextDecoder("utf-8").decode(
@@ -72,6 +76,7 @@ export const decodeString = (str) => {
   return decodedString;
 };
 
+// Функция для удаления файла
 export const deleteFile = async (filePath) => {
   try {
     await fs.promises.unlink(filePath);
@@ -81,6 +86,7 @@ export const deleteFile = async (filePath) => {
   }
 };
 
+// Функция для проверки, является ли пользователь администратором доски
 export const isUserAdmin = (board, reqUserId) => {
   if (board.creator._id.toString() === reqUserId) return true;
 
@@ -93,6 +99,7 @@ export const isUserAdmin = (board, reqUserId) => {
   return false;
 };
 
+// Функция для проверки, находится ли пользователь на доске
 export const isUserOnBoard = (board, reqUserId) => {
   return (
     board.users.some((user) => user.userId._id.toString() === reqUserId) ||
@@ -100,6 +107,7 @@ export const isUserOnBoard = (board, reqUserId) => {
   );
 };
 
+// Функция для отправки обновления доски через SSE
 export const sendBoardUpdate = async (boardId, initiator) => {
   const board = await Board.findById(boardId)
     .populate("creator", "username email")
@@ -125,6 +133,7 @@ export const sendBoardUpdate = async (boardId, initiator) => {
     })
     .lean();
 
+  // Форматируем пользователей
   const formattedUsers = board.users.map((user) => ({
     _id: user.userId._id,
     role: user.role,
@@ -134,11 +143,12 @@ export const sendBoardUpdate = async (boardId, initiator) => {
 
   board.users = formattedUsers;
 
+  // Сортируем списки и карточки внутри них
   board.lists.sort((a, b) => a.order - b.order);
-
   board.lists.forEach((list) => {
     list.cards.sort((a, b) => a.order - b.order);
   });
 
+  // Отправляем обновление доски через SSE
   sse.send({ boardId, board, initiator }, "boardUpdate");
 };

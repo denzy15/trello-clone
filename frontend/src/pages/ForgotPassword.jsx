@@ -15,33 +15,34 @@ import { useSelector } from "react-redux";
 import { getTheme } from "../theme";
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState("");
-  const [sended, setSended] = useState(false);
+  const [email, setEmail] = useState(""); // Хранит значение email из поля ввода
 
-  const { mode } = useSelector((state) => state.theme);
-  const theme = getTheme(mode);
+  const [sended, setSended] = useState(false); // Устанавливает статус отправки формы восстановления пароля
+
+  const { mode } = useSelector((state) => state.theme); // Получает текущий режим темы из глобального состояния
+  const theme = getTheme(mode); // Определяет тему для компонентов MUI на основе текущего режима
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSended(true);
-    await axiosInstance
-      .post(`${SERVER_URL}/api/auth/forgotPassword`, {
-        email,
-      })
-      .then(() => {
-        toast.success(
-          "На ваш email отправлена ссылка для восстановления пароля"
-        );
-      })
-      .catch((e) => {
-        toast.error(
-          e.response.data.message ||
-            "Произошла ошибка при восстановлении пароля"
-        );
-        setSended(false);
-      });
-  };
+    // Обработчик отправки формы
+    e.preventDefault(); // Предотвращает стандартное поведение отправки формы и перезагрузку страницы
+    setSended(true); // Устанавливает статус отправки формы в значение true
 
+    try {
+      // Попытка отправить запрос на сервер для восстановления пароля
+      await axiosInstance.post(`${SERVER_URL}/api/auth/forgotPassword`, {
+        email,
+      });
+      // Успешное выполнение запроса
+      toast.success("На ваш email отправлена ссылка для восстановления пароля"); // Выводит уведомление об успешной отправке
+    } catch (error) {
+      // Обработка ошибки при отправке запроса
+      toast.error(
+        error.response.data.message ||
+          "Произошла ошибка при восстановлении пароля"
+      ); // Выводит уведомление об ошибке восстановления пароля
+      setSended(false); // Возвращает статус отправки формы в исходное состояние (не отправлено)
+    }
+  };
   return (
     <Box
       sx={{

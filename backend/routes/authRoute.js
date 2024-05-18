@@ -133,6 +133,7 @@ router.post("/forgotPassword", async (req, res) => {
   });
 });
 
+// Восстановление пароля
 router.post("/reset/:token", async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
