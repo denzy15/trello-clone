@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import "filepond/dist/filepond.min.css";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import { useDispatch, useSelector } from "react-redux";
 import { SERVER_URL } from "../../constants";
@@ -15,16 +15,38 @@ const AttachmentsModal = ({ closeModal }) => {
   const { currentBoard } = useSelector((state) => state.boards);
 
   const dispatch = useDispatch();
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleFileChange = async (event) => {
     const selectedFiles = Array.from(event.target.files);
+    await uploadFiles(selectedFiles);
+  };
 
+  const handleDrop = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
+    const droppedFiles = Array.from(event.dataTransfer.files);
+    await uploadFiles(droppedFiles);
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const uploadFiles = async (files) => {
     try {
-      for (const file of selectedFiles) {
+      for (const file of files) {
         if (file.size > 10 * 1024 * 1024) {
-          toast.warn(
-            `Файл ${file.name} превышает максимально допустимый размер (10 МБ)`
-          );
+          toast.warn(`Файл ${file.name} превышает максимально допустимый размер (10 МБ)`);
           continue;
         }
 
@@ -63,14 +85,23 @@ const AttachmentsModal = ({ closeModal }) => {
       }
       closeModal();
     } catch (e) {
-      toast.error(
-        e.response.data.message || "Ошибка при отправке файлов: " + e
-      );
+      toast.error(e.response.data.message || "Ошибка при отправке файлов: " + e);
     }
   };
 
   return (
-    <Box sx={{ py: 2 }}>
+    <Box
+      sx={{
+        py: 4,
+        border: isDragging ? '2px dashed #000' : '2px solid transparent',
+        borderRadius: 1,
+        textAlign: 'center',
+        position: 'relative',
+      }}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <Button
         component="label"
         variant="contained"
@@ -95,6 +126,25 @@ const AttachmentsModal = ({ closeModal }) => {
           type="file"
         />
       </Button>
+      <Typography sx={{mt:1}}>Либо перетащите файлы в эту область</Typography>
+      {isDragging && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(255, 255, 255, 0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            zIndex: 1,
+          }}
+        >
+        </Box>
+      )}
     </Box>
   );
 };

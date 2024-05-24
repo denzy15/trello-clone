@@ -1,19 +1,24 @@
+// Импорт необходимых модулей и зависимостей
 import request from "supertest";
 import app from "../../server.js";
 import Board from "../../models/board.js";
 import Invitation from "../../models/invitation.js";
 
+// Функция для установки токена аутентификации
 const setAuthToken = async (data) => {
+  // Отправляем запрос на аутентификацию и получаем токен
   const response = await request(app).post("/api/auth/login").send(data);
   return response.body.token;
 };
 
+// Группа тестов для маршрутов приглашений
 describe("Invitation routes", () => {
   let token;
   let boardId;
   let invitedUserId = "65bc81683d07858fcab31e01";
   let invitedUserToken;
 
+  // Перед выполнением всех тестов получаем токен аутентификации, токен приглашенного пользователя и id доски
   beforeAll(async () => {
     token = await setAuthToken({
       email: "dmirshanov@mail.ru",
@@ -32,6 +37,7 @@ describe("Invitation routes", () => {
     boardId = boardResponse.body._id;
   });
 
+  // Тесты для отправки, принятия, отклонения и удаления приглашений
   test("Отправка приглашения на доску", async () => {
     const response = await request(app)
       .post("/api/invite")
@@ -62,8 +68,8 @@ describe("Invitation routes", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("status", "accepted");
 
+    // Удаляем пользователя из списка пользователей доски, чтобы избежать дублирования при следующем тесте
     const board = await Board.findById(boardId);
-
     board.users = board.users.filter(
       (user) => user.userId.toString() !== invitedUserId
     );
@@ -75,8 +81,6 @@ describe("Invitation routes", () => {
       .post("/api/invite")
       .set("Authorization", `Bearer ${token}`)
       .send({ boardId, invitedUser: invitedUserId });
-
-   
 
     const invitationId = invitationResponse.body._id;
 
@@ -106,6 +110,7 @@ describe("Invitation routes", () => {
     expect(response.body).toHaveProperty("_id", invitationId);
   });
 
+  // После выполнения каждого теста удаляем созданные приглашения
   afterEach(async () => {
     await Invitation.deleteMany({ board: boardId });
   });

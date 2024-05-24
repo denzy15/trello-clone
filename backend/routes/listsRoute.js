@@ -6,6 +6,48 @@ import Card from "../models/card.js";
 
 const router = express.Router();
 
+
+// Получение всех списков на доске
+router.get("/:boardId", isAuth, async (req, res) => {
+  try {
+    const { boardId } = req.params;
+
+    const board = await Board.findById(boardId)
+      .populate({
+        path: "lists",
+        populate: {
+          path: "cards",
+          populate: {
+            path: "assignedUsers",
+          },
+        },
+      })
+      .exec();
+
+    if (!board) {
+      return res.status(404).json({ message: "Доска не найдена" });
+    }
+
+    // Проверяем доступ пользователя к этой доске перед получением списков
+    if (!isUserOnBoard(board, req.user._id)) {
+      return res.status(403).json({
+        message: "У вас нет доступа к просмотру списков на этой доске",
+      });
+    }
+
+    board.lists.sort((a, b) => a.order - b.order);
+
+    board.lists.forEach((list) => {
+      list.cards.sort((a, b) => a.order - b.order);
+    });
+
+    res.json(board.lists);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
 // Создание нового списка на доске
 router.post("/:boardId", isAuth, async (req, res) => {
   try {

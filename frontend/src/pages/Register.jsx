@@ -124,7 +124,7 @@ const Register = () => {
           });
       })
       .catch((e) => {
-        setErrors((prev) => ({ ...prev, common: "Ошибка сервера" }));
+        setErrors((prev) => ({ ...prev, common: e.response.data.message || "Ошибка сервера" }));
       });
   };
 

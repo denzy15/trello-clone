@@ -3,11 +3,12 @@ import app from "../../server.js";
 import User from "../../models/user.js";
 import Card from "../../models/card.js";
 
+// Функция для установки токена аутентификации
 const setAuthToken = async (data) => {
   const response = await request(app).post("/api/auth/login").send(data);
   return response.body.token;
 };
-
+// Функция для создания временной карточки
 const createTempCard = async (boardId, listId, token, title) => {
   const newCardResponse = await request(app)
     .post(`/api/cards/${boardId}/${listId}`)
@@ -16,11 +17,13 @@ const createTempCard = async (boardId, listId, token, title) => {
 
   return newCardResponse.body;
 };
-
+// Группа тестов для маршрутов карточек
 describe("Card routes", () => {
   let token;
   let boardId;
   let listId;
+
+    // Перед выполнением всех тестов получаем токен аутентификации и id доски
 
   beforeAll(async () => {
     token = await setAuthToken({
@@ -37,6 +40,7 @@ describe("Card routes", () => {
     listId = boardResponse.body.lists[0]._id;
   });
 
+    // Тесты для создания, удаления, обновления карточек
   test("Создание новой карточки", async () => {
     const title = "New Card";
 
@@ -288,6 +292,7 @@ describe("Card routes", () => {
     );
   });
 
+    // После выполнения всех тестов удаляем созданные временные карточки
   afterAll(async () => {
     await Card.deleteMany({
       $or: [{ title: "New Card" }, { title: "Updated Card Title" }],

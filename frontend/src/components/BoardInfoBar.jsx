@@ -54,7 +54,6 @@ const steps = [
 ];
 
 const BoardInfoBar = (props) => {
-  // debugger
   const [openDrawer, setOpenDrawer] = useState(false);
 
   const [modalState, setModalState] = useState(steps[0]);
@@ -120,7 +119,7 @@ const BoardInfoBar = (props) => {
           <TextField
             value={newTitle}
             autoFocus
-            sx={{ bgcolor: "white" }}
+            sx={{ input: { color: "white" } }}
             onBlur={handleEditTitle}
             onKeyDown={handleEditTitle}
             onChange={(e) => setNewTitle(e.target.value)}
@@ -146,7 +145,7 @@ const BoardInfoBar = (props) => {
           <Stack
             direction={"row"}
             alignItems={"start"}
-            justifyContent={'space-between'}
+            justifyContent={"space-between"}
             spacing={6}
             sx={{ mb: 1 }}
           >

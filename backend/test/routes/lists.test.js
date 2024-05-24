@@ -1,18 +1,22 @@
+// Импорт необходимых модулей и зависимостей
 import request from "supertest";
 import app from "../../server.js";
 import Card from "../../models/card.js";
 import List from "../../models/list.js";
 import Board from "../../models/board.js";
 
+// Функция для установки токена аутентификации
 const setAuthToken = async (data) => {
   const response = await request(app).post("/api/auth/login").send(data);
   return response.body.token;
 };
 
+// Группа тестов для маршрутов списков
 describe("List routes", () => {
   let token;
   let boardId;
 
+  // Перед выполнением всех тестов получаем токен аутентификации и идентификатор доски
   beforeAll(async () => {
     token = await setAuthToken({
       email: "dmirshanov@mail.ru",
@@ -25,6 +29,7 @@ describe("List routes", () => {
     boardId = boardResponse.body._id;
   });
 
+  // Тесты для создания, удаления, обновления заголовка, перемещения и копирования списков
   test("Создание нового списка", async () => {
     const title = "New list";
 
@@ -231,6 +236,7 @@ describe("List routes", () => {
     expect(updatedResultList.cards[0].toString()).toBe(cardResponse.body._id);
   });
 
+  // После каждого теста удаляем созданные списки и карточки
   afterEach(async () => {
     await List.deleteMany({
       $or: [
